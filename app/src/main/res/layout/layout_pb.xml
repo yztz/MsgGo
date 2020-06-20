@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="@drawable/bg_tab"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="群发信息中..."
+        android:textColor="@color/colorDark"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+
+    <ProgressBar
+        android:id="@+id/pb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:indeterminate="false"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:progress="0"
+        android:max="100" />
+
+    <top.yzzblog.messagehelper.widgets.ObservableScrollView
+        android:id="@+id/sv_broad"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/tv_broadMsg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/lightDark"
+            android:gravity="center"
+            android:textSize="15sp" />
+
+    </top.yzzblog.messagehelper.widgets.ObservableScrollView>
+
+
+
+</LinearLayout>

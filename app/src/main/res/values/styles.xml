@@ -1,0 +1,41 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="TitleStyleShadowFW">
+        <item name="android:gravity">center</item>
+        <item name="android:shadowColor">@color/lightDark</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Shadow">
+        <item name="android:shadowColor">@color/lightDark</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+    </style>
+
+    <style name="SettingButtonDescription">
+        <item name="android:textColor">@color/lightDark</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="varsStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorDark</item>
+        <item name="android:shadowColor">@color/lightDark</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+    </style>
+</resources>

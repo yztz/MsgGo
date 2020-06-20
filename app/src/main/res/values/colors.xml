@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#22D3FF</color>
+    <color name="colorPrimaryDark">#00B1DD</color>
+    <color name="colorAccent">#000</color>
+    <color name="colorDark">#000</color>
+    <color name="lightDarkWhite">#EEEEEE</color>
+    <color name="skyBule">#22D3FF</color>
+    <color name="darkBule">#00B1DD</color>
+    <color name="lightDark">#888888</color>
+    <color name="white">#fff</color>
+    <color name="msgColor">#F8E7A0</color>
+</resources>

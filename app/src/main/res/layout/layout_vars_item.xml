@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_var"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/tv_var"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="字段"
+        android:textSize="20sp"
+        style="@style/varsStyle"
+        android:gravity="center"
+        android:drawableLeft="@drawable/var"/>
+</LinearLayout>
