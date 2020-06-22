@@ -94,7 +94,7 @@ public class SettingFrag extends Fragment {
         }
     }
 
-    private void showInfo() {
+    public void showInfo() {
         String path = DataLoader.getLastPath();
 
         //设置当前路径显示

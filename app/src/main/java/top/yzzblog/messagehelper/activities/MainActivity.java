@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION = 200;
 
     private ImageView mHome, mSet, mGet;
-    private Fragment home;
-    private Fragment setting;
+    private HomeFrag home;
+    private SettingFrag setting;
     private LoadDialog loadDialog;
 
 
@@ -204,6 +204,8 @@ public class MainActivity extends AppCompatActivity {
                     boolean isSuccessful = intent.getBooleanExtra("isSuccessful", false);
                     if (isSuccessful) {
                         ToastUtil.show(MainActivity.this, "数据加载成功");
+                        //更新设置
+                        setting.showInfo();
                         //清空编辑器
                         DataLoader.setContent("");
                         //若设置为自动进入编辑器
