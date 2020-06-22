@@ -10,17 +10,21 @@ import android.os.Handler;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.daimajia.numberprogressbar.NumberProgressBar;
 
 import top.yzzblog.messagehelper.R;
 import top.yzzblog.messagehelper.widgets.ObservableScrollView;
 
 public class ProgressDialog extends Dialog {
-    private ProgressBar mPb;
+    private NumberProgressBar mPb;
     private TextView mTv;
     private ObservableScrollView mSv;
+    private ImageView mImgClose;
     private Context context;
     private int max;
     private Handler handler = new Handler();
@@ -52,9 +56,15 @@ public class ProgressDialog extends Dialog {
         mPb = findViewById(R.id.pb);
         mTv = findViewById(R.id.tv_broadMsg);
         mSv = findViewById(R.id.sv_broad);
-
+        mImgClose = findViewById(R.id.img_close);
         mPb.setMax(max);
 
+        mImgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
     }
 
     public void update(int progress) {
@@ -62,12 +72,13 @@ public class ProgressDialog extends Dialog {
             mPb.setProgress(progress);
         else{
             mPb.setProgress(progress);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    dismiss();
-                }
-            }, 5000);
+//            handler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dismiss();
+//                }
+//            }, 5000);
+            mImgClose.setVisibility(View.VISIBLE);
         }
     }
 
