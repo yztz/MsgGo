@@ -19,16 +19,17 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.WebViewActivity"></activity>
-        <activity android:name=".activities.ChooserActivity" />
-        <activity android:name=".activities.EditActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.CoverActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.WebViewActivity" />
+        <activity android:name=".activities.ChooserActivity" />
+        <activity android:name=".activities.EditActivity" />
+        <activity android:name=".activities.MainActivity"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -35,7 +35,6 @@ import top.yzzblog.messagehelper.util.ToastUtil;
 import static top.yzzblog.messagehelper.util.FileUtil.getPath;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSION = 200;
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            actionBar.show();
         }
 
         init();

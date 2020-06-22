@@ -11,8 +11,6 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.daimajia.numberprogressbar.NumberProgressBar;
@@ -22,7 +20,7 @@ import top.yzzblog.messagehelper.widgets.ObservableScrollView;
 
 public class ProgressDialog extends Dialog {
     private NumberProgressBar mPb;
-    private TextView mTv;
+    private TextView mTvMsg, mTvTitle;
     private ObservableScrollView mSv;
     private ImageView mImgClose;
     private Context context;
@@ -54,7 +52,8 @@ public class ProgressDialog extends Dialog {
         getWindow().setAttributes(p);
 
         mPb = findViewById(R.id.pb);
-        mTv = findViewById(R.id.tv_broadMsg);
+        mTvMsg = findViewById(R.id.tv_broadMsg);
+        mTvTitle = findViewById(R.id.tv_title);
         mSv = findViewById(R.id.sv_broad);
         mImgClose = findViewById(R.id.img_close);
         mPb.setMax(max);
@@ -78,12 +77,13 @@ public class ProgressDialog extends Dialog {
 //                    dismiss();
 //                }
 //            }, 5000);
+            mTvTitle.setText("发送完成");
             mImgClose.setVisibility(View.VISIBLE);
         }
     }
 
     public void appendMsg(String msg) {
-        mTv.append(msg);
-        if(!mSv.isMoving()) mSv.toBottom();
+        mTvMsg.append(msg);
+        if(!mSv.isTouching()) mSv.toBottom();
     }
 }
