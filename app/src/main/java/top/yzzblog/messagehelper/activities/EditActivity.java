@@ -140,21 +140,21 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 屏蔽返回键
-     *
-     * @param keyCode
-     * @param event
-     * @return
-     */
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        //屏蔽返回键
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    /**
+//     * 屏蔽返回键
+//     *
+//     * @param keyCode
+//     * @param event
+//     * @return
+//     */
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        //屏蔽返回键
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     /**
      * 打开编辑器

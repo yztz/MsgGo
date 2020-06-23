@@ -19,16 +19,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import top.yzzblog.messagehelper.data.DataCleaner;
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.R;
 import top.yzzblog.messagehelper.util.ToastUtil;
 
 public class SettingFrag extends Fragment {
     private Context context;
-    private TextView mTvPath;
+    private TextView mTvPath, mTvCache;
     private EditText mEtMaxLimit;
     private Button mBtnSave;
     private Checkable mCbAutoEditor;
+    private LinearLayout mLinearDelCache;
 
 
 
@@ -46,6 +48,8 @@ public class SettingFrag extends Fragment {
         mEtMaxLimit = view.findViewById(R.id.et_max_limit);
         mBtnSave = view.findViewById(R.id.btn_save);
         mCbAutoEditor = view.findViewById(R.id.cb_auto_enter_editor);
+        mTvCache = view.findViewById(R.id.tv_cache);
+        mLinearDelCache = view.findViewById(R.id.linear_del_cache);
 
         showInfo();
 
@@ -74,6 +78,17 @@ public class SettingFrag extends Fragment {
                 } catch (NumberFormatException e) {
                     ToastUtil.show(context, "保存失败，错误的限制数目");
                 }
+            }
+        });
+
+        //设置缓存按钮监听器
+        mLinearDelCache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DataCleaner.cleanInternalCache(context);
+                showCache();
+
+                ToastUtil.show(context, "缓存已清空~");
             }
         });
     }
@@ -108,6 +123,17 @@ public class SettingFrag extends Fragment {
 
         //设置是否进入编辑器
         mCbAutoEditor.setChecked(DataLoader.autoEnterEditor());
+
+        //显示缓存大小
+        showCache();
+    }
+
+    private void showCache() {
+        try {
+            mTvCache.setText(DataCleaner.getCacheSize(context.getCacheDir()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

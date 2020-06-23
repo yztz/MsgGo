@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/skyBule"
     android:clickable="true"
     android:focusable="true"
@@ -69,10 +69,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-<!--        <CheckBox-->
-<!--            android:id="@+id/cb_auto_enter_editor"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="match_parent" />-->
+        <!--        <CheckBox-->
+        <!--            android:id="@+id/cb_auto_enter_editor"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="match_parent" />-->
 
         <cn.refactor.library.SmoothCheckBox
             android:id="@+id/cb_auto_enter_editor"
@@ -81,7 +81,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="10dp"
             app:color_checked="@color/skyBule"
-            app:duration="100"/>
+            app:duration="100" />
 
     </LinearLayout>
 
@@ -117,6 +117,45 @@
             android:layout_marginLeft="5dp"
             android:background="@null"
             android:inputType="number" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_del_cache"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_tab"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:src="@drawable/clean_cache" />
+
+        <TextView
+
+            style="@style/SettingButtonDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:text="清空缓存" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_cache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="缓存大小" />
     </LinearLayout>
 
     <Button

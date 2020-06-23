@@ -4,7 +4,10 @@ package top.yzzblog.messagehelper.data;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.FileUtils;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -15,16 +18,21 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import top.yzzblog.messagehelper.activities.MainActivity;
 import top.yzzblog.messagehelper.dialog.ChoosePhoneDialog;
 import top.yzzblog.messagehelper.exception.DataLoadFailed;
 import top.yzzblog.messagehelper.services.LoadService;
+import top.yzzblog.messagehelper.util.FileUtil;
+import top.yzzblog.messagehelper.util.ToastUtil;
 
 
 public class DataLoader {
@@ -94,7 +102,7 @@ public class DataLoader {
      * @param path 文件路径
      */
     public static void load(String path, Context context) {
-        //if (path.equals(getLastPath())) return;
+        Log.d("msgD", "开始加载path: " + path);
 
         Intent intent = new Intent(context, LoadService.class);
         intent.putExtra("path", path);
@@ -104,7 +112,8 @@ public class DataLoader {
     public static void __load(String path) throws DataLoadFailed {
         ExcelReader.read(path);
         dataModel = new DataModel(ExcelReader.readExcelContent());
-        setLastPath(path);
+        //清空编辑器
+        setContent("");
     }
 
 
@@ -136,15 +145,22 @@ public class DataLoader {
         }
         spManager.mEditor.apply();
 
-        String last_path = getLastPath();
-        //如果有上次文件加载记录直接加载
-        if (!TextUtils.isEmpty(last_path)) {
-            load(last_path, context);
-        }
-    }
+        Intent intent = ((MainActivity) context).getIntent();
+        String action = intent.getAction();
+        Uri uri = intent.getData();
 
-    public static SharedPreferences getSharedPreference() {
-        return spManager.mSp;
+        if (Intent.ACTION_VIEW.equals(action) && uri != null) {
+            load(FileUtil.getFilePathFromContentUri(context, uri), context);
+        } else {
+            String last_path = getLastPath();
+            //如果有上次文件加载记录且文件存在直接加载
+            if (!TextUtils.isEmpty(last_path)) {
+                if (new File(last_path).exists())
+                    load(last_path, context);
+                else
+                    setLastPath("");
+            }
+        }
     }
 
 

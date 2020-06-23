@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -32,7 +33,7 @@ import top.yzzblog.messagehelper.fragments.SettingFrag;
 import top.yzzblog.messagehelper.services.LoadService;
 import top.yzzblog.messagehelper.util.ToastUtil;
 
-import static top.yzzblog.messagehelper.util.FileUtil.getPath;
+import static top.yzzblog.messagehelper.util.FileUtil.getFilePathFromContentUri;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -115,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
         loadDialog = new LoadDialog(this);
 
         registerReceiver();
-
         DataLoader.init(this);
         initFragment();
 
@@ -140,8 +140,9 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
                 if (data == null || data.getData() == null) return;
-                String path = getPath(this, data.getData());
-                if (TextUtils.isEmpty(path)) return;
+                //String path = getPath(this, data.getData());
+                Log.d("msgD", data.getData().getEncodedPath());
+                String path = getFilePathFromContentUri(this, data.getData());
                 //打开excel文件
                 DataLoader.load(path, this);
 
@@ -204,10 +205,9 @@ public class MainActivity extends AppCompatActivity {
                     boolean isSuccessful = intent.getBooleanExtra("isSuccessful", false);
                     if (isSuccessful) {
                         ToastUtil.show(MainActivity.this, "数据加载成功");
+                        DataLoader.setLastPath(intent.getStringExtra("path"));
                         //更新设置
                         setting.showInfo();
-                        //清空编辑器
-                        DataLoader.setContent("");
                         //若设置为自动进入编辑器
                         if (DataLoader.autoEnterEditor()) {
                             EditActivity.openEditor(context);

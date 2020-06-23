@@ -28,15 +28,16 @@ public class LoadService extends Service {
             public void run() {
                 Intent it;
                 try {
-                    sendBroadcast(true, false);
+                    sendBroadcast(true, false, path);
 
                     DataLoader.__load(path);
 
-                    sendBroadcast(false, true);
+                    sendBroadcast(false, true, path);
                     Log.d("msgD", "数据加载成功");
+                    stopSelf();
                 } catch (DataLoadFailed dataLoadFailed) {
                     Log.d("msgD", "数据加载失败");
-                    sendBroadcast(false, false);
+                    sendBroadcast(false, false, path);
                     stopSelf();
                 }
             }
@@ -45,10 +46,11 @@ public class LoadService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendBroadcast(boolean isLoading, boolean isSuccessful) {
+    private void sendBroadcast(boolean isLoading, boolean isSuccessful, String msg) {
         Intent it = new Intent(LOADING_ACTION);
         it.putExtra("isLoading", isLoading);
         it.putExtra("isSuccessful", isSuccessful);
+        it.putExtra("path", msg);
         sendBroadcast(it);
     }
 }
