@@ -105,6 +105,9 @@ public class DataCleaner {
     private static void deleteFilesByDirectory(File directory) {
         if (directory != null && directory.exists() && directory.isDirectory()) {
             for (File item : directory.listFiles()) {
+                if (item.isDirectory()) {
+                    deleteFilesByDirectory(item);
+                }
                 item.delete();
             }
         }
