@@ -26,6 +26,7 @@ public class CoverActivity extends AppCompatActivity {
                 Intent intent = new Intent(CoverActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(0, R.anim.fade_out);
+                finish();
             }
         }, 1800);
     }
