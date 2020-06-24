@@ -17,7 +17,9 @@
 数据|数据|数据|...
 数据|数据|数据|...
 ...|
-
+## 下载
+[release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)
+[百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ)提取码：emjz
 ## 未来更新计划：
 
 * 号码列记忆功能，不用每次发送都要重新选择了。
