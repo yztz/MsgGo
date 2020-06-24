@@ -18,8 +18,8 @@
 数据|数据|数据|...
 ...|
 ## 下载
-[release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)
-[百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ)提取码：emjz
+[release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)  
+[百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ) 提取码：emjz
 ## 未来更新计划：
 
 * 号码列记忆功能，不用每次发送都要重新选择了。
@@ -28,5 +28,5 @@
 * ~~鉴于时间有限且技术不足，目前暂且不支持第三方文件浏览器打开excel，否则会出现闪退情况，未来考虑会支持。同时也会考虑支持在其他软件中用MsgGo直接导入excel~~（***目前已经支持第三方excel数据文件最直接导入：第三方应用使用选择其他应用打开，选择MsgGoj即可***）
 
 联系qq：781089956  
-BugReport:781089956@qq.com  
+BugReport：781089956@qq.com  
 [个人博客](http://yzzblog.top/)
