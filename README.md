@@ -3,7 +3,7 @@
 
 
 安卓平台上的一款轻量的短信群发App。  
-## features
+## Features
 * 界面美观，交互性良好
 * 基于excel数据格式导入
 * 自动获取短信变量名
@@ -13,7 +13,7 @@
 * 无需指定固定格式，App内指定号码列
 * *第三方应用数据一键导入*
 
-使用步骤：  
+## 基本使用
 1. 导入数据
 2. 编辑短信内容
 3. 选择号码变量
@@ -31,7 +31,7 @@
 ## 下载
 [release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)  
 [百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ) 提取码：emjz
-## 未来更新计划：
+## 未来更新计划
 
 * 号码列记忆功能，不用每次发送都要重新选择了。
 * 发送情况详单，了解到底是谁没收到短信。
