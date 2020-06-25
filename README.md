@@ -16,7 +16,8 @@
 -|-|-|-
 数据|数据|数据|...
 数据|数据|数据|...
-...|
+...|  
+注：（未测试）兼容所有excel格式
 ## 下载
 [release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)  
 [百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ) 提取码：emjz
