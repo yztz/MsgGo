@@ -26,7 +26,6 @@ public class LoadService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Intent it;
                 try {
                     sendBroadcast(true, false, path);
 
