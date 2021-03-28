@@ -27,7 +27,11 @@
 数据|数据|数据|...
 ...|  
   
-注：（未测试）兼容所有excel格式
+注：
+1. （未测试）兼容所有excel格式
+2. ***由于运营商对于群发短息你的限制，请特别注意每次发送短信的数量最好控制在10条左右
+3. ***请注意数据表后方的空数据格子是否去除干净，否则可能会导致导入失败！
+
 ## 下载
 [release](https://github.com/781089956/MsgGo/releases/download/1.1/msgGo.apk)  
 [百度网盘](https://pan.baidu.com/s/1fdnUKfsopAgSQVf3nsxPaQ) 提取码：emjz
