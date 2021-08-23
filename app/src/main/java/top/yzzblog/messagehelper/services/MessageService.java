@@ -40,6 +40,9 @@ public class MessageService extends IntentService {
         } catch (ClassCastException e) {
             e.printStackTrace();
         }
+
+        int delay = DataLoader.getDelay();
+
         for (int i = 1; i <= itemIndices.size(); i++) {
             try {
                 String rawContent = DataLoader.getContent();
@@ -56,7 +59,7 @@ public class MessageService extends IntentService {
 //                it.putExtra("number", phoneNumber);
 //                sendBroadcast(it);
 
-                Thread.sleep(500);
+                Thread.sleep(delay);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

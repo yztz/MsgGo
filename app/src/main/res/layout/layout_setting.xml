@@ -106,10 +106,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
-            android:text="消息单次发送限制(0为无限制): " />
+            android:text="消息发送间隔（毫秒）" />
 
         <EditText
-            android:id="@+id/et_max_limit"
+            android:id="@+id/et_delay"
             style="@style/SettingButtonDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

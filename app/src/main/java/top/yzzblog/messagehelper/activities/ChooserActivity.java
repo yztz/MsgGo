@@ -56,28 +56,28 @@ public class ChooserActivity extends AppCompatActivity {
                 //发送消息
                 ArrayList<Integer> itemIndices = new ArrayList<>();
                 SparseBooleanArray checkedMap = adapter.getCheckedMap();
-                int max_limit = DataLoader.getMaxLimit();
+//                int max_limit = DataLoader.getMaxLimit();
                 //获取选中项目索引
                 for (int i = 0; i < adapter.getItemCount(); i++) {
                     if (checkedMap.get(i)) {
                         itemIndices.add(i);
                     }
                 }
-                //小于等于0表示无限制
+
                 if (itemIndices.size() == 0) {
                     ToastUtil.show(ChooserActivity.this, "当前还未选择任何收件人哦~");
                     return;
                 }
-
-                if (max_limit <= 0 || itemIndices.size() <= max_limit) {
-                    pro = new ProgressDialog(ChooserActivity.this, itemIndices.size());
-                    pro.show();
-                    Intent intent = new Intent(ChooserActivity.this, MessageService.class);
-                    intent.putExtra("itemIndices", itemIndices);
-                    startService(intent);
-                } else {
-                    ToastUtil.show(ChooserActivity.this, "超出了最大人数限制" + max_limit + "了哦~");
-                }
+                //小于等于0表示无限制
+//                if (max_limit <= 0 || itemIndices.size() <= max_limit) {
+                pro = new ProgressDialog(ChooserActivity.this, itemIndices.size());
+                pro.show();
+                Intent intent = new Intent(ChooserActivity.this, MessageService.class);
+                intent.putExtra("itemIndices", itemIndices);
+                startService(intent);
+//                } else {
+//                    ToastUtil.show(ChooserActivity.this, "超出了最大人数限制" + max_limit + "了哦~");
+//                }
 
             }
         });

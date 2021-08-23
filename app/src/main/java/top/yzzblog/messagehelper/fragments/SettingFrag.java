@@ -27,11 +27,10 @@ import top.yzzblog.messagehelper.util.ToastUtil;
 public class SettingFrag extends Fragment {
     private Context context;
     private TextView mTvPath, mTvCache;
-    private EditText mEtMaxLimit;
+    private EditText mEtDelay;
     private Button mBtnSave;
     private Checkable mCbAutoEditor;
     private LinearLayout mLinearDelCache;
-
 
 
     @Nullable
@@ -45,7 +44,7 @@ public class SettingFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTvPath = view.findViewById(R.id.tv_path);
-        mEtMaxLimit = view.findViewById(R.id.et_max_limit);
+        mEtDelay = view.findViewById(R.id.et_delay);
         mBtnSave = view.findViewById(R.id.btn_save);
         mCbAutoEditor = view.findViewById(R.id.cb_auto_enter_editor);
         mTvCache = view.findViewById(R.id.tv_cache);
@@ -61,23 +60,25 @@ public class SettingFrag extends Fragment {
         });
 
 
-
         //设置保存按钮监听
         mBtnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    //保存消息限制数
-                    int limit_num = Integer.parseInt(mEtMaxLimit.getText().toString());
-                    DataLoader.setMaxLimit(limit_num);
-
-                    //保存编辑器是否自动
-                    DataLoader.setAutoEnterEditor(mCbAutoEditor.isChecked());
-
-                    ToastUtil.show(context, "保存成功");
-                } catch (NumberFormatException e) {
-                    ToastUtil.show(context, "保存失败，错误的限制数目");
+//                try {
+                //保存消息发送间隔
+                int delay = Integer.parseInt(mEtDelay.getText().toString());
+                if (delay <= 0) {
+                    ToastUtil.show(context, "保存失败：发送间隔不能小于0");
                 }
+                DataLoader.setDelay(delay);
+
+                //保存编辑器是否自动打开
+                DataLoader.setAutoEnterEditor(mCbAutoEditor.isChecked());
+
+                ToastUtil.show(context, "保存成功");
+//                } catch (Exception e) {
+//                    ToastUtil.show(context, "保存失败");
+//                }
             }
         });
 
@@ -114,12 +115,12 @@ public class SettingFrag extends Fragment {
 
         //设置当前路径显示
         if (TextUtils.isEmpty(path))
-            mTvPath.setText("你还没选择路径呢！");
+            mTvPath.setText("你还没加载文件呢！");
         else
             mTvPath.setText(path);
 
         //显示消息数限制
-        mEtMaxLimit.setText(String.valueOf(DataLoader.getMaxLimit()));
+        mEtDelay.setText(String.valueOf(DataLoader.getDelay()));
 
         //设置是否进入编辑器
         mCbAutoEditor.setChecked(DataLoader.autoEnterEditor());

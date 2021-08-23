@@ -47,11 +47,11 @@ public class DataLoader {
         //消息内容
         DefaultPropMap.put("content", "");
         //一次发送消息条数限制
-        DefaultPropMap.put("max_limit", 3);
+        DefaultPropMap.put("send_delay", 5000);
         //上次数据的记录
         DefaultPropMap.put("last_path", "");
         //加载完成是否自动进入编辑界面
-        DefaultPropMap.put("auto_enter_editor", true);
+        DefaultPropMap.put("auto_enter_editor", false);
     }
 
     public static void askNumberColumn(Context context) {
@@ -68,12 +68,12 @@ public class DataLoader {
         spManager.mEditor.apply();
     }
 
-    public static int getMaxLimit() {
-        return spManager.mSp.getInt("max_limit", 3);
+    public static int getDelay() {
+        return spManager.mSp.getInt("send_delay", 5000);
     }
 
-    public static void setMaxLimit(int num) {
-        spManager.mEditor.putInt("max_limit", num);
+    public static void setDelay(int num) {
+        spManager.mEditor.putInt("send_delay", num);
         spManager.mEditor.apply();
     }
 
@@ -87,7 +87,7 @@ public class DataLoader {
     }
 
     public static boolean autoEnterEditor() {
-        return spManager.mSp.getBoolean("auto_enter_editor", true);
+        return spManager.mSp.getBoolean("auto_enter_editor", false);
     }
 
     public static void setAutoEnterEditor(boolean flag) {
