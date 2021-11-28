@@ -1,8 +1,11 @@
 # MsgGo
+
 ![MsgGo](./app/src/main/res/drawable/icon.png)  
 
-
 安卓平台上的一款轻量的短信群发App。  
+
+![](https://img.shields.io/github/downloads/yztz/MsgGo/total?color=green)
+
 ## Features
 * 界面美观，交互性良好
 * 基于excel数据格式导入
