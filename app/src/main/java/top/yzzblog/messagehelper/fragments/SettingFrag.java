@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.Arrays;
+
 import top.yzzblog.messagehelper.data.DataCleaner;
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.R;
@@ -112,10 +114,10 @@ public class SettingFrag extends Fragment {
 
     public void showInfo() {
         String path = DataLoader.getLastPath();
-
+        path = path.substring(path.indexOf(':') + 1);
         //设置当前路径显示
         if (TextUtils.isEmpty(path))
-            mTvPath.setText("你还没加载文件呢！");
+            mTvPath.setText("啥也没有~");
         else
             mTvPath.setText(path);
 

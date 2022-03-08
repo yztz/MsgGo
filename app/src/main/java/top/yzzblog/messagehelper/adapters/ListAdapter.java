@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.HashMap;
 
-import cn.refactor.library.SmoothCheckBox;
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.data.DataModel;
 import top.yzzblog.messagehelper.R;

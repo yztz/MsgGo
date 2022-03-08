@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
-            android:text="当前路径: " />
+            android:text="当前打开文件" />
 
         <TextView
             android:id="@+id/tv_path"
@@ -37,8 +37,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="end"
             android:layout_marginLeft="5dp"
             android:ellipsize="start"
+            android:text="abdhbdqw"
             android:singleLine="true" />
     </LinearLayout>
 
@@ -74,7 +76,7 @@
         <!--            android:layout_width="wrap_content"-->
         <!--            android:layout_height="match_parent" />-->
 
-        <cn.refactor.library.SmoothCheckBox
+        <top.yzzblog.messagehelper.widgets.SmoothCheckBox
             android:id="@+id/cb_auto_enter_editor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -35,6 +35,5 @@ dependencies {
     implementation files('libs/poi-3.12-android-a.jar')
     implementation files('libs/poi-ooxml-schemas-3.12-20150511-a.jar')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation project(':library')
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
 }

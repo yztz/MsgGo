@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.refactor.library;
+package top.yzzblog.messagehelper.widgets;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
@@ -32,6 +32,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Checkable;
+
+import top.yzzblog.messagehelper.R;
+import top.yzzblog.messagehelper.util.CompatUtils;
 
 /**
  * Author : andy
