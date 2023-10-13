@@ -74,6 +74,6 @@ If this project helps you anyway, would you please give it a little star :) Than
 
 ## END
 
-For any problems on usage or bugs, please contact me at 19052129@hdu.edu.cn
+For any problems on usage or bugs, welcome to issue~
 
 **Solemn reminder: This project is for study only, do not use this software to spread illegal harassment content. the users' behavior and purpose have nothing to do with me!**
