@@ -1,33 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/skyBule"
-    android:orientation="vertical"
-    android:padding="10dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_data"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="0dp">
 
-
-
-    <LinearLayout
-        android:id="@+id/linear_send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@drawable/bg_tab"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp">
-
-        <ImageView
+        <com.google.android.material.appbar.AppBarLayout
+            android:fitsSystemWindows="true"
+            app:liftOnScrollTargetViewId="@id/rv_data"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:scaleType="center"
-            android:src="@drawable/send_small" />
-    </LinearLayout>
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:layout_scrollEffect="compress"
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:title="选择收信人"
+                app:menu="@menu/top_send_menu"
+                app:navigationIcon="@drawable/left" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_data"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <Button
+        android:id="@+id/btn_send"
+        style="?attr/materialIconButtonFilledStyle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="bottom"
+        app:icon="@drawable/send_small"
+        app:iconGravity="textStart" />
+
+
+
 </LinearLayout>

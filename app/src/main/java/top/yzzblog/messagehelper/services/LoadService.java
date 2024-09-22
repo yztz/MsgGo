@@ -23,22 +23,19 @@ public class LoadService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         final String path = intent.getStringExtra("path");
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    sendBroadcast(true, false, path);
+        new Thread(() -> {
+            try {
+                sendBroadcast(true, false, path);
 
-                    DataLoader.__load(path);
+                DataLoader.__load(path);
 
-                    sendBroadcast(false, true, path);
-                    Log.d("msgD", "数据加载成功");
-                    stopSelf();
-                } catch (DataLoadFailed dataLoadFailed) {
-                    Log.d("msgD", "数据加载失败");
-                    sendBroadcast(false, false, path);
-                    stopSelf();
-                }
+                sendBroadcast(false, true, path);
+                Log.d("msgD", "数据加载成功");
+                stopSelf();
+            } catch (DataLoadFailed dataLoadFailed) {
+                Log.d("msgD", "数据加载失败");
+                sendBroadcast(false, false, path);
+                stopSelf();
             }
         }).start();
 

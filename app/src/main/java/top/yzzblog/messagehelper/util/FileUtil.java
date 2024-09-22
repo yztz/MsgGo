@@ -22,15 +22,22 @@ import androidx.loader.content.CursorLoader;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import top.yzzblog.messagehelper.data.Message;
+
 public class FileUtil {
+
+    private static final String TAG = "FileUtil";
 
     public static String getFilePathFromContentUri(Context context, Uri contentUri) {
         String fileName = getFileName(contentUri);
@@ -91,4 +98,37 @@ public class FileUtil {
         return count;
     }
 
+
+    public static String saveMessageArrayToFile(Context context, Message[] messages) {
+        String fileName = "messages_" + System.currentTimeMillis() + ".ser";
+        try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(messages);  // 序列化Message数组
+            Log.d(TAG, "Message array has been serialized to file: " + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return fileName;  // 返回生成的文件名
+    }
+
+    public static Message[] readMessageArrayFromFile(Context context, String fileName) {
+        Message[] messages = null;
+        try (FileInputStream fis = context.openFileInput(fileName);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            messages = (Message[]) ois.readObject();  // 反序列化Message数组
+            Log.d(TAG, "Message array has been deserialized from file: " + fileName);
+
+            // 成功读取后删除文件
+//            boolean isDeleted = context.deleteFile(fileName);
+//            if (isDeleted) {
+//                Log.d(TAG, "File " + fileName + " has been deleted.");
+//            } else {
+//                Log.d(TAG, "Failed to delete file: " + fileName);
+//            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return messages;
+    }
 }

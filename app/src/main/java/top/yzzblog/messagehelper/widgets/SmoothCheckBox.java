@@ -46,6 +46,7 @@ import top.yzzblog.messagehelper.util.CompatUtils;
 
 public class SmoothCheckBox extends View implements Checkable {
     private static final String KEY_INSTANCE_STATE = "InstanceState";
+    private static final String SUPER_INSTANCE_STATE = "SuperInstanceState";
 
     private static final int COLOR_TICK = Color.WHITE;
     private static final int COLOR_UNCHECKED = Color.WHITE;
@@ -139,7 +140,7 @@ public class SmoothCheckBox extends View implements Checkable {
     @Override
     protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_INSTANCE_STATE, super.onSaveInstanceState());
+        bundle.putParcelable(SUPER_INSTANCE_STATE, super.onSaveInstanceState());
         bundle.putBoolean(KEY_INSTANCE_STATE, isChecked());
         return bundle;
     }
@@ -150,7 +151,7 @@ public class SmoothCheckBox extends View implements Checkable {
             Bundle bundle = (Bundle) state;
             boolean isChecked = bundle.getBoolean(KEY_INSTANCE_STATE);
             setChecked(isChecked);
-            super.onRestoreInstanceState(bundle.getParcelable(KEY_INSTANCE_STATE));
+            super.onRestoreInstanceState(bundle.getParcelable(SUPER_INSTANCE_STATE));
             return;
         }
         super.onRestoreInstanceState(state);

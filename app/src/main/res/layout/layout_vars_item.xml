@@ -6,13 +6,16 @@
     android:background="@drawable/bg_var"
     android:gravity="center_horizontal">
 
+    <ImageView
+        android:layout_gravity="center"
+        android:src="@drawable/var"
+        android:layout_width="22sp"
+        android:layout_height="22sp"/>
     <TextView
         android:id="@+id/tv_var"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="字段"
         android:textSize="20sp"
-        style="@style/varsStyle"
-        android:gravity="center"
-        android:drawableLeft="@drawable/var"/>
+        android:gravity="center" />
 </LinearLayout>

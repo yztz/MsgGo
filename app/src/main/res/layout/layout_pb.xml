@@ -38,9 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="消息发送中..."
-            android:textColor="@color/colorDark"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="20sp"/>
 
     </LinearLayout>
 
@@ -73,7 +71,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/lightDark"
             android:textSize="15sp" />
 
     </top.yzzblog.messagehelper.widgets.ObservableScrollView>

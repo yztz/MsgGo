@@ -8,4 +8,8 @@
         <attr name="color_unchecked" format="color"/>
         <attr name="color_unchecked_stroke" format="color"/>
     </declare-styleable>
+
+    <attr name="RadioButton">
+
+    </attr>
 </resources>

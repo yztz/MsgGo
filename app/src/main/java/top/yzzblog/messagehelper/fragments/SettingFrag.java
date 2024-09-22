@@ -19,6 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.android.material.transition.MaterialSharedAxis;
+
 import java.util.Arrays;
 
 import top.yzzblog.messagehelper.data.DataCleaner;
@@ -34,6 +37,16 @@ public class SettingFrag extends Fragment {
     private Checkable mCbAutoEditor;
     private LinearLayout mLinearDelCache;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        MaterialSharedAxis enterTransition = new MaterialSharedAxis(MaterialSharedAxis.X, true);
+        MaterialSharedAxis returnTransition = new MaterialSharedAxis(MaterialSharedAxis.X, false);
+
+        setEnterTransition(enterTransition);
+        setReturnTransition(returnTransition);
+    }
 
     @Nullable
     @Override
@@ -63,25 +76,22 @@ public class SettingFrag extends Fragment {
 
 
         //设置保存按钮监听
-        mBtnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mBtnSave.setOnClickListener(v -> {
 //                try {
-                //保存消息发送间隔
-                int delay = Integer.parseInt(mEtDelay.getText().toString());
-                if (delay <= 0) {
-                    ToastUtil.show(context, "保存失败：发送间隔不能小于0");
-                }
-                DataLoader.setDelay(delay);
+            //保存消息发送间隔
+            int delay = Integer.parseInt(mEtDelay.getText().toString());
+            if (delay <= 0) {
+                ToastUtil.show(context, "保存失败：发送间隔不能小于0");
+            }
+            DataLoader.setDelay(delay);
 
-                //保存编辑器是否自动打开
-                DataLoader.setAutoEnterEditor(mCbAutoEditor.isChecked());
+            //保存编辑器是否自动打开
+            DataLoader.setAutoEnterEditor(mCbAutoEditor.isChecked());
 
-                ToastUtil.show(context, "保存成功");
+            ToastUtil.show(context, "保存成功");
 //                } catch (Exception e) {
 //                    ToastUtil.show(context, "保存失败");
 //                }
-            }
         });
 
         //设置缓存按钮监听器
@@ -111,6 +121,14 @@ public class SettingFrag extends Fragment {
             showInfo();
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        ToastUtil.show(getContext(), "resumed");
+        showInfo();
+    }
+
 
     public void showInfo() {
         String path = DataLoader.getLastPath();

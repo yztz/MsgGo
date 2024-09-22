@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/lightDarkWhite"/>
+            <solid android:color="@color/md_theme_inversePrimary"/>
             <corners android:radius="10dp"/>
         </shape>
     </item>

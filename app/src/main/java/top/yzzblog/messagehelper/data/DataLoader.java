@@ -9,6 +9,8 @@ import android.os.FileUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -28,11 +30,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import top.yzzblog.messagehelper.activities.MainActivity;
-import top.yzzblog.messagehelper.dialog.ChoosePhoneDialog;
 import top.yzzblog.messagehelper.exception.DataLoadFailed;
 import top.yzzblog.messagehelper.services.LoadService;
+import top.yzzblog.messagehelper.services.SMSSender;
 import top.yzzblog.messagehelper.util.FileUtil;
-import top.yzzblog.messagehelper.util.ToastUtil;
 
 
 public class DataLoader {
@@ -46,27 +47,35 @@ public class DataLoader {
     static {
         //消息内容
         DefaultPropMap.put("content", "");
-        //一次发送消息条数限制
-        DefaultPropMap.put("send_delay", 5000);
+        //发送间隔
+        DefaultPropMap.put("send_delay", 3000);
         //上次数据的记录
         DefaultPropMap.put("last_path", "");
         //加载完成是否自动进入编辑界面
         DefaultPropMap.put("auto_enter_editor", false);
+        // sim 卡插槽
+        DefaultPropMap.put("sub_id", SMSSender.getDefaultSubID());
     }
 
-    public static void askNumberColumn(Context context) {
-        ChoosePhoneDialog dialog = new ChoosePhoneDialog(context);
-        dialog.show();
-    }
 
     public static String getContent() {
         return spManager.mSp.getString("content", "");
     }
 
     public static void setContent(String content) {
-        spManager.mEditor.putString("content", content);
+        spManager.mEditor.putString("content", content).apply();
+//        spManager.mEditor.apply();
+    }
+
+    public static int getSimSubId() {
+        return spManager.mSp.getInt("sub_id", 0);
+    }
+
+    public static void setSimSubId(int id) {
+        spManager.mEditor.putInt("sub_id", id);
         spManager.mEditor.apply();
     }
+
 
     public static int getDelay() {
         return spManager.mSp.getInt("send_delay", 5000);
@@ -112,8 +121,9 @@ public class DataLoader {
     public static void __load(String path) throws DataLoadFailed {
         ExcelReader.read(path);
         dataModel = new DataModel(ExcelReader.readExcelContent());
+
         //清空编辑器
-        setContent("");
+        if (!getLastPath().equals(path)) setContent("");
     }
 
 

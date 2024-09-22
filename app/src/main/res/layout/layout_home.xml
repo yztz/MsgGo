@@ -2,66 +2,64 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/skyBule"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clickable="true"
     android:focusable="true"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="10dp">
 
-    <LinearLayout
-        android:id="@+id/linear_send"
+
+    <!--    <Button-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:text="选择 SIM 卡"-->
+<!--        android:background="@drawable/bg_send"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"/>-->
+
+<!--    <in.goodiebag.carouselpicker.CarouselPicker-->
+<!--        android:id="@+id/carousel"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="#CCC"-->
+<!--        app:items_visible="three" />-->
+
+    <Button
+        android:id="@+id/send_btn"
+        style="@style/Widget.Material3.Button.ElevatedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_send"
-        android:orientation="vertical"
-        android:padding="30dp">
+        android:text="发  送"
+        android:textSize="30sp"
+        app:iconGravity="textStart" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="center"
-            android:src="@drawable/send" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:text="发  送"
-            android:textColor="@color/colorDark"
-            android:textSize="28sp" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:gravity="center"
-        android:id="@+id/linear_edit"
+    <Button
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        android:id="@+id/sim_btn"
+        android:layout_marginTop="10dp"
+        app:icon="@drawable/sim"
+        app:iconGravity="textStart"
+        android:text="选 择 SIM 卡"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_send"
-        android:layout_marginTop="20dp"
-        android:padding="10dp">
+        android:textSize="23sp"/>
 
 
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:scaleType="center"
-            android:src="@drawable/edit_main" />
+    <Button
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+        android:id="@+id/edit_btn"
+        android:layout_marginTop="10dp"
+        app:icon="@drawable/edit_main"
+        app:iconGravity="textStart"
+        android:text="编 辑 短 信"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="23sp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="编 辑 短 信"
-            android:textColor="@color/colorDark"
-            android:textSize="24sp" />
-
-    </LinearLayout>
 
 
 </LinearLayout>

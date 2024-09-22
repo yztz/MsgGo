@@ -11,8 +11,6 @@
         android:id="@+id/tv_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/TitleStyleShadowFW"
-        android:textColor="@color/colorDark"
         android:text="加载中..."/>
 
     <ProgressBar

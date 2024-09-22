@@ -7,19 +7,32 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.R;
 
 
-public class VarAdapter extends RecyclerView.Adapter<VarAdapter.MyViewHolder> {
+public class VarAdapter extends ListAdapter<String, VarAdapter.MyViewHolder> {
     private Context context;
-    IOnClickListener listener;
+//    IOnClickListener listener;
 
-    public VarAdapter(Context context, IOnClickListener l) {
+    public VarAdapter(Context context) {
+        super(new DiffUtil.ItemCallback<String>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+                return oldItem.equals(newItem);
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
         this.context = context;
-        this.listener = l;
+//        this.listener = l;
     }
 
     @NonNull
@@ -31,15 +44,15 @@ public class VarAdapter extends RecyclerView.Adapter<VarAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         holder.mTvVar.setText(DataLoader.getTitles()[position]);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.perform(position);
-                }
-
-            }
-        });
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (listener != null) {
+//                    listener.perform(position);
+//                }
+//
+//            }
+//        });
     }
 
 
@@ -48,7 +61,7 @@ public class VarAdapter extends RecyclerView.Adapter<VarAdapter.MyViewHolder> {
         return DataLoader.getTitles().length;
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView mTvVar;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -57,7 +70,7 @@ public class VarAdapter extends RecyclerView.Adapter<VarAdapter.MyViewHolder> {
         }
     }
 
-    public interface IOnClickListener {
-        void perform(int position);
-    }
+//    public interface IOnClickListener {
+//        void perform(int position);
+//    }
 }

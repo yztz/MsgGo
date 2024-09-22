@@ -1,5 +1,6 @@
 package top.yzzblog.messagehelper.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,21 +9,32 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.transition.TransitionManager;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
 
 
 import top.yzzblog.messagehelper.R;
@@ -31,94 +43,121 @@ import top.yzzblog.messagehelper.dialog.LoadDialog;
 import top.yzzblog.messagehelper.fragments.HomeFrag;
 import top.yzzblog.messagehelper.fragments.SettingFrag;
 import top.yzzblog.messagehelper.services.LoadService;
+import top.yzzblog.messagehelper.services.SMSSender;
+import top.yzzblog.messagehelper.util.Config;
 import top.yzzblog.messagehelper.util.ToastUtil;
 
 import static top.yzzblog.messagehelper.util.FileUtil.getFilePathFromContentUri;
 
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.transition.MaterialFade;
+import com.kongzue.dialogx.DialogX;
+
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final int REQUEST_PERMISSION = 200;
-
-    private ImageView mHome, mSet, mGet;
+    private static final String TAG = "MainActivity";
+//    private ImageView mHome, mSet, mGet;
     private HomeFrag home;
     private SettingFrag setting;
-    private LoadDialog loadDialog;
+//    private LoadDialog loadDialog;
+    private TextSwitcher mTitle;
+    private BottomNavigationView nMenu;
+    private LinearProgressIndicator indicator;
 
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: ");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart: ");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(TAG, "onRestoreInstanceState: ");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
+//        DynamicColors.applyToActivitiesIfAvailable(getApplication());
         setContentView(R.layout.activity_main);
+        nMenu = findViewById(R.id.bottom_navigation);
+        mTitle = findViewById(R.id.title);
+        indicator = findViewById(R.id.progress);
+        mTitle.setInAnimation(this, R.anim.fade_in);
+        mTitle.setOutAnimation(this, R.anim.fade_out);
+//        loadDialog = new LoadDialog(this);
+        DialogX.init(this);
+        initImporter();
 
-        //申请权限
-        requestPermission();
 
-        //更换标题栏
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            View actionbarView = LayoutInflater.from(this).inflate(R.layout.layout_main_action_bar, new ConstraintLayout(this), false);
-            actionBar.setCustomView(actionbarView);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Toolbar parent = (Toolbar) actionbarView.getParent();
-                parent.setContentInsetsAbsolute(0, 0);
-            }
-
-            ImageView mImgHelp = actionbarView.findViewById(R.id.img_help);
-            mImgHelp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
-                    startActivity(intent);
-                }
-            });
-            actionBar.show();
+        if (SMSSender.getSubs(this).isEmpty()) {
+            ToastUtil.show(this, "没发现可用于发送短信的 SIM 卡，即将退出");
+            finish(); // 退出应用
         }
-
-        init();
-
-        mGet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //打开文件浏览器
-                openFileChooser();
-            }
-        });
-
-        //fragment的切换
-        mHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().hide(setting).show(home).commitAllowingStateLoss();
-
-            }
-        });
-
-        mSet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().hide(home).show(setting).commitAllowingStateLoss();
-
-            }
-        });
 
     }
 
-    /**
-     * 全局初始化
-     */
-    private void init() {
-        mHome = findViewById(R.id.go_send);
-        mSet = findViewById(R.id.go_setting);
-        mGet = findViewById(R.id.go_get);
-        loadDialog = new LoadDialog(this);
+
+    @SuppressLint("RestrictedApi")
+    private void initImporter() {
+        BottomNavigationMenuView menuView = (BottomNavigationMenuView) nMenu.getChildAt(0);
+        View centerButton = menuView.getChildAt(1);
+        BottomNavigationItemView itemView = (BottomNavigationItemView) centerButton;
+        itemView.setShifting(false);
+        itemView.setCheckable(false);
+        itemView.setOnClickListener(_view -> {
+            openFileChooser();
+        });
 
         registerReceiver();
         DataLoader.init(this);
         initFragment();
-
     }
 
     /**
@@ -128,10 +167,30 @@ public class MainActivity extends AppCompatActivity {
         home = new HomeFrag();
         setting = new SettingFrag();
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.fl_container, setting, "setting");
-        transaction.hide(setting).add(R.id.fl_container, home, "home");
-        transaction.commitAllowingStateLoss();
+        mTitle.setText("送 信");
+        loadFragment(home);
+
+        nMenu.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            switch (item.getItemId()) {
+                case R.id.nav_home:
+                    mTitle.setText("送 信");
+                    selectedFragment = home;
+                    break;
+                case R.id.nav_settings:
+                    mTitle.setText("設 定");
+                    selectedFragment = setting;
+                    break;
+            }
+            if (selectedFragment != null) {
+                loadFragment(selectedFragment);
+            }
+            return true;
+        });
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.add(R.id.fl_container, setting, "setting");
+//        transaction.hide(setting).add(R.id.fl_container, home, "home");
+//        transaction.commitAllowingStateLoss();
     }
 
     @Override
@@ -141,7 +200,9 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if (data == null || data.getData() == null) return;
                 //String path = getPath(this, data.getData());
-                Log.d("msgD", data.getData().getEncodedPath());
+                Uri uri = data.getData();
+//                Log.d("msgD", "onActivityResult: "+ uri.toString()+ " " + uri.getLastPathSegment()+ " " +uri.getPath());
+                Log.d("msgD", uri.getEncodedPath());
                 String path = getFilePathFromContentUri(this, data.getData());
                 //打开excel文件
                 DataLoader.load(path, this);
@@ -151,26 +212,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-    }
-
-    /**
-     * 请求权限
-     */
-    private void requestPermission() {
-        String[] PERMISSIONS_STORAGE = {
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.SEND_SMS
-        };
-        int checkExternalStorage = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int checkSMS = ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        if (checkSMS != PackageManager.PERMISSION_GRANTED || checkExternalStorage != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_PERMISSION
-            );
-        }
     }
 
     /**
@@ -198,16 +239,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 boolean isLoading = intent.getBooleanExtra("isLoading", false);
-                if (isLoading)
-                    loadDialog.show();
-                else {
-                    loadDialog.dismiss();
+                if (isLoading && !indicator.isShown()) {
+                    indicator.show();
+                } else if (!isLoading) {
+                    if (indicator.isShown()) {
+                        indicator.hide();
+                    }
+//                    loadDialog.dismiss();
                     boolean isSuccessful = intent.getBooleanExtra("isSuccessful", false);
                     if (isSuccessful) {
                         ToastUtil.show(MainActivity.this, "数据加载成功");
                         DataLoader.setLastPath(intent.getStringExtra("path"));
                         //更新设置
-                        setting.showInfo();
+//                        setting.showInfo();
                         //若设置为自动进入编辑器
                         if (DataLoader.autoEnterEditor()) {
                             EditActivity.openEditor(context);

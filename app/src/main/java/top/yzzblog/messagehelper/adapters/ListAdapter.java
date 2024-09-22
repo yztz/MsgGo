@@ -51,7 +51,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
         holder.mCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                checkedMap.put(position, isChecked);
+                checkedMap.put(holder.getAdapterPosition(), isChecked);
             }
         });
         holder.mCb.setChecked(checkedMap.get(position));

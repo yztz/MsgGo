@@ -12,8 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="选择号码列"
-        style="@style/TitleStyleShadowFW"
-        android:textColor="@color/colorDark"/>
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_vars"
         android:layout_width="match_parent"

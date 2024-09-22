@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="主页"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/import_btn"
+        android:icon="@drawable/add"
+        android:checkable="true"
+        android:title="导入"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/setting"
+        android:title="设置"
+        app:showAsAction="ifRoom" />
+</menu>

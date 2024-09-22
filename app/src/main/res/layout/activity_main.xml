@@ -1,61 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/skyBule"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+<!--    <TextView-->
+<!--        android:id="@+id/title"-->
+<!--        android:layout_marginLeft="23dp"-->
+<!--        style="?attr/textAppearanceDisplayLarge"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="start"-->
+<!--        android:transitionName="@string/material_motion_easing_linear"-->
+<!--        android:text="送 信"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/fragment_container"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
+    <TextSwitcher
+        android:id="@+id/title"
+        android:layout_marginLeft="23dp"
+        style="?attr/textAppearanceDisplayLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:transitionName="@string/material_motion_easing_linear"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fragment_container"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            style="@style/TextAppearance.Msggo.DisplayLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            style="@style/TextAppearance.Msggo.DisplayLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </TextSwitcher>
+
+    <!-- Fragment container -->
     <FrameLayout
-        android:id="@+id/fl_container"
-        android:layout_width="match_parent"
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="8" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintBottom_toTopOf="@id/progress" />
 
-    <LinearLayout
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        android:layout_marginTop="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:indeterminate="true"
+        app:hideAnimationBehavior="inward"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation" />
 
-        android:orientation="horizontal">
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:labelVisibilityMode="unlabeled"
+        android:layout_marginTop="16dp"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
 
-        <ImageView
-            android:id="@+id/go_send"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
-            android:background="@drawable/bg_tab"
-            android:src="@drawable/home"
-            android:gravity="center"
-            android:scaleType="center"
-             />
-
-
-        <ImageView
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:id="@+id/go_get"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/add"
-            android:scaleType="center"
-            android:layout_weight="3"
-            android:background="@drawable/bg_tab"
-            android:gravity="center" />
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 
-        <ImageView
-            android:id="@+id/go_setting"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
-            android:gravity="center"
-            android:src="@drawable/setting"
-            android:scaleType="center"
-            android:background="@drawable/bg_tab" />
-
-    </LinearLayout>
-
-</LinearLayout>
+    <!-- Floating Action Button -->
+</androidx.constraintlayout.widget.ConstraintLayout>

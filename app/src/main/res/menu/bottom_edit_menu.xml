@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/btn_var"
+        android:icon="@drawable/var"
+        android:title="魔法变量"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/btn_clear"
+        android:icon="@drawable/trash"
+        android:title="清空内容"
+        app:showAsAction="ifRoom"/>
+
+<!--    <item-->
+<!--        android:id="@+id/rotation"-->
+<!--        android:icon="@drawable/ic_3d_rotation_24px"-->
+<!--        android:title="@string/rotation"-->
+<!--        android:contentDescription="@string/content_description_rotation"-->
+<!--        app:showAsAction="ifRoom"/>-->
+
+<!--    <item-->
+<!--        android:id="@+id/dashboard"-->
+<!--        android:icon="@drawable/ic_dashboard_24px"-->
+<!--        android:title="@string/dashboard"-->
+<!--        android:contentDescription="@string/content_description_dashboard"-->
+<!--        app:showAsAction="ifRoom"/>-->
+</menu>
