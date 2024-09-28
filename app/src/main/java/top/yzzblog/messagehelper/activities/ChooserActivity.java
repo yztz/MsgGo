@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -19,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.SparseBooleanArray;
@@ -184,10 +186,16 @@ public class ChooserActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (receiver != null) {
-            unregisterReceiver(receiver);
-            receiver = null;
-        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unRegisterReceiver();
+    }
+
+    private void unRegisterReceiver(){
+        unregisterReceiver(receiver);
     }
 
     private void registerReceiver() {
@@ -213,7 +221,11 @@ public class ChooserActivity extends AppCompatActivity {
             }
         };
 
-        registerReceiver(receiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(receiver, filter);
+        }
         this.receiver = receiver;
 
 

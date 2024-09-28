@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.transition.TransitionManager;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private TextSwitcher mTitle;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
+    private BroadcastReceiver loadReceiver;
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -81,12 +83,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        registerReceiver();
         Log.d(TAG, "onStart: ");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        unRegisterReceiver();
         Log.d(TAG, "onStop: ");
     }
 
@@ -155,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
             openFileChooser();
         });
 
-        registerReceiver();
         DataLoader.init(this);
         initFragment();
     }
@@ -230,12 +233,16 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, 1);
     }
 
+    private void unRegisterReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(loadReceiver);
+    }
+
     /**
      * 注册广播接收器
      */
     private void registerReceiver() {
         IntentFilter filter = new IntentFilter(LoadService.LOADING_ACTION);
-        registerReceiver(new BroadcastReceiver() {
+        loadReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 boolean isLoading = intent.getBooleanExtra("isLoading", false);
@@ -261,7 +268,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }, filter);
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(loadReceiver, filter);
     }
 }
 

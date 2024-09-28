@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.exception.DataLoadFailed;
@@ -47,6 +48,7 @@ public class LoadService extends Service {
         it.putExtra("isLoading", isLoading);
         it.putExtra("isSuccessful", isSuccessful);
         it.putExtra("path", msg);
-        sendBroadcast(it);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(it);
+//        sendBroadcast(it);
     }
 }

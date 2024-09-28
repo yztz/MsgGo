@@ -31,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.List;
 
 import top.yzzblog.messagehelper.data.Message;
@@ -64,7 +65,7 @@ public class FileUtil {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(srcUri);
             if (inputStream == null) return;
-            OutputStream outputStream = new FileOutputStream(dstFile);
+            OutputStream outputStream = Files.newOutputStream(dstFile.toPath());
             copyStream(inputStream, outputStream);
             inputStream.close();
             outputStream.close();
