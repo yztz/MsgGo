@@ -28,6 +28,7 @@ public class CoverActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION = 200;
     private String[] permissions = new String[] {
             Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.POST_NOTIFICATIONS,
 //            Manifest.permission.WRITE_EXTERNAL_STORAGE,
 //            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.SEND_SMS
@@ -79,6 +80,7 @@ public class CoverActivity extends AppCompatActivity {
             }
         }
         if (!permissionsToRequest.isEmpty()) {
+            Log.d("Permissions", "开始请求权限");
             ActivityCompat.requestPermissions(this,
                     permissionsToRequest.toArray(new String[0]), REQUEST_PERMISSION);
         } else {

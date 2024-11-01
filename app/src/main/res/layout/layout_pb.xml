@@ -75,4 +75,14 @@
 
     </top.yzzblog.messagehelper.widgets.ObservableScrollView>
 
+    <Button
+        style="@style/Widget.Material3.Button.TextButton"
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:text="取  消  发  送"
+        android:textSize="20sp" />
+
+
 </LinearLayout>

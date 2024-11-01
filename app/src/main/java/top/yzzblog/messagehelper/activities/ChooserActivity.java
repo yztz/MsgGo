@@ -1,14 +1,11 @@
 package top.yzzblog.messagehelper.activities;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -23,25 +20,15 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.apache.poi.util.ArrayUtil;
-
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,15 +37,15 @@ import top.yzzblog.messagehelper.adapters.ListAdapter;
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.data.Message;
 import top.yzzblog.messagehelper.dialog.ProgressDialog;
-import top.yzzblog.messagehelper.services.MessageWorker;
+import top.yzzblog.messagehelper.services.MessageService;
 import top.yzzblog.messagehelper.services.SMSSender;
 import top.yzzblog.messagehelper.util.Config;
 import top.yzzblog.messagehelper.util.FileUtil;
 import top.yzzblog.messagehelper.util.TextParser;
 import top.yzzblog.messagehelper.util.ToastUtil;
-import top.yzzblog.messagehelper.util.Utils;
 
 public class ChooserActivity extends AppCompatActivity {
+    private static final String TAG = "ChooserActivity";
     private RecyclerView mRv;
     private Button mSend;
     private ProgressDialog pro;
@@ -100,7 +87,9 @@ public class ChooserActivity extends AppCompatActivity {
 
 
             pro = new ProgressDialog(ChooserActivity.this, itemIndices.size());
-            pro.show();
+            runOnUiThread(()->{
+                pro.show();
+            });
 
             String rawContent = DataLoader.getContent();
             String numberCol = DataLoader.getNumberColumn();
@@ -121,16 +110,22 @@ public class ChooserActivity extends AppCompatActivity {
                 return;
             }
 
-            Data inputData = new Data.Builder()
-                    .putInt("delay", DataLoader.getDelay())
-                    .putInt("subId", DataLoader.getSimSubId())
-                    .putString("message_file", serPath)
-                    .build();
+            Intent serviceIntent = new Intent(this, MessageService.class);
+            serviceIntent.putExtra("delay", DataLoader.getDelay());  // 延迟时间
+            serviceIntent.putExtra("subId", DataLoader.getSimSubId());  // SIM卡ID
+            serviceIntent.putExtra("message_file", serPath);  // 消息文件路径
 
-            OneTimeWorkRequest messageWorkRequest = new OneTimeWorkRequest.Builder(MessageWorker.class)
-                    .setInputData(inputData).addTag(Config.SEND_WORKER_TAG)
-                    .build();
-            WorkManager.getInstance(ChooserActivity.this).enqueue(messageWorkRequest);
+            ContextCompat.startForegroundService(this, serviceIntent);
+//            Data inputData = new Data.Builder()
+//                    .putInt("delay", DataLoader.getDelay())
+//                    .putInt("subId", DataLoader.getSimSubId())
+//                    .putString("message_file", serPath)
+//                    .build();
+
+//            OneTimeWorkRequest messageWorkRequest = new OneTimeWorkRequest.Builder(MessageService.class)
+//                    .setInputData(inputData).addTag(Config.SEND_WORKER_TAG)
+//                    .build();
+//            WorkManager.getInstance(ChooserActivity.this).enqueue(messageWorkRequest);
 //                } else {
 //                    ToastUtil.show(ChooserActivity.this, "超出了最大人数限制" + max_limit + "了哦~");
 //                }
@@ -186,12 +181,16 @@ public class ChooserActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        unRegisterReceiver();
+        stopService(new Intent(this, MessageService.class));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unRegisterReceiver();
+        Log.d(TAG, "onStop: ");
+
     }
 
     private void unRegisterReceiver(){
@@ -204,8 +203,10 @@ public class ChooserActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int code = intent.getIntExtra("code", -1);
-                switch (getResultCode()) {
+                int resultCode = getResultCode();
+                switch (resultCode) {
                     case Activity.RESULT_OK:
+                        Log.d(TAG, "onReceive: 第" + code + "条 发送成功");
                         pro.appendMsg("第" + code + "条 发送成功\n");
                         pro.update(code);
                         break;
@@ -214,6 +215,8 @@ public class ChooserActivity extends AppCompatActivity {
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
 
                     case SmsManager.RESULT_ERROR_NULL_PDU:
+                    default:
+                        Log.d(TAG, "onReceive: 第" + code + "条 发送失败: " + resultCode);
                         pro.appendMsg("第" + code + "条 发送失败\n");
                         pro.update(code);
                         break;

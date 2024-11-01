@@ -49,7 +49,7 @@ public class HomeFrag extends Fragment {
     private Button mBtnEdit;
     private TextSwitcher mTitle;
     private List<SubscriptionInfo> subs;
-    private int simSubId = DataLoader.getSimSubId();
+    private int simSubId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +90,7 @@ public class HomeFrag extends Fragment {
         mBtnSend = view.findViewById(R.id.send_btn);
         mBtnEdit = view.findViewById(R.id.edit_btn);
         simBtn = view.findViewById(R.id.sim_btn);
+        simSubId = DataLoader.getSimSubId();
 //        mTitle = view.findViewById(R.id.title);
 
 
