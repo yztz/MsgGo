@@ -1,4 +1,9 @@
 <resources>
+    <!-- Common colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    
+    <!-- Material 3 Theme Colors -->
     <color name="md_theme_primary">#824C76</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_primaryContainer">#FFD7F1</color>

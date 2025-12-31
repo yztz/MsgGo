@@ -1,57 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:fitsSystemWindows="true"
-            app:liftOnScrollTargetViewId="@id/rv_data"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            app:liftOnScrollTargetViewId="@id/rv_data">
 
             <com.google.android.material.appbar.MaterialToolbar
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:layout_scrollEffect="compress"
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                app:title="选择收信人"
                 app:menu="@menu/top_send_menu"
-                app:navigationIcon="@drawable/left" />
+                app:navigationIcon="@drawable/left"
+                app:title="预览与发送" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_data"
-            android:padding="10dp"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+            <!-- Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                style="?attr/materialCardViewFilledStyle">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:baselineAligned="false">
+
+                    <!-- File Info -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_file"
+                            app:tint="?attr/colorPrimary"/>
+                        <TextView
+                            android:id="@+id/tv_file_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Data.xlsx"
+                            style="?attr/textAppearanceTitleSmall"
+                            android:maxLines="1"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+
+                    <!-- Divider/Space -->
+                    <Space
+                        android:layout_width="16dp"
+                        android:layout_height="wrap_content"/>
+
+                    <!-- SIM Info -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/sim"
+                            app:tint="?attr/colorPrimary"/>
+                        <TextView
+                            android:id="@+id/tv_sim_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="SIM 1"
+                            style="?attr/textAppearanceBodyMedium"
+                            android:maxLines="1"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                style="?attr/materialCardViewFilledStyle">
+                <!-- Table Header & List -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <!-- Main Data Table (Scrollable) -->
+                <HorizontalScrollView
+                    android:id="@+id/hsv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fillViewport="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <!-- Header Row -->
+                        <LinearLayout
+                            android:id="@+id/header_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="?attr/colorSurfaceContainer"
+                            android:paddingVertical="8dp">
+
+                            <LinearLayout
+                                android:id="@+id/layout_header"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"/>
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_data"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/listDivider"/>
+
+                <!-- Fixed Checkbox Column -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <!-- Select All Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingVertical="8dp"
+                        android:background="?attr/colorSurfaceContainer">
+                        <CheckBox
+                            android:id="@+id/cb_select_all"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minWidth="32dp"
+                            android:minHeight="32dp"/>
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_checkbox"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            
+        </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_send"
-        style="?attr/materialIconButtonFilledStyle"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="10dp"
+        android:layout_height="56dp"
         android:layout_gravity="bottom"
+        android:layout_margin="24dp"
+        android:elevation="4dp"
+        app:cornerRadius="28dp"
         app:icon="@drawable/send_small"
-        app:iconGravity="textStart" />
-
-
+        app:iconGravity="textStart"
+        android:text="立即发送"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
 
 </LinearLayout>

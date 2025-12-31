@@ -1,9 +1,11 @@
 package top.yzzblog.messagehelper.activities;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -124,6 +126,26 @@ public class EditActivity extends AppCompatActivity {
 //        //分割线
 //        mRv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 //        mRv.setAdapter(adapter);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (edited) {
+                    new MaterialAlertDialogBuilder(EditActivity.this)
+                            .setTitle("您的编辑尚未保存哦")
+                            .setMessage("确定不保存就离开吗？")
+                            .setPositiveButton("确定", (dialog, which) -> {
+                                setEnabled(false); // 禁用此回调
+                                getOnBackPressedDispatcher().onBackPressed(); // 触发系统默认退出
+                            })
+                            .setNegativeButton("取消", null)
+                            .show();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     /**
@@ -138,30 +160,25 @@ public class EditActivity extends AppCompatActivity {
         Pattern p = Pattern.compile("\\$\\{(.*?)\\}");
         Matcher m = p.matcher(temp);
         while (m.find()) {
-            span = new ForegroundColorSpan(getResources().getColor(R.color.md_theme_primary));
+            span = new ForegroundColorSpan(ContextCompat.getColor(this, R.color.md_theme_primary));
             s.setSpan(span, m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && edited) {
-            new MaterialAlertDialogBuilder(this).setTitle("您的编辑尚未保存哦")
-                    .setMessage("确定不保存就离开吗？")
-                    .setPositiveButton("确定", (dialog, which) -> {
-                        dialog.dismiss();
-                        finish();
-                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK && edited) {
+//            new MaterialAlertDialogBuilder(this).setTitle("您的编辑尚未保存哦")
+//                    .setMessage("确定不保存就离开吗？")
+//                    .setPositiveButton("确定", (dialog, which) -> {
+//                        dialog.dismiss();
+//                        finish();
+//                    }).setNegativeButton("取消", (dialog, which) -> dialog.dismiss()).show();
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     /**
      * 打开编辑器

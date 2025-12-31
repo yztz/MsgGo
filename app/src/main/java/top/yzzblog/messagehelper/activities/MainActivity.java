@@ -1,51 +1,31 @@
 package top.yzzblog.messagehelper.activities;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.transition.TransitionManager;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.webkit.WebView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextSwitcher;
-import android.widget.TextView;
-
 
 import top.yzzblog.messagehelper.R;
 import top.yzzblog.messagehelper.data.DataLoader;
-import top.yzzblog.messagehelper.dialog.LoadDialog;
 import top.yzzblog.messagehelper.fragments.HomeFrag;
 import top.yzzblog.messagehelper.fragments.SettingFrag;
 import top.yzzblog.messagehelper.services.LoadService;
 import top.yzzblog.messagehelper.services.SMSSender;
-import top.yzzblog.messagehelper.util.Config;
 import top.yzzblog.messagehelper.util.ToastUtil;
 
 import static top.yzzblog.messagehelper.util.FileUtil.getFilePathFromContentUri;
@@ -53,26 +33,29 @@ import static top.yzzblog.messagehelper.util.FileUtil.getFilePathFromContentUri;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.color.DynamicColors;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.google.android.material.transition.MaterialFade;
-import com.kongzue.dialogx.DialogX;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-//    private ImageView mHome, mSet, mGet;
+    private static final int REQUEST_PERMISSION = 200;
+    private final String[] permissions = new String[]{
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.SEND_SMS
+    };
+
     private HomeFrag home;
     private SettingFrag setting;
-//    private LoadDialog loadDialog;
     private TextSwitcher mTitle;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
-    private BroadcastReceiver loadReceiver;
+    private String lastProcessedPath = null;
+
+    private ActivityResultLauncher<Intent> excelPickerLauncher;
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -83,15 +66,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver();
         Log.d(TAG, "onStart: ");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unRegisterReceiver();
-        Log.d(TAG, "onStop: ");
     }
 
     @Override
@@ -113,36 +88,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "onRestart: ");
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.d(TAG, "onRestoreInstanceState: ");
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION) {
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                initApp();
+            } else {
+                ToastUtil.show(this, "权限被拒绝，应用将退出");
+                finish();
+            }
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
-//        DynamicColors.applyToActivitiesIfAvailable(getApplication());
+        excelPickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        Uri uri = data.getData();
+                        if (uri != null) {
+                            Log.d(TAG, "File URI: " + uri.getEncodedPath());
+                            // 调用你原来的路径转换和加载工具
+                            String path = getFilePathFromContentUri(this, uri);
+                            DataLoader.load(path, this);
+                        }
+                    }
+                }
+        );
         setContentView(R.layout.activity_main);
+        observeLoadStatus();
         nMenu = findViewById(R.id.bottom_navigation);
         mTitle = findViewById(R.id.title);
         indicator = findViewById(R.id.progress);
         mTitle.setInAnimation(this, R.anim.fade_in);
         mTitle.setOutAnimation(this, R.anim.fade_out);
-//        loadDialog = new LoadDialog(this);
-        DialogX.init(this);
+//        DialogX.init(this);
+
+        // Check permissions
+        List<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
+            }
+        }
+        if (!permissionsToRequest.isEmpty()) {
+            Log.d(TAG, "Requesting permissions");
+            ActivityCompat.requestPermissions(this,
+                    permissionsToRequest.toArray(new String[0]), REQUEST_PERMISSION);
+        } else {
+            initApp();
+        }
+    }
+
+    private void initApp() {
         initImporter();
-
-
         if (SMSSender.getSubs(this).isEmpty()) {
             ToastUtil.show(this, "没发现可用于发送短信的 SIM 卡，即将退出");
-            finish(); // 退出应用
+            finish();
         }
 
     }
@@ -151,13 +164,11 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("RestrictedApi")
     private void initImporter() {
         BottomNavigationMenuView menuView = (BottomNavigationMenuView) nMenu.getChildAt(0);
-        View centerButton = menuView.getChildAt(1);
+        android.view.View centerButton = menuView.getChildAt(1);
         BottomNavigationItemView itemView = (BottomNavigationItemView) centerButton;
         itemView.setShifting(false);
         itemView.setCheckable(false);
-        itemView.setOnClickListener(_view -> {
-            openFileChooser();
-        });
+        itemView.setOnClickListener(_view -> openFileChooser());
 
         DataLoader.init(this);
         initFragment();
@@ -175,47 +186,32 @@ public class MainActivity extends AppCompatActivity {
 
         nMenu.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    mTitle.setText("送 信");
-                    selectedFragment = home;
-                    break;
-                case R.id.nav_settings:
-                    mTitle.setText("設 定");
-                    selectedFragment = setting;
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                mTitle.setText("送 信");
+                selectedFragment = home;
+            } else if (itemId == R.id.nav_settings) {
+                mTitle.setText("設 定");
+                selectedFragment = setting;
             }
             if (selectedFragment != null) {
                 loadFragment(selectedFragment);
             }
             return true;
         });
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.add(R.id.fl_container, setting, "setting");
-//        transaction.hide(setting).add(R.id.fl_container, home, "home");
-//        transaction.commitAllowingStateLoss();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case 1:
-                if (data == null || data.getData() == null) return;
-                //String path = getPath(this, data.getData());
-                Uri uri = data.getData();
-//                Log.d("msgD", "onActivityResult: "+ uri.toString()+ " " + uri.getLastPathSegment()+ " " +uri.getPath());
-                Log.d("msgD", uri.getEncodedPath());
-                String path = getFilePathFromContentUri(this, data.getData());
-                //打开excel文件
-                DataLoader.load(path, this);
-
-                break;
-            default:
-                break;
-        }
-
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == 1) {
+//            if (data == null || data.getData() == null) return;
+//            Uri uri = data.getData();
+//            Log.d(TAG, "File URI: " + uri.getEncodedPath());
+//            String path = getFilePathFromContentUri(this, data.getData());
+//            DataLoader.load(path, this);
+//        }
+//    }
 
     /**
      * 打开文件选择器
@@ -223,54 +219,50 @@ public class MainActivity extends AppCompatActivity {
     private void openFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        intent.setType("*/*");
+
         String[] mimeTypes = {
                 "application/vnd.ms-excel",
                 "application/x-excel",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         };
-        intent.setType("application/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, 1);
-    }
-
-    private void unRegisterReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(loadReceiver);
+        excelPickerLauncher.launch(intent);
     }
 
     /**
-     * 注册广播接收器
+     * 使用 LiveData 观察加载状态
      */
-    private void registerReceiver() {
-        IntentFilter filter = new IntentFilter(LoadService.LOADING_ACTION);
-        loadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                boolean isLoading = intent.getBooleanExtra("isLoading", false);
-                if (isLoading && !indicator.isShown()) {
+    private void observeLoadStatus() {
+        LoadService.getLoadStatus().observe(this, status -> {
+            if (status == null) return;
+            
+            if (status.isLoading) {
+                if (!indicator.isShown()) {
                     indicator.show();
-                } else if (!isLoading) {
-                    if (indicator.isShown()) {
-                        indicator.hide();
+                }
+            } else {
+                if (indicator.isShown()) {
+                    indicator.hide();
+                }
+                
+                // Prevent duplicate processing of the same load event
+                if (status.path != null && status.path.equals(lastProcessedPath)) {
+                    return;
+                }
+                lastProcessedPath = status.path;
+                
+                if (status.isSuccessful) {
+                    ToastUtil.show(MainActivity.this, "数据加载成功");
+                    DataLoader.setLastPath(status.path);
+                    if (DataLoader.autoEnterEditor()) {
+                        EditActivity.openEditor(this);
                     }
-//                    loadDialog.dismiss();
-                    boolean isSuccessful = intent.getBooleanExtra("isSuccessful", false);
-                    if (isSuccessful) {
-                        ToastUtil.show(MainActivity.this, "数据加载成功");
-                        DataLoader.setLastPath(intent.getStringExtra("path"));
-                        //更新设置
-//                        setting.showInfo();
-                        //若设置为自动进入编辑器
-                        if (DataLoader.autoEnterEditor()) {
-                            EditActivity.openEditor(context);
-                        }
-                    } else {
-                        ToastUtil.show(MainActivity.this, "数据加载失败");
-                    }
+                } else {
+                    ToastUtil.show(MainActivity.this, "数据加载失败");
                 }
             }
-        };
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(loadReceiver, filter);
+        });
     }
 }
-

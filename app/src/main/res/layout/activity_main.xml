@@ -1,83 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-<!--    <TextView-->
-<!--        android:id="@+id/title"-->
-<!--        android:layout_marginLeft="23dp"-->
-<!--        style="?attr/textAppearanceDisplayLarge"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="start"-->
-<!--        android:transitionName="@string/material_motion_easing_linear"-->
-<!--        android:text="送 信"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/fragment_container"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-
-    <TextSwitcher
-        android:id="@+id/title"
-        android:layout_marginLeft="23dp"
-        style="?attr/textAppearanceDisplayLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:transitionName="@string/material_motion_easing_linear"
-
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/fragment_container"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            style="@style/TextAppearance.Msggo.DisplayLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            style="@style/TextAppearance.Msggo.DisplayLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </TextSwitcher>
-
-    <!-- Fragment container -->
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintBottom_toTopOf="@id/progress" />
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progress"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:indeterminate="true"
-        app:hideAnimationBehavior="inward"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top App Bar Area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp">
+
+            <TextSwitcher
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/TextAppearance.Msggo.DisplayLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    style="@style/TextAppearance.Msggo.DisplayLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface" />
+            </TextSwitcher>
+        </LinearLayout>
+
+        <!-- Progress Indicator -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:hideAnimationBehavior="inward"
+            app:trackColor="?attr/colorSurfaceVariant"
+            app:indicatorColor="?attr/colorPrimary" />
+
+        <!-- Fragment container -->
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="?attr/colorSurface" />
+
+    </LinearLayout>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:labelVisibilityMode="unlabeled"
-        android:layout_marginTop="16dp"
-        app:menu="@menu/bottom_nav_menu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" >
+        android:layout_gravity="bottom"
+        android:background="?attr/colorSurfaceContainer"
+        app:itemActiveIndicatorStyle="@style/Widget.Msggo.BottomNavigation.ActiveIndicator"
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemRippleColor="?attr/colorPrimaryContainer"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
-
-
-    <!-- Floating Action Button -->
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

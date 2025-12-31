@@ -6,13 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 
 import java.util.HashMap;
 
@@ -23,16 +21,11 @@ import top.yzzblog.messagehelper.R;
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
     private Context context;
     private DataModel dataModel;
-    private SparseBooleanArray checkedMap;
+
 
     public ListAdapter(Context context) {
         this.context = context;
-        checkedMap = new SparseBooleanArray();
         dataModel = DataLoader.getDataModel();
-
-        for (int i = 0; i < getItemCount(); i++) {
-            checkedMap.put(i, false);
-        }
     }
 
     @NonNull
@@ -43,60 +36,44 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ListHolder holder, final int position) {
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
-        holder.mRv.setLayoutManager(manager);
+        // Disable nested scrolling to let parent handle horizontal scroll
+        holder.mRv.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
+            @Override
+            public boolean canScrollHorizontally() {
+                return false;
+            }
+        });
+        
         HashMap<String, String> temp = dataModel.getMap(position);
         DataAdapter adapter = new DataAdapter(context, temp);
         holder.mRv.setAdapter(adapter);
-        holder.mCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                checkedMap.put(holder.getAdapterPosition(), isChecked);
-            }
-        });
-        holder.mCb.setChecked(checkedMap.get(position));
     }
 
-
-    public void setAllCheckBoxChosen(boolean flag) {
-        for (int i = 0; i < checkedMap.size(); i++) {
-            checkedMap.put(i, flag);
-        }
-
-        notifyDataSetChanged();
-    }
 
     @Override
     public int getItemCount() {
-        return dataModel.getSize();
+        return dataModel == null ? 0 : dataModel.getSize();
     }
 
-    class ListHolder extends RecyclerView.ViewHolder {
+    static class ListHolder extends RecyclerView.ViewHolder {
         private RecyclerView mRv;
-        private CheckBox mCb;
 
         ListHolder(@NonNull View itemView) {
             super(itemView);
-
             mRv = itemView.findViewById(R.id.rv_single);
-            mCb = itemView.findViewById(R.id.cb_check);
         }
     }
-
-    public SparseBooleanArray getCheckedMap() {
-        return checkedMap;
-    }
-
-
 }
 
 class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
     private Context context;
     private HashMap<String, String> map;
+    private String[] titles;
 
     DataAdapter(Context context, HashMap<String, String> map) {
         this.context = context;
         this.map = map;
+        this.titles = DataLoader.getTitles();
     }
 
     @NonNull
@@ -107,23 +84,21 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull DataHolder holder, int position) {
-        String key = DataLoader.getTitles()[position];
-        holder.mTvLabel.setText(key);
-        holder.mTvData.setText(map.get(key));
+        String key = titles[position];
+        String value = map.get(key);
+        holder.mTvData.setText(value != null ? value : "");
     }
 
     @Override
     public int getItemCount() {
-        return map.size();
+        return titles == null ? 0 : titles.length;
     }
 
-    class DataHolder extends RecyclerView.ViewHolder {
-        private TextView mTvLabel, mTvData;
+    static class DataHolder extends RecyclerView.ViewHolder {
+        private TextView mTvData;
 
         DataHolder(@NonNull View itemView) {
             super(itemView);
-
-            mTvLabel = itemView.findViewById(R.id.tv_label);
             mTvData = itemView.findViewById(R.id.tv_data);
         }
     }

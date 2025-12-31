@@ -6,13 +6,32 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.lifecycle.MutableLiveData;
 
 import top.yzzblog.messagehelper.data.DataLoader;
 import top.yzzblog.messagehelper.exception.DataLoadFailed;
 
 public class LoadService extends Service {
-    public static final String LOADING_ACTION = "top.yzzblog.messagehelper.service.LOADING_ACTION";
+    private static final String TAG = "LoadService";
+    
+    // LiveData for observing load status
+    private static final MutableLiveData<LoadStatus> loadStatus = new MutableLiveData<>();
+    
+    public static MutableLiveData<LoadStatus> getLoadStatus() {
+        return loadStatus;
+    }
+    
+    public static class LoadStatus {
+        public final boolean isLoading;
+        public final boolean isSuccessful;
+        public final String path;
+        
+        public LoadStatus(boolean isLoading, boolean isSuccessful, String path) {
+            this.isLoading = isLoading;
+            this.isSuccessful = isSuccessful;
+            this.path = path;
+        }
+    }
 
     @Nullable
     @Override
@@ -26,16 +45,16 @@ public class LoadService extends Service {
 
         new Thread(() -> {
             try {
-                sendBroadcast(true, false, path);
+                postStatus(true, false, path);
 
                 DataLoader.__load(path);
 
-                sendBroadcast(false, true, path);
-                Log.d("msgD", "数据加载成功");
+                postStatus(false, true, path);
+                Log.d(TAG, "数据加载成功");
                 stopSelf();
             } catch (DataLoadFailed dataLoadFailed) {
-                Log.d("msgD", "数据加载失败");
-                sendBroadcast(false, false, path);
+                Log.d(TAG, "数据加载失败");
+                postStatus(false, false, path);
                 stopSelf();
             }
         }).start();
@@ -43,12 +62,7 @@ public class LoadService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendBroadcast(boolean isLoading, boolean isSuccessful, String msg) {
-        Intent it = new Intent(LOADING_ACTION);
-        it.putExtra("isLoading", isLoading);
-        it.putExtra("isSuccessful", isSuccessful);
-        it.putExtra("path", msg);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(it);
-//        sendBroadcast(it);
+    private void postStatus(boolean isLoading, boolean isSuccessful, String path) {
+        loadStatus.postValue(new LoadStatus(isLoading, isSuccessful, path));
     }
 }

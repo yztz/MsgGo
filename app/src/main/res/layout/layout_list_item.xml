@@ -1,33 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:background="@drawable/bg_list_item"
-    android:layout_marginTop="10dp">
+    android:minHeight="48dp"
+    android:background="?attr/selectableItemBackground"
+    android:paddingEnd="16dp">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_weight="5"
-        android:layout_height="wrap_content"
-        android:scrollbars="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_single"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-    </ScrollView>
 
-    <CheckBox
-        android:id="@+id/cb_check"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_marginLeft="10dp"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_single"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal" />
 </LinearLayout>

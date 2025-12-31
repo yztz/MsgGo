@@ -2,27 +2,22 @@ package top.yzzblog.messagehelper.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.Checkable;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.transition.MaterialSharedAxis;
-
-import java.util.Arrays;
 
 import top.yzzblog.messagehelper.data.DataCleaner;
 import top.yzzblog.messagehelper.data.DataLoader;
@@ -32,26 +27,22 @@ import top.yzzblog.messagehelper.util.ToastUtil;
 public class SettingFrag extends Fragment {
     private Context context;
     private TextView mTvPath, mTvCache;
-    private EditText mEtDelay;
-    private Button mBtnSave;
-    private Checkable mCbAutoEditor;
-    private LinearLayout mLinearDelCache;
+    private TextInputEditText mEtDelay;
+    private MaterialSwitch mSwitchAutoEditor;
+    private MaterialCardView mCardClearCache;
+    private boolean isUpdatingUI = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        MaterialSharedAxis enterTransition = new MaterialSharedAxis(MaterialSharedAxis.X, true);
-        MaterialSharedAxis returnTransition = new MaterialSharedAxis(MaterialSharedAxis.X, false);
-
-        setEnterTransition(enterTransition);
-        setReturnTransition(returnTransition);
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.layout_setting, null);
+        return inflater.inflate(R.layout.layout_setting, container, false);
     }
 
     @Override
@@ -60,52 +51,54 @@ public class SettingFrag extends Fragment {
 
         mTvPath = view.findViewById(R.id.tv_path);
         mEtDelay = view.findViewById(R.id.et_delay);
-        mBtnSave = view.findViewById(R.id.btn_save);
-        mCbAutoEditor = view.findViewById(R.id.cb_auto_enter_editor);
+        mSwitchAutoEditor = view.findViewById(R.id.switch_auto_editor);
         mTvCache = view.findViewById(R.id.tv_cache);
-        mLinearDelCache = view.findViewById(R.id.linear_del_cache);
+        mCardClearCache = view.findViewById(R.id.card_clear_cache);
 
+        setupListeners();
         showInfo();
-
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
-
-
-        //设置保存按钮监听
-        mBtnSave.setOnClickListener(v -> {
-//                try {
-            //保存消息发送间隔
-            int delay = Integer.parseInt(mEtDelay.getText().toString());
-            if (delay <= 0) {
-                ToastUtil.show(context, "保存失败：发送间隔不能小于0");
-            }
-            DataLoader.setDelay(delay);
-
-            //保存编辑器是否自动打开
-            DataLoader.setAutoEnterEditor(mCbAutoEditor.isChecked());
-
-            ToastUtil.show(context, "保存成功");
-//                } catch (Exception e) {
-//                    ToastUtil.show(context, "保存失败");
-//                }
-        });
-
-        //设置缓存按钮监听器
-        mLinearDelCache.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataCleaner.cleanInternalCache(context);
-                showCache();
-
-                ToastUtil.show(context, "缓存已清空~");
-            }
-        });
     }
 
+    private void setupListeners() {
+        // Auto-save: Auto Editor Switch
+        mSwitchAutoEditor.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!isUpdatingUI) {
+                DataLoader.setAutoEnterEditor(isChecked);
+            }
+        });
+
+        // Auto-save: Delay Input with debounce
+        mEtDelay.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isUpdatingUI) return;
+                
+                String text = s.toString().trim();
+                if (TextUtils.isEmpty(text)) return;
+                
+                try {
+                    int delay = Integer.parseInt(text);
+                    if (delay >= 0) {
+                        DataLoader.setDelay(delay);
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+
+        // Clear Cache
+        mCardClearCache.setOnClickListener(v -> {
+            DataCleaner.cleanInternalCache(context);
+            showCache();
+            mTvPath.setText("尚未打开任何文件");
+            ToastUtil.show(context, "缓存已清空");
+        });
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -116,7 +109,6 @@ public class SettingFrag extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-
         if (!hidden) {
             showInfo();
         }
@@ -125,36 +117,42 @@ public class SettingFrag extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        ToastUtil.show(getContext(), "resumed");
         showInfo();
     }
 
-
     public void showInfo() {
+        isUpdatingUI = true;
+        
+        // Display current file path
         String path = DataLoader.getLastPath();
-        path = path.substring(path.indexOf(':') + 1);
-        //设置当前路径显示
-        if (TextUtils.isEmpty(path))
-            mTvPath.setText("啥也没有~");
-        else
+        if (!TextUtils.isEmpty(path)) {
+            int colonIndex = path.indexOf(':');
+            if (colonIndex >= 0) {
+                path = path.substring(colonIndex + 1);
+            }
             mTvPath.setText(path);
+        } else {
+            mTvPath.setText("尚未打开任何文件");
+        }
 
-        //显示消息数限制
+        // Display delay
         mEtDelay.setText(String.valueOf(DataLoader.getDelay()));
 
-        //设置是否进入编辑器
-        mCbAutoEditor.setChecked(DataLoader.autoEnterEditor());
+        // Set auto editor switch
+        mSwitchAutoEditor.setChecked(DataLoader.autoEnterEditor());
 
-        //显示缓存大小
+        // Display cache size
         showCache();
+        
+        isUpdatingUI = false;
     }
 
     private void showCache() {
         try {
-            mTvCache.setText(DataCleaner.getCacheSize(context.getCacheDir()));
+            String cacheSize = DataCleaner.getCacheSize(context.getCacheDir());
+            mTvCache.setText("当前缓存: " + cacheSize);
         } catch (Exception e) {
-            e.printStackTrace();
+            mTvCache.setText("无法计算缓存大小");
         }
     }
-
 }
