@@ -1,5 +1,7 @@
 package top.yzzblog.messagehelper.fragments;
 
+import static top.yzzblog.messagehelper.util.XiaomiUtil.showXiaomiPermissionDialog;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,22 +21,38 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.transition.MaterialSharedAxis;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import top.yzzblog.messagehelper.activities.EditActivity;
+import top.yzzblog.messagehelper.activities.MainActivity;
+import top.yzzblog.messagehelper.data.DataContext;
 import top.yzzblog.messagehelper.data.DataLoader;
+import top.yzzblog.messagehelper.data.HistoryManager;
 import top.yzzblog.messagehelper.R;
+import top.yzzblog.messagehelper.services.LoadService;
 import top.yzzblog.messagehelper.services.SMSSender;
 import top.yzzblog.messagehelper.util.ToastUtil;
+import top.yzzblog.messagehelper.util.XiaomiUtil;
 import top.yzzblog.messagehelper.activities.ChooserActivity;
 
 public class HomeFrag extends Fragment {
     private static final String TAG = "HomeFrag";
     private Context context;
     
-    private MaterialCardView cardSend, cardEdit, cardSim;
-    private TextView tvSimInfo, tvDataStatus, tvTemplateStatus, tvSimStatus;
+    private View cardCurrentFile, cardNumberColumn, rowEditContent, rowSelectSim, rowSend;
+    private TextView tvSimInfo, tvSubtitleSend, tvSubtitleEdit, tvEmptyHistory;
+    private TextView tvCurrentFilePath, tvCurrentNumberColumn;
+    private RecyclerView rvHistory;
+    private HistoryAdapter historyAdapter;
+
     
     private List<SubscriptionInfo> subs;
     private int simSubId;
@@ -69,13 +87,21 @@ public class HomeFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         // Initialize views
-        cardSend = view.findViewById(R.id.card_send);
-        cardEdit = view.findViewById(R.id.card_edit);
-        cardSim = view.findViewById(R.id.card_sim);
         tvSimInfo = view.findViewById(R.id.tv_sim_info);
-        tvDataStatus = view.findViewById(R.id.tv_data_status);
-        tvTemplateStatus = view.findViewById(R.id.tv_template_status);
-        tvSimStatus = view.findViewById(R.id.tv_sim_status);
+        tvSubtitleSend = view.findViewById(R.id.tv_subtitle_send);
+        tvSubtitleEdit = view.findViewById(R.id.tv_subtitle_edit);
+        rvHistory = view.findViewById(R.id.rv_history);
+        tvEmptyHistory = view.findViewById(R.id.tv_empty_history);
+        
+        cardCurrentFile = view.findViewById(R.id.card_current_file);
+        cardNumberColumn = view.findViewById(R.id.card_number_column);
+        rowEditContent = view.findViewById(R.id.row_edit_content);
+        rowSelectSim = view.findViewById(R.id.row_select_sim);
+        rowSend = view.findViewById(R.id.row_send);
+        tvCurrentFilePath = view.findViewById(R.id.tv_current_file_path);
+        tvCurrentNumberColumn = view.findViewById(R.id.tv_current_number_column);
+
+        setupHistoryList();
         
         simSubId = DataLoader.getSimSubId();
         
@@ -86,9 +112,9 @@ public class HomeFrag extends Fragment {
 
     private void setupClickListeners() {
         // Send button
-        cardSend.setOnClickListener(v -> {
+        rowSend.setOnClickListener(v -> {
             if (DataLoader.getDataModel() == null) {
-                ToastUtil.show(context, "请先点击底部 + 导入数据");
+                ToastUtil.show(context, "请先导入数据");
             } else if (TextUtils.isEmpty(DataLoader.getContent())) {
                 ToastUtil.show(context, "请先编辑短信内容");
             } else {
@@ -96,15 +122,32 @@ public class HomeFrag extends Fragment {
             }
         });
         
-        // Edit button
-        cardEdit.setOnClickListener(v -> EditActivity.openEditor(context));
+        // Content editing
+        rowEditContent.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), EditActivity.class);
+            startActivity(intent);
+        });
         
         // SIM selection
-        cardSim.setOnClickListener(v -> showSimSelector());
+        rowSelectSim.setOnClickListener(v -> showSimSelector());
+
+        // File import
+        cardCurrentFile.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openFileChooser();
+            }
+        });
+
+        // Number column selection
+        cardNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
     }
 
     private void loadSimInfo() {
         subs = SMSSender.getSubs(getContext());
+        if (subs.isEmpty() && XiaomiUtil.isXiaomi()) {
+            showXiaomiPermissionDialog(getActivity());
+            return;
+        }
         updateSimDisplay();
     }
 
@@ -134,22 +177,19 @@ public class HomeFrag extends Fragment {
                     ToastUtil.show(context, "已选择: " + options[which]);
                     dialog.dismiss();
                 })
-                .setNegativeButton("取消", null)
                 .show();
     }
 
     private void updateSimDisplay() {
         if (subs == null || subs.isEmpty()) {
             tvSimInfo.setText("无可用 SIM");
-            tvSimStatus.setText("未检测到");
             return;
         }
 
         for (SubscriptionInfo sub : subs) {
             if (sub.getSubscriptionId() == simSubId) {
                 String carrierName = sub.getCarrierName().toString();
-                tvSimInfo.setText(String.format("卡槽 %d", sub.getSimSlotIndex() + 1));
-                tvSimStatus.setText(carrierName.length() > 6 ? carrierName.substring(0, 6) + "…" : carrierName);
+                tvSimInfo.setText(String.format("卡槽 %d · %s", sub.getSimSlotIndex() + 1, carrierName));
                 return;
             }
         }
@@ -158,28 +198,181 @@ public class HomeFrag extends Fragment {
         simSubId = subs.get(0).getSubscriptionId();
         DataLoader.setSimSubId(simSubId);
         SubscriptionInfo first = subs.get(0);
-        tvSimInfo.setText(String.format("卡槽 %d", first.getSimSlotIndex() + 1));
-        tvSimStatus.setText(first.getCarrierName());
+        tvSimInfo.setText(String.format("卡槽 %d · %s", first.getSimSlotIndex() + 1, first.getCarrierName()));
     }
 
-    private void updateStatus() {
-        // Data status
-        if (DataLoader.getDataModel() != null) {
-            int count = DataLoader.getDataModel().getSize();
-            tvDataStatus.setText(count + " 条");
-        } else {
-            tvDataStatus.setText("未导入");
+    private void showNumberColumnSelector() {
+        String[] titles = DataLoader.getTitles();
+        if (titles == null || titles.length == 0) {
+            ToastUtil.show(context, "请先导入数据");
+            return;
         }
+
+        int checkedItem = -1;
+        String currentColumn = DataLoader.getNumberColumn();
+        for (int i = 0; i < titles.length; i++) {
+            if (titles[i].equals(currentColumn)) {
+                checkedItem = i;
+                break;
+            }
+        }
+
+        new MaterialAlertDialogBuilder(context)
+                .setTitle("选择号码列")
+                .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
+                    Log.i(TAG, "选择号码列: " + titles[which]);
+                    DataLoader.setNumberColumn(titles[which]);
+                    HistoryManager.addHistory(context, DataLoader.getDataContext());
+                    updateStatus();
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    public void updateStatus() {
+        if (!isAdded()) return;
         
-        // Template status
+        // Progressive Disclosure State
+        boolean hasData = false;
+        boolean hasContent = false;
+        boolean hasSim = false;
+
+        // 1. Data Status
+        String path = DataLoader.getLastPath();
+        if (DataLoader.getDataModel() != null && !TextUtils.isEmpty(path)) {
+            hasData = true;
+            int count = DataLoader.getDataModel().getSize();
+            tvSubtitleSend.setText(count + " 条数据已就绪");
+            
+            String fileName = path;
+            int lastSlash = path.lastIndexOf('/');
+            if (lastSlash >= 0) fileName = path.substring(lastSlash + 1);
+            tvCurrentFilePath.setText(fileName);
+        } else {
+            tvSubtitleSend.setText("未导入数据");
+            tvCurrentFilePath.setText("点击导入 Excel 文件");
+        }
+
+        // 2. Content Status
         String content = DataLoader.getContent();
         if (!TextUtils.isEmpty(content)) {
-            int len = content.length();
-            tvTemplateStatus.setText(len + " 字");
+            hasContent = true;
+            tvSubtitleEdit.setText("模板已就绪");
         } else {
-            tvTemplateStatus.setText("未编辑");
+            tvSubtitleEdit.setText("未设置模板");
+        }
+
+        // 3. SIM Status
+        // SIM Info is updated in updateSimDisplay() which is called on creation and when SIM changes.
+        // We consider SIM "set" if simSubId is valid.
+        if (simSubId != -1) {
+            hasSim = true;
+        }
+
+        // Progressive Visibility Logic
+        // Always show Data row
+        cardCurrentFile.setVisibility(View.VISIBLE);
+        
+        // Show Column & Content rows only after Data is loaded
+        if (hasData) {
+            cardNumberColumn.setVisibility(View.VISIBLE);
+            rowEditContent.setVisibility(View.VISIBLE);
+        } else {
+            cardNumberColumn.setVisibility(View.GONE);
+            rowEditContent.setVisibility(View.GONE);
         }
         
-        // SIM status is updated in updateSimDisplay()
+        // Show SIM row only after Content is set
+        if (hasData && hasContent) {
+            rowSelectSim.setVisibility(View.VISIBLE);
+        } else {
+            rowSelectSim.setVisibility(View.GONE);
+        }
+        
+        // Show Send row only after SIM information is retrieved (or just always after SIM row is shown if SIM is usually pre-available)
+        // Let's require SIM and Data and Content for Send row to appear.
+        if (hasData && hasContent && hasSim && subs != null && !subs.isEmpty()) {
+            rowSend.setVisibility(View.VISIBLE);
+        } else {
+            rowSend.setVisibility(View.GONE);
+        }
+
+        // Update Number Column Text
+        String numberColumn = DataLoader.getNumberColumn();
+        tvCurrentNumberColumn.setText(TextUtils.isEmpty(numberColumn) ? "未选择" : numberColumn);
+
+        loadHistory();
+    }
+
+    private void setupHistoryList() {
+        rvHistory.setLayoutManager(new LinearLayoutManager(context));
+        historyAdapter = new HistoryAdapter();
+        rvHistory.setAdapter(historyAdapter);
+    }
+
+    private void loadHistory() {
+        if (historyAdapter != null) {
+            List<DataContext> history = HistoryManager.getHistory(context);
+            historyAdapter.setItems(history);
+            
+            if (history.isEmpty()) {
+                rvHistory.setVisibility(View.GONE);
+                tvEmptyHistory.setVisibility(View.VISIBLE);
+            } else {
+                rvHistory.setVisibility(View.VISIBLE);
+                tvEmptyHistory.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+        private List<DataContext> items = new ArrayList<>();
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
+
+        public void setItems(List<DataContext> items) {
+            this.items = items;
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_history, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            DataContext item = items.get(position);
+            holder.tvFileName.setText(item.getFileName());
+            holder.tvDate.setText(dateFormat.format(new Date(item.timestamp)));
+            
+            String template = item.template;
+            if (TextUtils.isEmpty(template)) {
+                holder.tvTemplatePreview.setText("无模板内容");
+            } else {
+                holder.tvTemplatePreview.setText(template.replace("\n", " "));
+            }
+
+            holder.itemView.setOnClickListener(v -> {
+                DataLoader.load(item.path, context);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvFileName, tvTemplatePreview, tvDate;
+
+            ViewHolder(View itemView) {
+                super(itemView);
+                tvFileName = itemView.findViewById(R.id.tv_file_name);
+                tvTemplatePreview = itemView.findViewById(R.id.tv_template_preview);
+                tvDate = itemView.findViewById(R.id.tv_date);
+            }
+        }
     }
 }

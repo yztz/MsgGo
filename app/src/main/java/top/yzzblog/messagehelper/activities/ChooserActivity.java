@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SubscriptionInfo;
@@ -17,8 +18,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -32,6 +35,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import top.yzzblog.messagehelper.R;
@@ -55,8 +59,9 @@ public class ChooserActivity extends AppCompatActivity {
     private Button mSend;
     private CheckBox cbSelectAll;
     private MaterialToolbar topAppBar;
-    private TextView tvFileName, tvSimInfo;
+    private TextView tvFileName, tvSimInfo, tvSelectionCount, tvEstimatedCost;
     private LinearLayout layoutHeader;
+    private CheckboxAdapter checkboxAdapter;
     
     // Sending Progress UI
     private BottomSheetDialog progressDialog;
@@ -78,17 +83,35 @@ public class ChooserActivity extends AppCompatActivity {
         topAppBar = findViewById(R.id.topAppBar);
         tvFileName = findViewById(R.id.tv_file_name);
         tvSimInfo = findViewById(R.id.tv_sim_info);
+        tvSelectionCount = findViewById(R.id.tv_selection_count);
+        tvEstimatedCost = findViewById(R.id.tv_estimated_cost);
         layoutHeader = findViewById(R.id.layout_header);
 
         final RecyclerView.LayoutManager manager = new LinearLayoutManager(this);
         mRv.setLayoutManager(manager);
         final ListAdapter adapter = new ListAdapter(this);
         mRv.setAdapter(adapter);
+        adapter.setOnItemClickListener(position -> {
+            String template = DataLoader.getContent();
+            Map<String, String> dataMap = DataLoader.getDataModel().getMap(position);
+            String content = TextParser.parse(template, dataMap);
+            String recipient = dataMap.get(DataLoader.getNumberColumn());
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("消息预览")
+                    .setMessage(String.format("收件人：%s\n内容预览：\n%s",
+                            TextUtils.isEmpty(recipient) ? "未找到号码" : recipient,
+                            content))
+                    .setPositiveButton("确定", null)
+                    .show();
+        });
 
         final RecyclerView.LayoutManager checkboxManager = new LinearLayoutManager(this);
         rvCheckbox.setLayoutManager(checkboxManager);
-        final CheckboxAdapter checkboxAdapter = new CheckboxAdapter(this);
+        checkboxAdapter = new CheckboxAdapter(this);
         rvCheckbox.setAdapter(checkboxAdapter);
+
+        checkboxAdapter.setOnSelectionChangedListener((position, isChecked) -> updateSelectionSummary());
 
         // Synchronize scrolling
         RecyclerView.OnScrollListener syncScrollListener = new RecyclerView.OnScrollListener() {
@@ -109,12 +132,14 @@ public class ChooserActivity extends AppCompatActivity {
         // Select All Logic
         cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
             checkboxAdapter.setAllCheckBoxChosen(isChecked);
+            updateSelectionSummary();
         });
 
         mSend.setOnClickListener(v -> {
             ArrayList<Integer> itemIndices = new ArrayList<>();
             SparseBooleanArray checkedMap = checkboxAdapter.getCheckedMap();
-            for (int i = 0; i < adapter.getItemCount(); i++) {
+            int itemCount = mRv.getAdapter() != null ? mRv.getAdapter().getItemCount() : 0;
+            for (int i = 0; i < itemCount; i++) {
                 if (checkedMap.get(i)) {
                     itemIndices.add(i);
                 }
@@ -125,19 +150,52 @@ public class ChooserActivity extends AppCompatActivity {
                 return;
             }
 
-            startSending(itemIndices);
+            double rate = 0.1;
+            try {
+                rate = Double.parseDouble(DataLoader.getSmsRate());
+            } catch (Exception ignored) {}
+            double cost = itemIndices.size() * rate;
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("确认发送")
+                    .setMessage(String.format(Locale.getDefault(), "确定向已选的 %d 位联系人发送短信吗？\n预计产生费用：¥%.2f", itemIndices.size(), cost))
+                    .setPositiveButton("立即发送", (dialog, which) -> startSending(itemIndices))
+                    .setNegativeButton("取消", null)
+                    .show();
         });
 
 
 
         topAppBar.setNavigationOnClickListener(v -> finish());
-        setupWindowInsets();
-        setupNumberColumnSelection();
+//        setupNumberColumnSelection();
         setupInfoCard();
         setupTableHeader();
+        updateSelectionSummary();
         
         // Observe Sending Status
         observeSending();
+    }
+
+    private void updateSelectionSummary() {
+        if (checkboxAdapter == null || tvSelectionCount == null || tvEstimatedCost == null) return;
+        
+        int total = DataLoader.getDataModel() == null ? 0 : DataLoader.getDataModel().getSize();
+        int selected = 0;
+        SparseBooleanArray checkedMap = checkboxAdapter.getCheckedMap();
+        for (int i = 0; i < total; i++) {
+            if (checkedMap.get(i)) {
+                selected++;
+            }
+        }
+
+        double rate = 0.1;
+        try {
+            rate = Double.parseDouble(DataLoader.getSmsRate());
+        } catch (Exception ignored) {}
+
+        double cost = selected * rate;
+        tvSelectionCount.setText(String.format(Locale.getDefault(), "%d / %d", selected, total));
+        tvEstimatedCost.setText(String.format(Locale.getDefault(), "%.2f", cost));
     }
     
     private void setupInfoCard() {
@@ -167,7 +225,7 @@ public class ChooserActivity extends AppCompatActivity {
         
         layoutHeader.removeAllViews();
         float density = getResources().getDisplayMetrics().density;
-        int width = (int) (100 * density); // Match updated layout_data_item width
+        int width = (int) (130 * density); // Match updated layout_data_item width
 
         // Ensure header background fills at least the screen width - handled by layout weight now
         
@@ -199,42 +257,21 @@ public class ChooserActivity extends AppCompatActivity {
         }
     }
 
-    private void setupWindowInsets() {
-        // 1. 先记录下 XML 中定义的原始 Margin
-        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) mSend.getLayoutParams();
-        int initialLeft = mlp.leftMargin;
-        int initialRight = mlp.rightMargin;
-        int initialBottom = mlp.bottomMargin;
 
-        ViewCompat.setOnApplyWindowInsetsListener(mSend, (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-
-            // 2. 在原始 Margin 的基础上加上系统栏的 Insets
-            params.leftMargin = initialLeft + insets.left;
-            params.rightMargin = initialRight + insets.right;
-            params.bottomMargin = initialBottom + insets.bottom;
-
-            v.setLayoutParams(params);
-
-            // 3. 返回被处理后的 Insets。
-            // 如果你希望父容器或其他 View 也能收到这个 Insets，建议返回 windowInsets 而不是 CONSUMED
-            return windowInsets;
-        });
-    }
-
-    private void setupNumberColumnSelection() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("哪列存储着号码？")
-                .setItems(DataLoader.getTitles(), (dialog, which) -> {
-                    DataLoader.setNumberColumn(DataLoader.getTitles()[which]);
-                    ToastUtil.show(this, "号码列: " + DataLoader.getTitles()[which]);
-                    dialog.dismiss();
-                })
-                .setCancelable(false)
-                .show();
-    }
+//    private void setupNumberColumnSelection() {
+//        if (!TextUtils.isEmpty(DataLoader.getNumberColumn())) {
+//            return;
+//        }
+//        new MaterialAlertDialogBuilder(this)
+//                .setTitle("哪列存储着号码？")
+//                .setItems(DataLoader.getTitles(), (dialog, which) -> {
+//                    DataLoader.setNumberColumn(DataLoader.getTitles()[which]);
+//                    ToastUtil.show(this, "号码列: " + DataLoader.getTitles()[which]);
+//                    dialog.dismiss();
+//                })
+//                .setCancelable(false)
+//                .show();
+//    }
 
     private void startSending(ArrayList<Integer> itemIndices) {
         String rawContent = DataLoader.getContent();

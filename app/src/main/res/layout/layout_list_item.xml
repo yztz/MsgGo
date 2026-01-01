@@ -14,5 +14,7 @@
         android:id="@+id/rv_single"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:clickable="false"
+        android:focusable="false"
         android:orientation="horizontal" />
 </LinearLayout>

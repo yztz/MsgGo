@@ -1,9 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chooser_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -14,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorSurface"
-            app:liftOnScrollTargetViewId="@id/rv_data">
+            app:liftOnScroll="false">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
@@ -44,60 +47,133 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical"
-                    android:baselineAligned="false">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- File Info -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_file"
-                            app:tint="?attr/colorPrimary"/>
-                        <TextView
-                            android:id="@+id/tv_file_name"
-                            android:layout_width="wrap_content"
+                        android:baselineAligned="false">
+
+                        <!-- File Info -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="Data.xlsx"
-                            style="?attr/textAppearanceTitleSmall"
-                            android:maxLines="1"
-                            android:ellipsize="end"/>
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_file"
+                                app:tint="?attr/colorPrimary"/>
+                            <TextView
+                                android:id="@+id/tv_file_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Data.xlsx"
+                                style="?attr/textAppearanceTitleSmall"
+                                android:maxLines="1"
+                                android:ellipsize="end"/>
+                        </LinearLayout>
+
+                        <!-- Divider/Space -->
+                        <Space
+                            android:layout_width="8dp"
+                            android:layout_height="wrap_content"/>
+
+                        <!-- SIM Info -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/sim"
+                                app:tint="?attr/colorPrimary"/>
+                            <TextView
+                                android:id="@+id/tv_sim_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="SIM 1"
+                                style="?attr/textAppearanceBodyMedium"
+                                android:maxLines="1"
+                                android:ellipsize="end"/>
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Divider/Space -->
+<!--                    <View-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="1dp"-->
+<!--                        android:layout_marginVertical="12dp"-->
+<!--                        android:background="?attr/colorOutlineVariant"-->
+<!--                        android:alpha="0.3" />-->
                     <Space
-                        android:layout_width="16dp"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="wrap_content"
+                        android:layout_height="10dp"/>
 
-                    <!-- SIM Info -->
+                    <!-- Selection & Cost row -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/sim"
-                            app:tint="?attr/colorPrimary"/>
-                        <TextView
-                            android:id="@+id/tv_sim_info"
-                            android:layout_width="wrap_content"
+
+                        <!-- Estimated Cost -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="SIM 1"
-                            style="?attr/textAppearanceBodyMedium"
-                            android:maxLines="1"
-                            android:ellipsize="end"/>
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_rmb"
+                                app:tint="?attr/colorPrimary" />
+                            <TextView
+                                android:id="@+id/tv_estimated_cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="0.00"
+                                android:textAppearance="?attr/textAppearanceTitleSmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+
+                        <!-- Divider/Space -->
+                        <Space
+                            android:layout_width="8dp"
+                            android:layout_height="wrap_content"/>
+
+                        <!-- Selection Count -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_checklist"
+                                app:tint="?attr/colorPrimary" />
+                            <TextView
+                                android:id="@+id/tv_selection_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="0 / 0"
+                                android:textAppearance="?attr/textAppearanceTitleSmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -105,7 +181,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginVertical="8dp"
+                android:layout_marginVertical="4dp"
                 style="?attr/materialCardViewFilledStyle">
                 <!-- Table Header & List -->
             <LinearLayout
@@ -130,7 +206,7 @@
                         <LinearLayout
                             android:id="@+id/header_container"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="50dp"
                             android:orientation="horizontal"
                             android:background="?attr/colorSurfaceContainer"
                             android:paddingVertical="8dp">
@@ -164,7 +240,7 @@
                     <!-- Select All Header -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
                         android:gravity="center"
                         android:paddingVertical="8dp"
                         android:background="?attr/colorSurfaceContainer">
@@ -189,13 +265,25 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <TextView
+        android:id="@+id/tv_footer_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="2dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:text="提示：点击数据行预览短信内容"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_send"
         style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"
-        android:layout_margin="24dp"
+        android:layout_marginHorizontal="16dp"
         android:elevation="4dp"
         app:cornerRadius="28dp"
         app:icon="@drawable/send_small"

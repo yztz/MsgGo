@@ -21,7 +21,15 @@ import top.yzzblog.messagehelper.R;
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
     private Context context;
     private DataModel dataModel;
+    private OnItemClickListener listener;
 
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public ListAdapter(Context context) {
         this.context = context;
@@ -47,6 +55,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
         HashMap<String, String> temp = dataModel.getMap(position);
         DataAdapter adapter = new DataAdapter(context, temp);
         holder.mRv.setAdapter(adapter);
+
+        // Make the inner RecyclerView pass touch events to the itemView
+        holder.mRv.setOnTouchListener((v, event) -> holder.itemView.onTouchEvent(event));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(holder.getAbsoluteAdapterPosition());
+            }
+        });
     }
 
 

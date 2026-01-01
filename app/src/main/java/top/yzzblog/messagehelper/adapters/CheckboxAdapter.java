@@ -52,9 +52,9 @@ public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.Checkb
         holder.mCb.setOnCheckedChangeListener(null);
         holder.mCb.setChecked(checkedMap.get(position));
         holder.mCb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            checkedMap.put(holder.getAdapterPosition(), isChecked);
+            checkedMap.put(holder.getAbsoluteAdapterPosition(), isChecked);
             if (selectionListener != null) {
-                selectionListener.onSelectionChanged(holder.getAdapterPosition(), isChecked);
+                selectionListener.onSelectionChanged(holder.getAbsoluteAdapterPosition(), isChecked);
             }
         });
 

@@ -86,7 +86,7 @@ public class MessageService extends Service {
                 Message message = messages[i];
                 try {
                     SMSSender.sendMessage(getApplicationContext(), message.getContent(), message.getPhone(), subId, i + 1);
-                    
+
                     // Update progress (requests sent)
                     updateNotification(i + 1, messages.length);
                     SendingMonitor.getInstance().updateProgress(i + 1);
@@ -104,16 +104,19 @@ public class MessageService extends Service {
 
             // Clean up
             getApplicationContext().deleteFile(serPath);
-            
+
             if (!isStopped) {
                 SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.COMPLETED);
-                // Keep notification for a moment or update it to "Completed"
                 showCompletedNotification();
             } else {
                 SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
             }
-            
-            stopForeground(false); // Keep notification visible
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(STOP_FOREGROUND_DETACH);
+            } else {
+                stopForeground(false);
+            }
         }).start();
 
         return START_STICKY;
@@ -123,7 +126,13 @@ public class MessageService extends Service {
         isStopped = true;
         SendingMonitor.getInstance().appendLog("发送任务已取消");
         SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
-        stopForeground(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE); // 移除通知
+        } else {
+            stopForeground(true);
+        }
+
         stopSelf();
     }
 
@@ -132,7 +141,7 @@ public class MessageService extends Service {
                 .setProgress(all, done, false);
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
     }
-    
+
     private void showCompletedNotification() {
         notificationBuilder.setContentText("发送任务已完成")
                 .setProgress(0, 0, false)
@@ -151,7 +160,7 @@ public class MessageService extends Service {
                 .setSmallIcon(R.drawable.send_small)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
-                .addAction(R.drawable.ic_close, "取消", cancelPendingIntent); // Assuming ic_close exists or use android.R.drawable.ic_menu_close_clear_cancel
+                .addAction(R.drawable.ic_close, "取消", cancelPendingIntent);
     }
 
     private void createNotificationChannel() {
@@ -170,13 +179,13 @@ public class MessageService extends Service {
                 int resultCode = getResultCode();
                 String log;
                 boolean success = (resultCode == android.app.Activity.RESULT_OK);
-                
+
                 if (success) {
                     log = "第 " + code + " 条: 发送成功";
                 } else {
                     log = "第 " + code + " 条: 发送失败 (代码 " + resultCode + ")";
                 }
-                
+
                 SendingMonitor.getInstance().appendLog(log);
             }
         };
@@ -188,7 +197,7 @@ public class MessageService extends Service {
             registerReceiver(smsStatusReceiver, filter);
         }
     }
-    
+
     private void unregisterSmsReceiver() {
         if (smsStatusReceiver != null) {
             try {

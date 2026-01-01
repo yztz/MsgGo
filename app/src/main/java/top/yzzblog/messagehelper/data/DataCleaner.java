@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class DataCleaner {
 
@@ -15,7 +16,11 @@ public class DataCleaner {
      * @param context
      */
     public static void cleanInternalCache(Context context) {
-        deleteFilesByDirectory(context.getCacheDir());
+        deleteFilesByDirectory(context.getCacheDir(), null);
+    }
+
+    public static void cleanInternalCache(Context context, String excludePath) {
+        deleteFilesByDirectory(context.getCacheDir(), excludePath);
     }
 
     /**
@@ -25,7 +30,7 @@ public class DataCleaner {
      */
     public static void cleanDatabases(Context context) {
         deleteFilesByDirectory(new File("/data/data/"
-                + context.getPackageName() + "/databases"));
+                + context.getPackageName() + "/databases"), null);
     }
 
     /**
@@ -35,7 +40,7 @@ public class DataCleaner {
      */
     public static void cleanSharedPreference(Context context) {
         deleteFilesByDirectory(new File("/data/data/"
-                + context.getPackageName() + "/shared_prefs"));
+                + context.getPackageName() + "/shared_prefs"), null);
     }
 
     /**
@@ -54,7 +59,7 @@ public class DataCleaner {
      * @param context
      */
     public static void cleanFiles(Context context) {
-        deleteFilesByDirectory(context.getFilesDir());
+        deleteFilesByDirectory(context.getFilesDir(), null);
     }
 
     /**
@@ -65,7 +70,7 @@ public class DataCleaner {
     public static void cleanExternalCache(Context context) {
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            deleteFilesByDirectory(context.getExternalCacheDir());
+            deleteFilesByDirectory(context.getExternalCacheDir(), null);
         }
     }
     /**
@@ -74,7 +79,7 @@ public class DataCleaner {
      * @param filePath
      * */
     public static void cleanCustomCache(String filePath) {
-        deleteFilesByDirectory(new File(filePath));
+        deleteFilesByDirectory(new File(filePath), null);
     }
 
     /**
@@ -102,12 +107,18 @@ public class DataCleaner {
      *
      * @param directory
      */
-    private static void deleteFilesByDirectory(File directory) {
+    private static void deleteFilesByDirectory(File directory, String excludePath) {
         if (directory != null && directory.exists() && directory.isDirectory()) {
             for (File item : directory.listFiles()) {
                 if (item.isDirectory()) {
-                    deleteFilesByDirectory(item);
+                    deleteFilesByDirectory(item, excludePath);
                 }
+                
+                // Keep the excluded file if it matches
+                if (excludePath != null && item.getAbsolutePath().equals(excludePath)) {
+                    continue;
+                }
+                
                 item.delete();
             }
         }
@@ -179,25 +190,25 @@ public class DataCleaner {
         double megaByte = kiloByte / 1024;
         if (megaByte < 1) {
             BigDecimal result1 = new BigDecimal(Double.toString(kiloByte));
-            return result1.setScale(2, BigDecimal.ROUND_HALF_UP)
+            return result1.setScale(2, RoundingMode.HALF_UP)
                     .toPlainString() + "KB";
         }
 
         double gigaByte = megaByte / 1024;
         if (gigaByte < 1) {
             BigDecimal result2 = new BigDecimal(Double.toString(megaByte));
-            return result2.setScale(2, BigDecimal.ROUND_HALF_UP)
+            return result2.setScale(2, RoundingMode.HALF_UP)
                     .toPlainString() + "MB";
         }
 
         double teraBytes = gigaByte / 1024;
         if (teraBytes < 1) {
             BigDecimal result3 = new BigDecimal(Double.toString(gigaByte));
-            return result3.setScale(2, BigDecimal.ROUND_HALF_UP)
+            return result3.setScale(2, RoundingMode.HALF_UP)
                     .toPlainString() + "GB";
         }
         BigDecimal result4 = new BigDecimal(teraBytes);
-        return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()
+        return result4.setScale(2, RoundingMode.HALF_UP).toPlainString()
                 + "TB";
     }
 

@@ -13,23 +13,34 @@ import androidx.fragment.app.FragmentTransaction;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
-import android.widget.TextSwitcher;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+// import android.widget.TextSwitcher; // Removed
 
 import top.yzzblog.messagehelper.R;
+import top.yzzblog.messagehelper.data.DataContext;
 import top.yzzblog.messagehelper.data.DataLoader;
+import top.yzzblog.messagehelper.data.HistoryManager;
 import top.yzzblog.messagehelper.fragments.HomeFrag;
 import top.yzzblog.messagehelper.fragments.SettingFrag;
 import top.yzzblog.messagehelper.services.LoadService;
 import top.yzzblog.messagehelper.services.SMSSender;
+import top.yzzblog.messagehelper.util.FileUtil;
 import top.yzzblog.messagehelper.util.ToastUtil;
+import top.yzzblog.messagehelper.util.XiaomiUtil;
 
 import static top.yzzblog.messagehelper.util.FileUtil.getFilePathFromContentUri;
 
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,10 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
     private HomeFrag home;
     private SettingFrag setting;
-    private TextSwitcher mTitle;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
-    private String lastProcessedPath = null;
 
     private ActivityResultLauncher<Intent> excelPickerLauncher;
 
@@ -73,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause: ");
+        // Save current state to history
+//        String lastPath = DataLoader.getLastPath();
+//        if (!TextUtils.isEmpty(lastPath)) {
+//            HistoryManager.addHistory(this, lastPath, DataLoader.getContent(), DataLoader.getNumberColumn(), DataLoader.getLastSignature());
+//        }
     }
 
     @Override
@@ -129,10 +144,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         observeLoadStatus();
         nMenu = findViewById(R.id.bottom_navigation);
-        mTitle = findViewById(R.id.title);
+        mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         indicator = findViewById(R.id.progress);
-        mTitle.setInAnimation(this, R.anim.fade_in);
-        mTitle.setOutAnimation(this, R.anim.fade_out);
+        
 //        DialogX.init(this);
 
         // Check permissions
@@ -152,27 +166,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initApp() {
-        initImporter();
+        DataLoader.init(this);
+        initFragment();
         if (SMSSender.getSubs(this).isEmpty()) {
+            if (XiaomiUtil.isXiaomi()) {
+                Log.d(TAG, "xiaomi: check perm");
+                XiaomiUtil.showXiaomiPermissionDialog(this);
+                return;
+            }
             ToastUtil.show(this, "没发现可用于发送短信的 SIM 卡，即将退出");
             finish();
         }
-
     }
 
 
-    @SuppressLint("RestrictedApi")
-    private void initImporter() {
-        BottomNavigationMenuView menuView = (BottomNavigationMenuView) nMenu.getChildAt(0);
-        android.view.View centerButton = menuView.getChildAt(1);
-        BottomNavigationItemView itemView = (BottomNavigationItemView) centerButton;
-        itemView.setShifting(false);
-        itemView.setCheckable(false);
-        itemView.setOnClickListener(_view -> openFileChooser());
 
-        DataLoader.init(this);
-        initFragment();
-    }
 
     /**
      * 初始化fragment
@@ -181,17 +189,17 @@ public class MainActivity extends AppCompatActivity {
         home = new HomeFrag();
         setting = new SettingFrag();
 
-        mTitle.setText("送 信");
+        mCollapsingToolbarLayout.setTitle("送 信");
         loadFragment(home);
 
         nMenu.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
-                mTitle.setText("送 信");
+                mCollapsingToolbarLayout.setTitle("送 信");
                 selectedFragment = home;
             } else if (itemId == R.id.nav_settings) {
-                mTitle.setText("設 定");
+                mCollapsingToolbarLayout.setTitle("設 定");
                 selectedFragment = setting;
             }
             if (selectedFragment != null) {
@@ -216,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 打开文件选择器
      */
-    private void openFileChooser() {
+    public void openFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
@@ -246,17 +254,57 @@ public class MainActivity extends AppCompatActivity {
                 if (indicator.isShown()) {
                     indicator.hide();
                 }
-                
-                // Prevent duplicate processing of the same load event
-                if (status.path != null && status.path.equals(lastProcessedPath)) {
-                    return;
-                }
-                lastProcessedPath = status.path;
+
                 
                 if (status.isSuccessful) {
-                    ToastUtil.show(MainActivity.this, "数据加载成功");
                     DataLoader.setLastPath(status.path);
-                    if (DataLoader.autoEnterEditor()) {
+                    String currentSig = DataLoader.getLastSignature();
+                    Log.i(TAG, "数据加载成功：" + status.path + " 签名: " + currentSig);
+                    ToastUtil.show(MainActivity.this, "数据加载成功");
+
+                    DataContext historyItem = HistoryManager.getItem(MainActivity.this, status.path);
+                    if (historyItem != null) {
+                        Log.i(TAG, "发现历史数据：" + historyItem.path + " 签名: " + historyItem.signature);
+                        if (currentSig.equals(historyItem.signature)) {
+                            DataLoader.setNumberColumn(historyItem.numberColumn);
+                            DataLoader.setContent(historyItem.template);
+                        } else {
+                             DataLoader.setNumberColumn("");
+                             DataLoader.setContent("");
+                        }
+                    }
+
+                    String[] titles = DataLoader.getTitles();
+                    if (!TextUtils.isEmpty(DataLoader.getNumberColumn())) {
+                        HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), DataLoader.getNumberColumn(), currentSig);
+                        setting.showInfo();
+                        home.updateStatus();
+                    } else if (titles != null && titles.length > 0) {
+                        int checkedItem = -1;
+                        String currentColumn = DataLoader.getNumberColumn();
+                        for (int i = 0; i < titles.length; i++) {
+                            if (titles[i].equals(currentColumn)) {
+                                checkedItem = i;
+                                break;
+                            }
+                        }
+
+                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
+                                .setTitle("选择号码列")
+                                .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
+                                    DataLoader.setNumberColumn(titles[which]);
+                                    // Update history with new selection
+                                    HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), titles[which], currentSig);
+                                    setting.showInfo();
+                                    home.updateStatus();
+                                    dialog.dismiss();
+                                    if (DataLoader.autoEnterEditor()) {
+                                        EditActivity.openEditor(MainActivity.this);
+                                    }
+                                })
+                                .setCancelable(false)
+                                .show();
+                    } else if (DataLoader.autoEnterEditor()) {
                         EditActivity.openEditor(this);
                     }
                 } else {

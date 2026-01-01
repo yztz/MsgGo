@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.WindowCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,7 +43,9 @@ import java.util.regex.Pattern;
 
 import top.yzzblog.messagehelper.R;
 import top.yzzblog.messagehelper.adapters.VarAdapter;
+import top.yzzblog.messagehelper.data.DataContext;
 import top.yzzblog.messagehelper.data.DataLoader;
+import top.yzzblog.messagehelper.data.HistoryManager;
 import top.yzzblog.messagehelper.util.ToastUtil;
 
 public class EditActivity extends AppCompatActivity {
@@ -58,12 +61,12 @@ public class EditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         mEt = findViewById(R.id.et_editor);
         mBtnSave = findViewById(R.id.btn_save);
         mBtnSave.setOnClickListener(v->{
             DataLoader.setContent(mEt.getText().toString().trim());
+            HistoryManager.addHistory(this, DataLoader.getDataContext());
             ToastUtil.show(EditActivity.this, "信息保存成功！");
             finish();
         });

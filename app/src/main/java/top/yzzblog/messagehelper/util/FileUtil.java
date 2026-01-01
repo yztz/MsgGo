@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -32,6 +33,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.security.MessageDigest;
 import java.util.List;
 
 import top.yzzblog.messagehelper.data.Message;
@@ -41,7 +43,7 @@ public class FileUtil {
     private static final String TAG = "FileUtil";
 
     public static String getFilePathFromContentUri(Context context, Uri contentUri) {
-        String fileName = getFileName(contentUri);
+        String fileName = getFileName(context, contentUri);
         if (!TextUtils.isEmpty(fileName)) {
             File copyFile = new File(context.getCacheDir() + File.separator + fileName);
             copyFile(context, contentUri, copyFile);
@@ -50,13 +52,29 @@ public class FileUtil {
         return null;
     }
 
-    private static String getFileName(Uri uri) {
+    private static String getFileName(Context context, Uri uri) {
         if (uri == null) return null;
         String fileName = null;
-        String path = uri.getPath();
-        int cut = path.lastIndexOf('/');
-        if (cut != -1) {
-            fileName = path.substring(cut + 1);
+        if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex != -1) {
+                        fileName = cursor.getString(nameIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to get filename from content URI", e);
+            }
+        }
+        if (fileName == null) {
+            String path = uri.getPath();
+            if (path != null) {
+                int cut = path.lastIndexOf('/');
+                if (cut != -1) {
+                    fileName = path.substring(cut + 1);
+                }
+            }
         }
         return fileName;
     }
@@ -131,5 +149,41 @@ public class FileUtil {
             e.printStackTrace();
         }
         return messages;
+    }
+
+
+    public static String getFileSignature(String path) {
+        if (TextUtils.isEmpty(path)) return "";
+        File file = new File(path);
+        if (!file.exists() || !file.isFile()) return "";
+
+        FileInputStream fis = null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            fis = new FileInputStream(file);
+
+            byte[] buffer = new byte[16384];
+            int len;
+            while ((len = fis.read(buffer)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+
+            // 将字节数组转换为十六进制字符串
+            byte[] bytes = digest.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 如果计算失败，回退到之前的时间戳+大小方案，保证逻辑不中断
+            return file.lastModified() + "_" + file.length();
+        } finally {
+            if (fis != null) {
+                try { fis.close(); } catch (Exception ignored) {}
+            }
+        }
     }
 }

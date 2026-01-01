@@ -9,6 +9,8 @@ import android.os.FileUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.core.content.IntentCompat;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -24,6 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,37 +38,40 @@ import top.yzzblog.messagehelper.exception.DataLoadFailed;
 import top.yzzblog.messagehelper.services.LoadService;
 import top.yzzblog.messagehelper.services.SMSSender;
 import top.yzzblog.messagehelper.util.FileUtil;
+import top.yzzblog.messagehelper.util.HashUtils;
 
 
 public class DataLoader {
     private static DataModel dataModel = null;
     private static SpManager spManager;
-    private static String numberColumn = "";
+
+    private static DataContext dataContext = new DataContext();
 
     //默认属性初始化表
     public static final HashMap<String, Object> DefaultPropMap = new HashMap<>();
 
     static {
         //消息内容
-        DefaultPropMap.put("content", "");
+//        DefaultPropMap.put("content", "");
         //发送间隔
         DefaultPropMap.put("send_delay", 3000);
-        //上次数据的记录
-        DefaultPropMap.put("last_path", "");
         //加载完成是否自动进入编辑界面
         DefaultPropMap.put("auto_enter_editor", false);
         // sim 卡插槽
         DefaultPropMap.put("sub_id", SMSSender.getDefaultSubID());
+        // 短信资费
+        DefaultPropMap.put("sms_rate", "0.1");
     }
 
-
     public static String getContent() {
-        return spManager.mSp.getString("content", "");
+//        return spManager.mSp.getString("content", "");
+        return dataContext.template;
     }
 
     public static void setContent(String content) {
-        spManager.mEditor.putString("content", content).apply();
+//        spManager.mEditor.putString("content", content).apply();
 //        spManager.mEditor.apply();
+        dataContext.template = content;
     }
 
     public static int getSimSubId() {
@@ -87,12 +94,21 @@ public class DataLoader {
     }
 
     public static String getLastPath() {
-        return spManager.mSp.getString("last_path", "");
+        return dataContext.path;
+    }
+
+    public static String getLastSignature() {
+        return dataContext.signature;
+    }
+
+    public static DataContext getDataContext() {
+        return dataContext;
     }
 
     public static void setLastPath(String path) {
-        spManager.mEditor.putString("last_path", path);
-        spManager.mEditor.apply();
+        dataContext = new DataContext();
+        dataContext.path = path;
+        dataContext.signature = calculateSignature();
     }
 
     public static boolean autoEnterEditor() {
@@ -121,9 +137,6 @@ public class DataLoader {
     public static void __load(String path) throws DataLoadFailed {
         ExcelReader.read(path);
         dataModel = new DataModel(ExcelReader.readExcelContent());
-
-        //清空编辑器
-        if (!getLastPath().equals(path)) setContent("");
     }
 
 
@@ -132,7 +145,16 @@ public class DataLoader {
     }
 
     public static String[] getTitles() {
+        if (dataModel == null) return null;
         return ExcelReader.titles;
+    }
+
+    private static String calculateSignature() {
+        if (TextUtils.isEmpty(getLastPath()) || dataModel == null || ExcelReader.titles == null || ExcelReader.titles.length == 0) {
+            return "";
+        }
+        String input = getLastPath() + "+" + String.join("-", getTitles());
+        return HashUtils.toMd5(input);
     }
 
     /**
@@ -157,29 +179,39 @@ public class DataLoader {
 
         Intent intent = ((MainActivity) context).getIntent();
         String action = intent.getAction();
-        Uri uri = intent.getData();
+        Uri uri = null;
 
-        if (Intent.ACTION_VIEW.equals(action) && uri != null) {
+        if (Intent.ACTION_VIEW.equals(action)) {
+            uri = intent.getData();
+        } else if (Intent.ACTION_SEND.equals(action)) {
+            uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class);
+        }
+
+        if (uri != null) {
             load(FileUtil.getFilePathFromContentUri(context, uri), context);
-        } else {
-            String last_path = getLastPath();
-            //如果有上次文件加载记录且文件存在直接加载
-            if (!TextUtils.isEmpty(last_path)) {
-                if (new File(last_path).exists())
-                    load(last_path, context);
-                else
-                    setLastPath("");
-            }
         }
     }
 
 
     public static String getNumberColumn() {
-        return numberColumn;
+        return dataContext.numberColumn;
     }
 
-    public static void setNumberColumn(String numberColumn) {
-        DataLoader.numberColumn = numberColumn;
+    public static void setNumberColumn(String col) {
+        dataContext.numberColumn = col;
+    }
+
+    public static String getSmsRate() {
+        return spManager.mSp.getString("sms_rate", "0.1");
+    }
+
+    public static void setSmsRate(String rate) {
+        spManager.mEditor.putString("sms_rate", rate).apply();
+    }
+
+    public static void clear() {
+        dataModel = null;
+        dataContext = new DataContext();
     }
 
 
@@ -204,14 +236,6 @@ class ExcelReader {
     public static int colNum = 0;
     public static int rowNum = 0;
     public static String[] titles = null;
-    //关键字词典
-    private static String[] dict = {
-            "电话",
-            "电话号码",
-            "手机",
-            "手机号码",
-            "号码",
-    };
 
 
     static void read(String path) throws DataLoadFailed {
@@ -233,12 +257,6 @@ class ExcelReader {
             titles = readExcelTitle();
             //得到总行数（包含标题）
             rowNum = sheet.getLastRowNum();
-            //智能寻找号码
-            for (String title : titles) {
-                for (String meta : dict) {
-                    if (title.equals(meta)) DataLoader.setNumberColumn(title);
-                }
-            }
 
         } catch (IOException e) {
             //抛出读取异常

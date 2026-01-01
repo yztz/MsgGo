@@ -45,7 +45,14 @@ public class SMSSender {
      * @param code        独一无二的请求码（用以广播接收）
      */
     public static void sendMessage(Context context, String content, String phoneNumber, int subId, int code) {
-        final SmsManager manager = SmsManager.getSmsManagerForSubscriptionId(subId);
+        final SmsManager manager;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            manager = context.getSystemService(SmsManager.class).createForSubscriptionId(subId);
+        } else {
+            manager = SmsManager.getSmsManagerForSubscriptionId(subId);
+        }
+
 
         Intent sentIntent = new Intent(SENT_SMS_ACTION);
         sentIntent.putExtra("code", code);
