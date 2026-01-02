@@ -3,30 +3,23 @@ package top.yztz.msggo.activities;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.IntentCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-// import android.widget.TextSwitcher; // Removed
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataContext;
@@ -44,8 +37,6 @@ import top.yztz.msggo.util.XiaomiUtil;
 import static top.yztz.msggo.util.FileUtil.getFilePathFromContentUri;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.bottomnavigation.BottomNavigationItemView;
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -62,16 +53,78 @@ public class MainActivity extends AppCompatActivity {
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
+    private ViewPager2 viewPager;
 
     private ActivityResultLauncher<Intent> excelPickerLauncher;
 
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+    /**
+     * 初始化fragment
+     */
+    public void initFragment() {
+        home = new HomeFrag();
+        setting = new SettingFrag();
+
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setUserInputEnabled(true); // Enable swipe
+        
+        // Create adapter for ViewPager2
+        FragmentStateAdapter pagerAdapter = new FragmentStateAdapter(this) {
+            @Override
+            public int getItemCount() {
+                return 2;
+            }
+
+            @Override
+            @NonNull
+            public Fragment createFragment(int position) {
+                return position == 0 ? home : setting;
+            }
+        };
+        
+        viewPager.setAdapter(pagerAdapter);
+        mCollapsingToolbarLayout.setTitle("送 信");
+
+        // Sync ViewPager with BottomNavigationView
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            boolean initiated = false;
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                String newTitle = position == 0 ? "送 信" : "設 定";
+                int menuItemId = position == 0 ? R.id.nav_home : R.id.nav_settings;
+
+                if (!initiated) {
+                    mCollapsingToolbarLayout.setTitle(newTitle);
+                    initiated = true;
+                } else {
+                    mCollapsingToolbarLayout.animate()
+                            .alpha(0.1f)
+                            .setDuration(120)
+                            .withEndAction(() -> {
+                                mCollapsingToolbarLayout.setTitle(newTitle);
+                                // Slide in and fade new title
+                                mCollapsingToolbarLayout.animate()
+                                        .alpha(1f)
+                                        .setDuration(120)
+                                        .start();
+                            })
+                            .start();
+                }
+
+                
+                // Update bottom navigation
+                nMenu.setSelectedItemId(menuItemId);
+            }
+        });
+
+        nMenu.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            int position = itemId == R.id.nav_home ? 0 : 1;
+            viewPager.setCurrentItem(position, true);
+            return true;
+        });
     }
 
-    @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart: ");
@@ -237,34 +290,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-    /**
-     * 初始化fragment
-     */
-    public void initFragment() {
-        home = new HomeFrag();
-        setting = new SettingFrag();
-
-        mCollapsingToolbarLayout.setTitle("送 信");
-        loadFragment(home);
-
-        nMenu.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                mCollapsingToolbarLayout.setTitle("送 信");
-                selectedFragment = home;
-            } else if (itemId == R.id.nav_settings) {
-                mCollapsingToolbarLayout.setTitle("設 定");
-                selectedFragment = setting;
-            }
-            if (selectedFragment != null) {
-                loadFragment(selectedFragment);
-            }
-            return true;
-        });
-    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

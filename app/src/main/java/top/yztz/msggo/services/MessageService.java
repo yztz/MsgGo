@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.IBinder;
-import android.telephony.SmsManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -228,11 +227,9 @@ public class MessageService extends Service {
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Message Send Channel", NotificationManager.IMPORTANCE_LOW);
-            channel.setDescription("Channel for message send progress");
-            notificationManager.createNotificationChannel(channel);
-        }
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Message Send Channel", NotificationManager.IMPORTANCE_LOW);
+        channel.setDescription("Channel for message send progress");
+        notificationManager.createNotificationChannel(channel);
     }
 
     private void registerSmsReceiver() {
