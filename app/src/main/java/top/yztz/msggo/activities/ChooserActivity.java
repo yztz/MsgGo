@@ -65,8 +65,8 @@ public class ChooserActivity extends AppCompatActivity {
     
     // Sending Progress UI
     private BottomSheetDialog progressDialog;
-    private TextView tvProgressTitle, tvProgressCount, tvLogs;
-    private LinearProgressIndicator progressBar;
+    private TextView tvProgressTitle, tvSentCount, tvConfirmedCount, tvLogs;
+    private LinearProgressIndicator progressSent, progressConfirmed;
     private ScrollView scrollLogs;
     private Button btnCancel;
 
@@ -285,18 +285,7 @@ public class ChooserActivity extends AppCompatActivity {
             messages.add(new Message(phoneNumber, content));
         }
 
-        String serPath = FileUtil.saveMessageArrayToFile(this, messages.toArray(new Message[0]));
-        if (serPath == null) {
-            ToastUtil.show(this, "短信服务启动失败");
-            return;
-        }
-
-        Intent serviceIntent = new Intent(this, MessageService.class);
-        serviceIntent.putExtra("delay", DataLoader.getDelay());
-        serviceIntent.putExtra("subId", DataLoader.getSimSubId());
-        serviceIntent.putExtra("message_file", serPath);
-
-        ContextCompat.startForegroundService(this, serviceIntent);
+        MessageService.startSending(this, messages, DataLoader.getSimSubId(), DataLoader.getDelay());
         showProgressDialog();
     }
     
@@ -308,9 +297,11 @@ public class ChooserActivity extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(false);
             
             tvProgressTitle = progressDialog.findViewById(R.id.tv_progress_title);
-            tvProgressCount = progressDialog.findViewById(R.id.tv_progress_count);
+            tvSentCount = progressDialog.findViewById(R.id.tv_sent_count);
+            tvConfirmedCount = progressDialog.findViewById(R.id.tv_confirmed_count);
             tvLogs = progressDialog.findViewById(R.id.tv_logs);
-            progressBar = progressDialog.findViewById(R.id.progress);
+            progressSent = progressDialog.findViewById(R.id.progress_sent);
+            progressConfirmed = progressDialog.findViewById(R.id.progress_confirmed);
             scrollLogs = progressDialog.findViewById(R.id.scroll_logs);
             btnCancel = progressDialog.findViewById(R.id.btn_cancel);
             
@@ -318,9 +309,7 @@ public class ChooserActivity extends AppCompatActivity {
                 btnCancel.setOnClickListener(v -> {
                     SendingMonitor.SendingState state = SendingMonitor.getInstance().getState().getValue();
                     if (state == SendingMonitor.SendingState.SENDING) {
-                        Intent intent = new Intent(this, MessageService.class);
-                        intent.setAction(MessageService.ACTION_CANCEL);
-                        startService(intent);
+                        MessageService.stopSending(ChooserActivity.this);
                     } else {
                         progressDialog.dismiss();
                     }
@@ -336,35 +325,54 @@ public class ChooserActivity extends AppCompatActivity {
     }
     
     private void refreshDialogUI() {
-       updateProgressUI(
-               SendingMonitor.getInstance().getProgress().getValue(),
-               SendingMonitor.getInstance().getTotal().getValue()
-       );
+        Integer total = SendingMonitor.getInstance().getTotal().getValue();
+        updateSentProgressUI(SendingMonitor.getInstance().getSentProgress().getValue(), total);
+        updateConfirmedProgressUI(SendingMonitor.getInstance().getConfirmedProgress().getValue(), total);
     }
     
-    private void updateProgressUI(Integer progress, Integer total) {
-        if (progress == null) progress = 0;
+    private void updateSentProgressUI(Integer sent, Integer total) {
+        if (sent == null) sent = 0;
         if (total == null) total = 0;
         
-        if (progressBar != null) {
-            progressBar.setMax(total);
-            progressBar.setProgress(progress);
+        if (progressSent != null) {
+            progressSent.setMax(total);
+            progressSent.setProgress(sent);
         }
-        if (tvProgressCount != null) {
-            tvProgressCount.setText(String.format("%d/%d", progress, total));
+        if (tvSentCount != null) {
+            tvSentCount.setText(String.format("%d/%d", sent, total));
+        }
+    }
+    
+    private void updateConfirmedProgressUI(Integer confirmed, Integer total) {
+        if (confirmed == null) confirmed = 0;
+        if (total == null) total = 0;
+        
+        if (progressConfirmed != null) {
+            progressConfirmed.setMax(total);
+            progressConfirmed.setProgress(confirmed);
+        }
+        if (tvConfirmedCount != null) {
+            tvConfirmedCount.setText(String.format("%d/%d", confirmed, total));
         }
     }
     
     private void observeSending() {
-        SendingMonitor.getInstance().getProgress().observe(this, progress -> {
+        SendingMonitor.getInstance().getSentProgress().observe(this, sent -> {
             if (progressDialog != null && progressDialog.isShowing()) {
-                updateProgressUI(progress, SendingMonitor.getInstance().getTotal().getValue());
+                updateSentProgressUI(sent, SendingMonitor.getInstance().getTotal().getValue());
+            }
+        });
+        
+        SendingMonitor.getInstance().getConfirmedProgress().observe(this, confirmed -> {
+            if (progressDialog != null && progressDialog.isShowing()) {
+                updateConfirmedProgressUI(confirmed, SendingMonitor.getInstance().getTotal().getValue());
             }
         });
         
         SendingMonitor.getInstance().getTotal().observe(this, total -> {
             if (progressDialog != null && progressDialog.isShowing()) {
-                updateProgressUI(SendingMonitor.getInstance().getProgress().getValue(), total);
+                updateSentProgressUI(SendingMonitor.getInstance().getSentProgress().getValue(), total);
+                updateConfirmedProgressUI(SendingMonitor.getInstance().getConfirmedProgress().getValue(), total);
             }
         });
         

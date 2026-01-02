@@ -56,6 +56,7 @@ public class SMSSender {
 
         Intent sentIntent = new Intent(SENT_SMS_ACTION);
         sentIntent.putExtra("code", code);
+        sentIntent.putExtra("phone", phoneNumber);
         PendingIntent sentPI = PendingIntent.getBroadcast(context, code, sentIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         if (content.length() > 70) {

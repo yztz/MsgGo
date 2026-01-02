@@ -5,18 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.FileUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.core.content.IntentCompat;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -42,6 +42,7 @@ import top.yztz.msggo.util.HashUtils;
 
 
 public class DataLoader {
+    private static final String TAG = "dataLoader";
     private static DataModel dataModel = null;
     private static SpManager spManager;
 
@@ -61,6 +62,11 @@ public class DataLoader {
         DefaultPropMap.put("sub_id", SMSSender.getDefaultSubID());
         // 短信资费
         DefaultPropMap.put("sms_rate", "0.1");
+        // 是否同意隐私协议
+        DefaultPropMap.put("privacy_accepted", false);
+        // 是否同意免责声明
+        DefaultPropMap.put("disclaimer_accepted", false);
+
     }
 
     public static String getContent() {
@@ -177,19 +183,19 @@ public class DataLoader {
         }
         spManager.mEditor.apply();
 
-        Intent intent = ((MainActivity) context).getIntent();
-        String action = intent.getAction();
-        Uri uri = null;
-
-        if (Intent.ACTION_VIEW.equals(action)) {
-            uri = intent.getData();
-        } else if (Intent.ACTION_SEND.equals(action)) {
-            uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class);
-        }
-
-        if (uri != null) {
-            load(FileUtil.getFilePathFromContentUri(context, uri), context);
-        }
+//        Intent intent = ((MainActivity) context).getIntent();
+//        String action = intent.getAction();
+//        Uri uri = null;
+//
+//        if (Intent.ACTION_VIEW.equals(action)) {
+//            uri = intent.getData();
+//        } else if (Intent.ACTION_SEND.equals(action)) {
+//            uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class);
+//        }
+//
+//        if (uri != null) {
+//            load(FileUtil.getFilePathFromContentUri(context, uri), context);
+//        }
     }
 
 
@@ -207,6 +213,22 @@ public class DataLoader {
 
     public static void setSmsRate(String rate) {
         spManager.mEditor.putString("sms_rate", rate).apply();
+    }
+
+    public static boolean isPrivacyAccepted() {
+        return spManager.mSp.getBoolean("privacy_accepted", false);
+    }
+
+    public static void setPrivacyAccepted(boolean flag) {
+        spManager.mEditor.putBoolean("privacy_accepted", flag).apply();
+    }
+
+    public static boolean isDisclaimerAccepted() {
+        return spManager.mSp.getBoolean("disclaimer_accepted", false);
+    }
+
+    public static void setDisclaimerAccepted(boolean flag) {
+        spManager.mEditor.putBoolean("disclaimer_accepted", flag).apply();
     }
 
     public static void clear() {
@@ -231,11 +253,13 @@ class SpManager {
 
 
 class ExcelReader {
+    private static final String TAG = "excelReader";
     private static Workbook wb;
     private static Sheet sheet;
     public static int colNum = 0;
-    public static int rowNum = 0;
+//    public static int rowNum = 0;
     public static String[] titles = null;
+    public static int[] titleColumns = null;
 
 
     static void read(String path) throws DataLoadFailed {
@@ -252,12 +276,17 @@ class ExcelReader {
             //获取第一张工作表（约定）
             sheet = wb.getSheetAt(0);
             //获取行的列数（可自定）
-            colNum = sheet.getRow(0).getPhysicalNumberOfCells();
-            //获取标题
-            titles = readExcelTitle();
-            //得到总行数（包含标题）
-            rowNum = sheet.getLastRowNum();
+            Row firstRow = sheet.getRow(0);
+            if (firstRow == null) throw new DataLoadFailed("未找到首行标题（内容为空）");
+            colNum = firstRow.getPhysicalNumberOfCells();
 
+            if (firstRow.getLastCellNum() - firstRow.getFirstCellNum() != colNum) throw new DataLoadFailed("数据内容列非连续");
+            //获取标题
+            readExcelTitle();
+            //得到总行数（不包含标题）
+            int lastRowNum = sheet.getLastRowNum();
+            if (lastRowNum == -1 || lastRowNum == 0) throw new DataLoadFailed("内容为空");
+            Log.i(TAG, String.format("lastRowNum=%d, colNum=%d(%d-%d)", lastRowNum, colNum, firstRow.getFirstCellNum(), firstRow.getLastCellNum() - 1));
         } catch (IOException e) {
             //抛出读取异常
             e.printStackTrace();
@@ -266,13 +295,16 @@ class ExcelReader {
     }
 
 
-    private static String[] readExcelTitle() {
+    private static void readExcelTitle() throws DataLoadFailed {
         Row row = sheet.getRow(0);
-        String[] titles = new String[colNum];
+        titles = new String[colNum];
+        titleColumns = new int[colNum];
+        int startCol = row.getFirstCellNum();
         for (int i = 0; i < titles.length; i++) {
-            titles[i] = getCellFormatValue(row.getCell(i));
+            titles[i] = getCellFormatValue(row.getCell(startCol + i));
+            titleColumns[i] = startCol + i;
+            if (TextUtils.isEmpty(titles[i])) throw new DataLoadFailed("标题内容列(" + (startCol + i) +")为空");
         }
-        return titles;
     }
 
     public static ArrayList<HashMap<String, String>> readExcelContent() {
@@ -280,15 +312,12 @@ class ExcelReader {
         HashMap<String, String> content = null;
         Row currentRow;
         // 正文内容应该从第二行开始,第一行为表头的标题
-        for (int i = 1; i <= rowNum; i++) {
-            int j = 0;
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             currentRow = sheet.getRow(i);
             content = new HashMap<>();
-            do {
-                content.put(titles[j], getCellFormatValue(currentRow.getCell(j))
-                        .trim());
-                j++;
-            } while (j < colNum);
+            for (int j = 0; j < titleColumns.length; j++) {
+                content.put(titles[j], getCellFormatValue(currentRow.getCell(titleColumns[j])).trim());
+            }
             list.add(content);
         }
         return list;
@@ -302,25 +331,25 @@ class ExcelReader {
      */
     private static String getCellFormatValue(Cell cell) {
         //判断是否为null或空串
-        if (cell == null || cell.toString().trim().equals("")) {
+        if (cell == null || cell.toString().trim().isEmpty()) {
             return "";
         }
         String cellValue = "";
-        int cellType = cell.getCellType();
+        CellType cellType = cell.getCellType();
 //        if (cellType == Cell.CELL_TYPE_FORMULA) { //表达式类型
 //            cellType = evaluator.evaluate(cell).getCellType();
 //        }
 
         switch (cellType) {
-            case Cell.CELL_TYPE_STRING: //字符串类型
+            case STRING: //字符串类型
                 cellValue = cell.getStringCellValue().trim();
                 cellValue = TextUtils.isEmpty(cellValue) ? "" : cellValue;
                 break;
-            case Cell.CELL_TYPE_BOOLEAN:  //布尔类型
+            case BOOLEAN:  //布尔类型
                 cellValue = String.valueOf(cell.getBooleanCellValue());
                 break;
-            case Cell.CELL_TYPE_NUMERIC: //数值类型
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {  //判断日期类型
+            case NUMERIC: //数值类型
+                if (DateUtil.isCellDateFormatted(cell)) {  //判断日期类型
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
                     cellValue = sdf.format(cell.getDateCellValue());
                 } else {  //否

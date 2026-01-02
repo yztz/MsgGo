@@ -14,6 +14,47 @@
         style="?attr/textAppearanceTitleLarge"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Sent Progress -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送进度"
+        style="?attr/textAppearanceLabelMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="4dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_sent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:trackCornerRadius="4dp" />
+
+        <TextView
+            android:id="@+id/tv_sent_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0/0"
+            android:layout_marginStart="16dp"
+            style="?attr/textAppearanceBodyMedium"/>
+    </LinearLayout>
+
+    <!-- Confirmed Progress -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="确认进度"
+        style="?attr/textAppearanceLabelMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="4dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,14 +63,16 @@
         android:layout_marginBottom="8dp">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progress"
+            android:id="@+id/progress_confirmed"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:trackCornerRadius="4dp" />
+            app:trackCornerRadius="4dp"
+            app:indicatorColor="?attr/colorTertiary"
+            app:trackColor="?attr/colorTertiaryContainer" />
 
         <TextView
-            android:id="@+id/tv_progress_count"
+            android:id="@+id/tv_confirmed_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0/0"
@@ -42,13 +85,13 @@
         android:layout_height="wrap_content"
         android:text="详细日志"
         style="?attr/textAppearanceLabelMedium"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
 
     <ScrollView
         android:id="@+id/scroll_logs"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="120dp"
         android:background="?attr/colorSurfaceContainerHigh"
         android:padding="8dp">
         <TextView
@@ -64,7 +107,7 @@
         android:id="@+id/btn_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="取消 / 完成"
+        android:text="取消"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_marginTop="16dp"/>
 

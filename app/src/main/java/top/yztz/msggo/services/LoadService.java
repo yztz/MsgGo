@@ -24,11 +24,13 @@ public class LoadService extends Service {
     public static class LoadStatus {
         public final boolean isLoading;
         public final boolean isSuccessful;
+        public final String errorMsg;
         public final String path;
         
-        public LoadStatus(boolean isLoading, boolean isSuccessful, String path) {
+        public LoadStatus(boolean isLoading, boolean isSuccessful, String path, String errorMsg) {
             this.isLoading = isLoading;
             this.isSuccessful = isSuccessful;
+            this.errorMsg = errorMsg;
             this.path = path;
         }
     }
@@ -53,8 +55,8 @@ public class LoadService extends Service {
                 Log.d(TAG, "数据加载成功");
                 stopSelf();
             } catch (DataLoadFailed dataLoadFailed) {
-                Log.d(TAG, "数据加载失败");
-                postStatus(false, false, path);
+                Log.d(TAG, "数据加载失败: " + dataLoadFailed.msg);
+                postStatus(false, false, path, dataLoadFailed.msg);
                 stopSelf();
             }
         }).start();
@@ -63,6 +65,10 @@ public class LoadService extends Service {
     }
 
     private void postStatus(boolean isLoading, boolean isSuccessful, String path) {
-        loadStatus.postValue(new LoadStatus(isLoading, isSuccessful, path));
+        loadStatus.postValue(new LoadStatus(isLoading, isSuccessful, path, "null"));
+    }
+
+    private void postStatus(boolean isLoading, boolean isSuccessful, String path, String msg) {
+        loadStatus.postValue(new LoadStatus(isLoading, isSuccessful, path, msg));
     }
 }

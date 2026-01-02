@@ -30,6 +30,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.ChooserActivity" />
+        <activity android:name=".activities.AboutActivity" />
         <activity android:name=".activities.EditActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.MainActivity"

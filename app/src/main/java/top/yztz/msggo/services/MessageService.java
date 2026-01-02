@@ -15,21 +15,73 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.Message;
 import top.yztz.msggo.util.FileUtil;
+import top.yztz.msggo.util.ToastUtil;
 
 public class MessageService extends Service {
     private static final String TAG = "MessageService";
     private static final String CHANNEL_ID = "message_send_channel";
     private static final int NOTIFICATION_ID = 1;
-    public static final String ACTION_CANCEL = "top.yztz.msggo.action.CANCEL_SENDING";
+    private static final String ACTION_CANCEL = "top.yztz.msggo.action.CANCEL_SENDING";
+    private static final String EXTRA_DELAY = "delay";
+    private static final String EXTRA_SUB_ID = "subId";
+    private static final String EXTRA_FILE_PATH = "message_file";
 
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notificationBuilder;
     private boolean isStopped;
     private BroadcastReceiver smsStatusReceiver;
+    private int totalMessages = 0;
+    private int confirmedMessages = 0;
+    private boolean allSentRequested = false;
+
+    /**
+     * Start sending messages service
+     *
+     * @param context  Context
+     * @param messages List of messages to send
+     * @param subId    Subscription ID (SIM card)
+     * @param delay    Delay between messages in milliseconds
+     */
+    public static void startSending(Context context, java.util.List<Message> messages, int subId, int delay) {
+        if (context == null || messages == null || messages.isEmpty()) return;
+
+        // Serialize messages to file
+        String serPath = FileUtil.saveMessageArrayToFile(context, messages.toArray(new Message[0]));
+        if (serPath == null) {
+            // Callback to UI or Toast? For now, we rely on the caller validation or just log error.
+            // Since this is a void method, we might want to return boolean or throw exception.
+            // But based on existing logic, we'll just try to start.
+            // Actually, ChooserActivity showed a toast if save failed.
+            // Let's rely on FileUtil internal error handling or assume it works for now.
+            // Ideally should propagate error.
+            ToastUtil.show(context, "短信服务启动失败: 文件保存错误");
+            return;
+        }
+
+        Intent serviceIntent = new Intent(context, MessageService.class);
+        serviceIntent.putExtra(EXTRA_DELAY, delay);
+        serviceIntent.putExtra(EXTRA_SUB_ID, subId);
+        serviceIntent.putExtra(EXTRA_FILE_PATH, serPath);
+
+        ContextCompat.startForegroundService(context, serviceIntent);
+    }
+
+    /**
+     * Stop sending messages
+     *
+     * @param context Context
+     */
+    public static void stopSending(Context context) {
+        if (context == null) return;
+        Intent intent = new Intent(context, MessageService.class);
+        intent.setAction(ACTION_CANCEL);
+        context.startService(intent);
+    }
 
     @Nullable
     @Override
@@ -60,9 +112,9 @@ public class MessageService extends Service {
             return START_NOT_STICKY;
         }
 
-        int delay = intent.getIntExtra("delay", 5000);
-        int subId = intent.getIntExtra("subId", SMSSender.getDefaultSubID());
-        String serPath = intent.getStringExtra("message_file");
+        int delay = intent.getIntExtra(EXTRA_DELAY, 5000);
+        int subId = intent.getIntExtra(EXTRA_SUB_ID, SMSSender.getDefaultSubID());
+        String serPath = intent.getStringExtra(EXTRA_FILE_PATH);
 
         if (serPath == null) {
             stopSelf();
@@ -70,6 +122,9 @@ public class MessageService extends Service {
         }
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build());
+        totalMessages = 0;
+        confirmedMessages = 0;
+        allSentRequested = false;
         SendingMonitor.getInstance().reset();
         SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.SENDING);
 
@@ -80,19 +135,18 @@ public class MessageService extends Service {
                 return;
             }
 
-            SendingMonitor.getInstance().setTotal(messages.length);
-
+            totalMessages = messages.length;
+            SendingMonitor.getInstance().setTotal(totalMessages);
             for (int i = 0; i < messages.length && !isStopped; i++) {
                 Message message = messages[i];
                 try {
+                    // Delay
+                    if (i != 0) Thread.sleep(delay);
                     SMSSender.sendMessage(getApplicationContext(), message.getContent(), message.getPhone(), subId, i + 1);
 
                     // Update progress (requests sent)
                     updateNotification(i + 1, messages.length);
-                    SendingMonitor.getInstance().updateProgress(i + 1);
-
-                    // Delay
-                    Thread.sleep(delay);
+                    SendingMonitor.getInstance().updateSentProgress(i + 1);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     stopSending();
@@ -102,36 +156,35 @@ public class MessageService extends Service {
                 }
             }
 
+            allSentRequested = true;
+
             // Clean up
             getApplicationContext().deleteFile(serPath);
 
-            if (!isStopped) {
-                SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.COMPLETED);
-                showCompletedNotification();
-            } else {
-                SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                stopForeground(STOP_FOREGROUND_DETACH);
-            } else {
-                stopForeground(false);
-            }
+            // Check if we can stop now (all confirmed)
+            checkAndStopIfFinished();
         }).start();
 
-        return START_STICKY;
+        return START_NOT_STICKY;
+    }
+
+    private synchronized void checkAndStopIfFinished() {
+        if (isStopped) return;
+        
+        if (allSentRequested && confirmedMessages >= totalMessages) {
+            Log.i(TAG, "所有消息已发送完成并确认");
+            SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.COMPLETED);
+            showCompletedNotification();
+            stopForeground(STOP_FOREGROUND_DETACH);
+            stopSelf();
+        }
     }
 
     private void stopSending() {
         isStopped = true;
         SendingMonitor.getInstance().appendLog("发送任务已取消");
         SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE); // 移除通知
-        } else {
-            stopForeground(true);
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE); // 移除通知
 
         stopSelf();
     }
@@ -176,17 +229,21 @@ public class MessageService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int code = intent.getIntExtra("code", -1);
+                String phone = intent.getStringExtra("phone");
                 int resultCode = getResultCode();
                 String log;
                 boolean success = (resultCode == android.app.Activity.RESULT_OK);
-
+            
                 if (success) {
-                    log = "第 " + code + " 条: 发送成功";
+                    log = String.format("#%d [%s] 发送成功", code, phone != null ? phone : "未知");
                 } else {
-                    log = "第 " + code + " 条: 发送失败 (代码 " + resultCode + ")";
+                    log = String.format("#%d [%s] 发送失败 (代码 %d)", code, phone != null ? phone : "未知", resultCode);
                 }
-
+                Log.i(TAG, log);
+                confirmedMessages++;
+                SendingMonitor.getInstance().incrementConfirmed(success);
                 SendingMonitor.getInstance().appendLog(log);
+                checkAndStopIfFinished();
             }
         };
 

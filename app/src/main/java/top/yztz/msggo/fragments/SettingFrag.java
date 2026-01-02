@@ -3,6 +3,7 @@ package top.yztz.msggo.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +37,7 @@ import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.R;
 import top.yztz.msggo.services.LoadService;
+import top.yztz.msggo.util.Config;
 import top.yztz.msggo.util.ToastUtil;
 
 public class SettingFrag extends Fragment {
@@ -45,7 +47,7 @@ public class SettingFrag extends Fragment {
     private Slider mSliderDelay;
     private MaterialSwitch mSwitchAutoEditor;
     private MaterialCardView mCardClearCache;
-    private View mRowExportLog, mRowProjectHome;
+    private View mRowExportLog, mRowAboutApp;
     private LinearLayout mCardSmsRate;
     private boolean isUpdatingUI = false;
 
@@ -75,7 +77,7 @@ public class SettingFrag extends Fragment {
         mCardSmsRate = view.findViewById(R.id.card_sms_rate);
         mTvSmsRateValue = view.findViewById(R.id.tv_sms_rate_value);
         mRowExportLog = view.findViewById(R.id.row_export_log);
-        mRowProjectHome = view.findViewById(R.id.row_project_home);
+        mRowAboutApp = view.findViewById(R.id.row_about_app);
 
         setupListeners();
         showInfo();
@@ -156,14 +158,9 @@ public class SettingFrag extends Fragment {
         // Export Log
         mRowExportLog.setOnClickListener(v -> exportLogs());
 
-        // Project Homepage
-        mRowProjectHome.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/yztz/MsgGo"));
-                startActivity(intent);
-            } catch (Exception e) {
-                ToastUtil.show(context, "无法打开链接: " + e.getMessage());
-            }
+        // About App
+        mRowAboutApp.setOnClickListener(v -> {
+            startActivity(new Intent(context, top.yztz.msggo.activities.AboutActivity.class));
         });
 
     }

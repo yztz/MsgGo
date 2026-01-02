@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -35,6 +36,7 @@ import top.yztz.msggo.fragments.HomeFrag;
 import top.yztz.msggo.fragments.SettingFrag;
 import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
+import top.yztz.msggo.util.Config;
 import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.util.XiaomiUtil;
@@ -130,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
                         Uri uri = data.getData();
                         if (uri != null) {
                             Log.d(TAG, "File URI: " + uri.getEncodedPath());
-                            // 调用你原来的路径转换和加载工具
                             String path = getFilePathFromContentUri(this, uri);
                             DataLoader.load(path, this);
                         }
@@ -138,13 +139,54 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
         setContentView(R.layout.activity_main);
+        DataLoader.init(this);
+
+        // Check Privacy Policy and Disclaimer
+        if (!DataLoader.isPrivacyAccepted()) {
+            showPrivacyDialog();
+        } else if (!DataLoader.isDisclaimerAccepted()) {
+            showDisclaimerDialog();
+        } else {
+            checkPermissionsAndInit();
+        }
+    }
+
+    private void showPrivacyDialog() {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("隐私政策")
+                .setMessage(Config.PRIVACY_POLICY)
+                .setCancelable(false)
+                .setPositiveButton("同意并继续", (dialog, which) -> {
+                    DataLoader.setPrivacyAccepted(true);
+                    if (!DataLoader.isDisclaimerAccepted()) {
+                        showDisclaimerDialog();
+                    } else {
+                        checkPermissionsAndInit();
+                    }
+                })
+                .setNegativeButton("不同意并退出", (dialog, which) -> finish())
+                .show();
+    }
+
+    private void showDisclaimerDialog() {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("免责声明")
+                .setMessage(Config.DISCLAIMER)
+                .setCancelable(false)
+                .setPositiveButton("已阅读并同意", (dialog, which) -> {
+                    DataLoader.setDisclaimerAccepted(true);
+                    checkPermissionsAndInit();
+                })
+                .setNegativeButton("不同意并退出", (dialog, which) -> finish())
+                .show();
+    }
+
+    private void checkPermissionsAndInit() {
         observeLoadStatus();
         nMenu = findViewById(R.id.bottom_navigation);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         indicator = findViewById(R.id.progress);
         
-//        DialogX.init(this);
-
         // Check permissions
         List<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.READ_PHONE_STATE);
@@ -168,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initApp() {
-        DataLoader.init(this);
         initFragment();
         if (SMSSender.getSubs(this).isEmpty()) {
             if (XiaomiUtil.isXiaomi()) {
@@ -179,8 +220,22 @@ public class MainActivity extends AppCompatActivity {
             ToastUtil.show(this, "没发现可用于发送短信的 SIM 卡，即将退出");
             finish();
         }
-    }
+        // check share
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        Uri uri = null;
 
+        if (Intent.ACTION_VIEW.equals(action)) {
+            uri = intent.getData();
+        } else if (Intent.ACTION_SEND.equals(action)) {
+            uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class);
+        }
+
+        if (uri != null) {
+            Log.i(TAG, "检测到外部链接，加载: " + uri);
+            DataLoader.load(FileUtil.getFilePathFromContentUri(this, uri), this);
+        }
+    }
 
 
 
@@ -310,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                         EditActivity.openEditor(this);
                     }
                 } else {
-                    ToastUtil.show(MainActivity.this, "数据加载失败");
+                    ToastUtil.show(MainActivity.this, "数据加载失败: " + status.errorMsg);
                 }
             }
         });
