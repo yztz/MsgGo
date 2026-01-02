@@ -62,21 +62,21 @@
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
                 
-                 <TextView
-                    android:id="@+id/tv_build_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Build 2026.01.01"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOutline" />
+<!--                 <TextView-->
+<!--                    android:id="@+id/tv_build_date"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="2dp"-->
+<!--                    android:text="Build 2026.01.01"-->
+<!--                    android:textAppearance="?attr/textAppearanceBodySmall"-->
+<!--                    android:textColor="?attr/colorOutline" />-->
 
                  <TextView
                     android:id="@+id/tv_arch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Arch: arm64-v8a"
+                    android:text="arm64-v8a"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?attr/colorOutline" />
 

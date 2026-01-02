@@ -10,7 +10,7 @@ android {
         versionCode 26010230
         versionName "3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "long", "BUILD_TIME", "${System.currentTimeMillis()}L"
+//        buildConfigField "long", "BUILD_TIME", "${System.currentTimeMillis()}L"
         multiDexEnabled true
     }
     buildFeatures {

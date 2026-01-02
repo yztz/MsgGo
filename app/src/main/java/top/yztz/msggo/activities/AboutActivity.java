@@ -31,25 +31,25 @@ public class AboutActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
 
         TextView tvVersion = findViewById(R.id.tv_version);
-        TextView tvBuildDate = findViewById(R.id.tv_build_date);
+//        TextView tvBuildDate = findViewById(R.id.tv_build_date);
         
         tvVersion.setText("Version " + BuildConfig.VERSION_NAME);
         
         // Format build date
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        // Note: BuildConfig.BUILD_TIME is expected to be a long
-        // If it's not generated yet, this might error in IDE but works after build. 
-        // We will assume the Gradle change is applied.
-        try {
-             // Accessing the field reflectively or directly if generated. 
-             // Since we modified build.gradle, it should be available as BuildConfig.BUILD_TIME
-             // However, for safety in case of sync issues, we'll try/catch or just use it.
-             // Direct access:
-             Date buildDate = new Date(BuildConfig.BUILD_TIME);
-             tvBuildDate.setText("Built on " + sdf.format(buildDate));
-        } catch (Exception e) {
-            tvBuildDate.setText("Build Date Unknown");
-        }
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+//        // Note: BuildConfig.BUILD_TIME is expected to be a long
+//        // If it's not generated yet, this might error in IDE but works after build.
+//        // We will assume the Gradle change is applied.
+//        try {
+//             // Accessing the field reflectively or directly if generated.
+//             // Since we modified build.gradle, it should be available as BuildConfig.BUILD_TIME
+//             // However, for safety in case of sync issues, we'll try/catch or just use it.
+//             // Direct access:
+//             Date buildDate = new Date(BuildConfig.BUILD_TIME);
+//             tvBuildDate.setText("Built on " + sdf.format(buildDate));
+//        } catch (Exception e) {
+//            tvBuildDate.setText("Build Date Unknown");
+//        }
 
         // Show Arch
         TextView tvArch = findViewById(R.id.tv_arch);
