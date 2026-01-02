@@ -1,7 +1,5 @@
 package top.yztz.msggo.util;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -41,7 +38,7 @@ public class XiaomiUtil {
                 .setTitle("SIM 卡信息读取受限")
                 .setMessage("小米系统“静默拒绝”了读取电话信息的权限。请前往设置手动开启“电话”权限，并确认没有开启“空白通行证”。")
                 .setPositiveButton("前往设置", (dialog, which) -> {
-                    startActivity(activity, XiaomiUtil.getPermissionManagementIntent(activity), null);
+                    activity.startActivity(XiaomiUtil.getPermissionManagementIntent(activity), null);
                     exitApp(activity);
                 })
                 .setNegativeButton("退出应用", (dialog, which) -> {

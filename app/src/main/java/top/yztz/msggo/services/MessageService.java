@@ -106,6 +106,17 @@ public class MessageService extends Service {
     }
 
     @Override
+    public void onTimeout(int startId, int fgsType) {
+        super.onTimeout(startId, fgsType);
+        Log.w(TAG, "Foreground service timeout reached. Stopping service gracefully.");
+        SendingMonitor.getInstance().appendLog("服务已达到6小时限制，正在停止...");
+        isStopped = true;
+        SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
+        stopForeground(STOP_FOREGROUND_REMOVE);
+        stopSelf();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && ACTION_CANCEL.equals(intent.getAction())) {
             stopSending();
