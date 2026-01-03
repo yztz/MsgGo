@@ -4,14 +4,9 @@ package top.yztz.msggo.data;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.nfc.Tag;
-import android.os.FileUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,23 +17,18 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.activities.MainActivity;
 import top.yztz.msggo.exception.DataLoadFailed;
 import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
-import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.HashUtils;
 
 
@@ -361,7 +351,7 @@ class ExcelReader {
                 break;
             case NUMERIC: //数值类型
                 if (DateUtil.isCellDateFormatted(cell)) {  //判断日期类型
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
                     cellValue = sdf.format(cell.getDateCellValue());
                 } else {  //否
                     cellValue = new DecimalFormat("#").format(cell.getNumericCellValue());

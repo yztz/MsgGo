@@ -138,28 +138,24 @@ public class SettingFrag extends Fragment {
 
 
         // Clear Cache
-        mCardClearCache.setOnClickListener(v -> {
-            new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
-                    .setTitle(getString(R.string.clear_cache))
-                    .setMessage(getString(R.string.confirm_clear_cache_msg))
-                    .setPositiveButton(getString(R.string.clear), (dialog, which) -> {
-                        DataCleaner.cleanInternalCache(context);
-                        HistoryManager.clearHistory(context);
-                        DataLoader.clear();
-                        ToastUtil.show(context, getString(R.string.cache_cleared));
-                        showInfo();
-                    })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
-        });
+        mCardClearCache.setOnClickListener(v -> new MaterialAlertDialogBuilder(context)
+                .setTitle(getString(R.string.clear_cache))
+                .setMessage(getString(R.string.confirm_clear_cache_msg))
+                .setPositiveButton(getString(R.string.clear), (dialog, which) -> {
+                    DataCleaner.cleanInternalCache(context);
+                    HistoryManager.clearHistory(context);
+                    DataLoader.clear();
+                    ToastUtil.show(context, getString(R.string.cache_cleared));
+                    showInfo();
+                })
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show());
 
         // Export Log
         mRowExportLog.setOnClickListener(v -> exportLogs());
 
         // About App
-        mRowAboutApp.setOnClickListener(v -> {
-            startActivity(new Intent(context, top.yztz.msggo.activities.AboutActivity.class));
-        });
+        mRowAboutApp.setOnClickListener(v -> startActivity(new Intent(context, top.yztz.msggo.activities.AboutActivity.class)));
 
         // Language
         mRowLanguage.setOnClickListener(v -> {

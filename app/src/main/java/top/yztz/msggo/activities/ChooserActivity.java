@@ -3,25 +3,17 @@ package top.yztz.msggo.activities;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SubscriptionInfo;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -46,7 +38,6 @@ import top.yztz.msggo.services.MessageService;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.services.SendingMonitor;
 
-import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.TextParser;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.adapters.CheckboxAdapter;
@@ -208,14 +199,13 @@ public class ChooserActivity extends AppCompatActivity {
         int subId = DataLoader.getSimSubId();
         List<SubscriptionInfo> subs = SMSSender.getSubs(this);
         String simName = getString(R.string.unknown_sim);
-        if (subs != null) {
-            for (SubscriptionInfo sub : subs) {
-                if (sub.getSubscriptionId() == subId) {
-                    simName = getString(R.string.sim_slot_format, sub.getSimSlotIndex() + 1, sub.getCarrierName());
-                    break;
-                }
+        for (SubscriptionInfo sub : subs) {
+            if (sub.getSubscriptionId() == subId) {
+                simName = getString(R.string.sim_slot_format, sub.getSimSlotIndex() + 1, sub.getCarrierName());
+                break;
             }
         }
+
         tvSimInfo.setText(simName);
     }
     
@@ -339,7 +329,7 @@ public class ChooserActivity extends AppCompatActivity {
             progressSent.setProgress(sent);
         }
         if (tvSentCount != null) {
-            tvSentCount.setText(String.format("%d/%d", sent, total));
+            tvSentCount.setText(String.format(Locale.getDefault(), "%d/%d", sent, total));
         }
     }
     
@@ -352,7 +342,7 @@ public class ChooserActivity extends AppCompatActivity {
             progressConfirmed.setProgress(confirmed);
         }
         if (tvConfirmedCount != null) {
-            tvConfirmedCount.setText(String.format("%d/%d", confirmed, total));
+            tvConfirmedCount.setText(String.format(Locale.getDefault(), "%d/%d", confirmed, total));
         }
     }
     

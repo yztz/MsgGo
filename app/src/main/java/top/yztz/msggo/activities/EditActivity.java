@@ -1,49 +1,29 @@
 package top.yztz.msggo.activities;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
 import androidx.core.view.WindowCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.adapters.VarAdapter;
-import top.yztz.msggo.data.DataContext;
 import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.util.ToastUtil;
@@ -151,11 +131,7 @@ public class EditActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 高亮
-     *
-     * @param s
-     */
+
     private void highLight(Editable s) {
         String temp = s.toString();
         CharacterStyle span;

@@ -181,7 +181,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:text="￥0.1"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorPrimary" />
 
@@ -253,7 +252,6 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:src="@drawable/ic_delete"
-                    android:contentDescription="清除缓存"
                     app:tint="?attr/colorOnSurfaceVariant" />
 
             </LinearLayout>

@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.transition.MaterialSharedAxis;
 
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,7 +35,6 @@ import top.yztz.msggo.data.DataContext;
 import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.R;
-import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.util.XiaomiUtil;
