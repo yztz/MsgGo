@@ -98,11 +98,11 @@ public class ChooserActivity extends AppCompatActivity {
             String recipient = dataMap.get(DataLoader.getNumberColumn());
 
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("消息预览")
-                    .setMessage(String.format("收件人：%s\n内容预览：\n%s",
-                            TextUtils.isEmpty(recipient) ? "未找到号码" : recipient,
+                    .setTitle(getString(R.string.preview_title))
+                    .setMessage(getString(R.string.preview_msg_format,
+                            TextUtils.isEmpty(recipient) ? getString(R.string.unknown) : recipient,
                             content))
-                    .setPositiveButton("确定", null)
+                    .setPositiveButton(getString(R.string.ok), null)
                     .show();
         });
 
@@ -146,7 +146,7 @@ public class ChooserActivity extends AppCompatActivity {
             }
 
             if (itemIndices.isEmpty()) {
-                ToastUtil.show(ChooserActivity.this, "当前还未选择任何收件人哦~");
+                ToastUtil.show(ChooserActivity.this, getString(R.string.no_recipients_selected));
                 return;
             }
 
@@ -157,10 +157,10 @@ public class ChooserActivity extends AppCompatActivity {
             double cost = itemIndices.size() * rate;
 
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("确认发送")
-                    .setMessage(String.format(Locale.getDefault(), "确定向已选的 %d 位联系人发送短信吗？\n预计产生费用：¥%.2f", itemIndices.size(), cost))
-                    .setPositiveButton("立即发送", (dialog, which) -> startSending(itemIndices))
-                    .setNegativeButton("取消", null)
+                    .setTitle(getString(R.string.confirm_send_title))
+                    .setMessage(getString(R.string.confirm_send_msg_format, itemIndices.size(), cost))
+                    .setPositiveButton(getString(R.string.send_now), (dialog, which) -> startSending(itemIndices))
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .show();
         });
 
@@ -207,11 +207,11 @@ public class ChooserActivity extends AppCompatActivity {
         
         int subId = DataLoader.getSimSubId();
         List<SubscriptionInfo> subs = SMSSender.getSubs(this);
-        String simName = "未知 SIM 卡";
+        String simName = getString(R.string.unknown_sim);
         if (subs != null) {
             for (SubscriptionInfo sub : subs) {
                 if (sub.getSubscriptionId() == subId) {
-                    simName = String.format("卡槽 %d · %s", sub.getSimSlotIndex() + 1, sub.getCarrierName());
+                    simName = getString(R.string.sim_slot_format, sub.getSimSlotIndex() + 1, sub.getCarrierName());
                     break;
                 }
             }
@@ -387,22 +387,22 @@ public class ChooserActivity extends AppCompatActivity {
             if (progressDialog != null && progressDialog.isShowing()) {
                 switch (state) {
                     case COMPLETED:
-                        tvProgressTitle.setText("发送完成");
+                        tvProgressTitle.setText(getString(R.string.sending_completed));
                         progressDialog.setCancelable(true);
                         progressDialog.setCanceledOnTouchOutside(true);
-                        btnCancel.setText("完成");
+                        btnCancel.setText(getString(R.string.done));
                         break;
                     case CANCELLED:
-                        tvProgressTitle.setText("已取消");
+                        tvProgressTitle.setText(getString(R.string.cancelled));
                         progressDialog.setCancelable(true);
                         progressDialog.setCanceledOnTouchOutside(true);
-                        btnCancel.setText("关闭");
+                        btnCancel.setText(getString(R.string.close));
                         break;
                     case SENDING:
-                        tvProgressTitle.setText("正在发送...");
+                        tvProgressTitle.setText(getString(R.string.sending));
                         progressDialog.setCancelable(false);
                         progressDialog.setCanceledOnTouchOutside(false);
-                        btnCancel.setText("取消");
+                        btnCancel.setText(getString(R.string.cancel));
                         break;
                 }
             }

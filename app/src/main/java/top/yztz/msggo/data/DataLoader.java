@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import top.yztz.msggo.R;
 import top.yztz.msggo.activities.MainActivity;
 import top.yztz.msggo.exception.DataLoadFailed;
 import top.yztz.msggo.services.LoadService;
@@ -66,6 +67,8 @@ public class DataLoader {
         DefaultPropMap.put("privacy_accepted", false);
         // 是否同意免责声明
         DefaultPropMap.put("disclaimer_accepted", false);
+        // 语言设置 (auto, en, zh)
+        DefaultPropMap.put("language", "auto");
 
     }
 
@@ -140,8 +143,8 @@ public class DataLoader {
         context.startService(intent);
     }
 
-    public static void __load(String path) throws DataLoadFailed {
-        ExcelReader.read(path);
+    public static void __load(Context context, String path) throws DataLoadFailed {
+        ExcelReader.read(context, path);
         dataModel = new DataModel(ExcelReader.readExcelContent());
     }
 
@@ -231,6 +234,14 @@ public class DataLoader {
         spManager.mEditor.putBoolean("disclaimer_accepted", flag).apply();
     }
 
+    public static String getLanguage() {
+        return spManager.mSp.getString("language", "auto");
+    }
+
+    public static void setLanguage(String lang) {
+        spManager.mEditor.putString("language", lang).apply();
+    }
+
     public static void clear() {
         dataModel = null;
         dataContext = new DataContext();
@@ -262,7 +273,7 @@ class ExcelReader {
     public static int[] titleColumns = null;
 
 
-    static void read(String path) throws DataLoadFailed {
+    static void read(Context context, String path) throws DataLoadFailed {
         try (FileInputStream is = new FileInputStream(path)) {
             //创建工作簿
             String postfix = path.substring(path.lastIndexOf("."));
@@ -277,15 +288,15 @@ class ExcelReader {
             sheet = wb.getSheetAt(0);
             //获取行的列数（可自定）
             Row firstRow = sheet.getRow(0);
-            if (firstRow == null) throw new DataLoadFailed("未找到首行标题（内容为空）");
+            if (firstRow == null) throw new DataLoadFailed(context.getString(R.string.error_no_header));
             colNum = firstRow.getPhysicalNumberOfCells();
 
-            if (firstRow.getLastCellNum() - firstRow.getFirstCellNum() != colNum) throw new DataLoadFailed("数据内容列非连续");
+            if (firstRow.getLastCellNum() - firstRow.getFirstCellNum() != colNum) throw new DataLoadFailed(context.getString(R.string.error_non_continuous_columns));
             //获取标题
-            readExcelTitle();
+            readExcelTitle(context);
             //得到总行数（不包含标题）
             int lastRowNum = sheet.getLastRowNum();
-            if (lastRowNum == -1 || lastRowNum == 0) throw new DataLoadFailed("内容为空");
+            if (lastRowNum == -1 || lastRowNum == 0) throw new DataLoadFailed(context.getString(R.string.error_empty_content));
             Log.i(TAG, String.format("lastRowNum=%d, colNum=%d(%d-%d)", lastRowNum, colNum, firstRow.getFirstCellNum(), firstRow.getLastCellNum() - 1));
         } catch (IOException e) {
             //抛出读取异常
@@ -295,7 +306,7 @@ class ExcelReader {
     }
 
 
-    private static void readExcelTitle() throws DataLoadFailed {
+    private static void readExcelTitle(Context context) throws DataLoadFailed {
         Row row = sheet.getRow(0);
         titles = new String[colNum];
         titleColumns = new int[colNum];
@@ -303,7 +314,7 @@ class ExcelReader {
         for (int i = 0; i < titles.length; i++) {
             titles[i] = getCellFormatValue(row.getCell(startCol + i));
             titleColumns[i] = startCol + i;
-            if (TextUtils.isEmpty(titles[i])) throw new DataLoadFailed("标题内容列(" + (startCol + i) +")为空");
+            if (TextUtils.isEmpty(titles[i])) throw new DataLoadFailed(context.getString(R.string.error_empty_title_column, (startCol + i)));
         }
     }
 

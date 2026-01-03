@@ -10,8 +10,8 @@
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入资费"
-        app:prefixText="￥">
+        android:hint="@string/hint_sms_rate"
+        app:prefixText="@string/currency_sms_rate">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text"

@@ -3,15 +3,12 @@ package top.yztz.msggo.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -36,20 +34,18 @@ import top.yztz.msggo.data.DataCleaner;
 import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.R;
-import top.yztz.msggo.services.LoadService;
-import top.yztz.msggo.util.Config;
 import top.yztz.msggo.util.ToastUtil;
 
 public class SettingFrag extends Fragment {
     private static final String TAG = "SettingFrag";
     private Context context;
-    private TextView mTvCache, mTvDelayValue, mTvSmsRateValue;
-    private Slider mSliderDelay;
     private MaterialSwitch mSwitchAutoEditor;
     private MaterialCardView mCardClearCache;
-    private View mRowExportLog, mRowAboutApp;
+    private View mRowExportLog, mRowAboutApp, mRowLanguage;
+    private TextView mTvCache, mTvDelayValue, mTvSmsRateValue, mTvLanguage;
     private LinearLayout mCardSmsRate;
     private boolean isUpdatingUI = false;
+    private Slider mSliderDelay;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +74,8 @@ public class SettingFrag extends Fragment {
         mTvSmsRateValue = view.findViewById(R.id.tv_sms_rate_value);
         mRowExportLog = view.findViewById(R.id.row_export_log);
         mRowAboutApp = view.findViewById(R.id.row_about_app);
+        mRowLanguage = view.findViewById(R.id.row_language);
+        mTvLanguage = view.findViewById(R.id.tv_language);
 
         setupListeners();
         showInfo();
@@ -97,13 +95,13 @@ public class SettingFrag extends Fragment {
                 int delayMs = (int) (value * 500); // 转换回毫秒
                 DataLoader.setDelay(delayMs);
                 float seconds = value * 0.5f;
-                mTvDelayValue.setText(String.format("%.1fs", seconds));
+                mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", seconds));
             }
         });
 
         mSliderDelay.setLabelFormatter(value -> {
             float seconds = value * 0.5f; // 转换回秒数
-            return String.format("%.1fs", seconds);
+            return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
 
         // SMS Rate
@@ -114,9 +112,9 @@ public class SettingFrag extends Fragment {
             editText.setSelection(editText.getText().length());
 
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
-                    .setTitle("设置短信资费")
+                    .setTitle(getString(R.string.set_sms_rate_title))
                     .setView(dialogView)
-                    .setPositiveButton("确定", (dialog, which) -> {
+                    .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                         String input = editText.getText().toString().trim();
                         if (TextUtils.isEmpty(input)) {
                             DataLoader.setSmsRate("0");
@@ -126,15 +124,15 @@ public class SettingFrag extends Fragment {
                                 if (rate >= 0 && rate <= 10) {
                                     DataLoader.setSmsRate(input);
                                 } else {
-                                    ToastUtil.show(context, "请输入 0-10 之间的数字");
+                                    ToastUtil.show(context, getString(R.string.error_invalid_rate_range));
                                 }
                             } catch (NumberFormatException e) {
-                                ToastUtil.show(context, "请输入有效的数字");
+                                ToastUtil.show(context, getString(R.string.error_invalid_number));
                             }
                         }
                         showInfo();
                     })
-                    .setNegativeButton("取消", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .show();
         });
 
@@ -142,16 +140,16 @@ public class SettingFrag extends Fragment {
         // Clear Cache
         mCardClearCache.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
-                    .setTitle("清除缓存")
-                    .setMessage("确定要清空应用缓存和历史记录吗？")
-                    .setPositiveButton("清空", (dialog, which) -> {
+                    .setTitle(getString(R.string.clear_cache))
+                    .setMessage(getString(R.string.confirm_clear_cache_msg))
+                    .setPositiveButton(getString(R.string.clear), (dialog, which) -> {
                         DataCleaner.cleanInternalCache(context);
                         HistoryManager.clearHistory(context);
                         DataLoader.clear();
-                        ToastUtil.show(context, "缓存已清空");
+                        ToastUtil.show(context, getString(R.string.cache_cleared));
                         showInfo();
                     })
-                .setNegativeButton("取消", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
         });
 
@@ -161,6 +159,34 @@ public class SettingFrag extends Fragment {
         // About App
         mRowAboutApp.setOnClickListener(v -> {
             startActivity(new Intent(context, top.yztz.msggo.activities.AboutActivity.class));
+        });
+
+        // Language
+        mRowLanguage.setOnClickListener(v -> {
+            String[] langs = {
+                    getString(R.string.language_auto),
+                    getString(R.string.language_en),
+                    getString(R.string.language_zh)
+            };
+            String[] tags = {"auto", "en", "zh"};
+            String current = DataLoader.getLanguage();
+            int checkedItem = 0;
+            for (int i = 0; i < tags.length; i++) {
+                if (tags[i].equals(current)) {
+                    checkedItem = i;
+                    break;
+                }
+            }
+
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle(getString(R.string.switch_language))
+                    .setSingleChoiceItems(langs, checkedItem, (dialog, which) -> {
+                        top.yztz.msggo.util.LocaleUtils.setLocale(tags[which]);
+                        dialog.dismiss();
+                        showInfo();
+                    })
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show();
         });
 
     }
@@ -194,7 +220,7 @@ public class SettingFrag extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Error exporting logs", e);
-            ToastUtil.show(context, "导出日志失败: " + e.getMessage());
+            ToastUtil.show(context, getString(R.string.export_log_failed_prefix, e.getMessage()));
         }
     }
 
@@ -219,7 +245,6 @@ public class SettingFrag extends Fragment {
     }
 
     public void showInfo() {
-        if (!isAdded()) return;
         isUpdatingUI = true;
         
         // Display delay
@@ -227,7 +252,7 @@ public class SettingFrag extends Fragment {
         float sliderValue = delayMs / 500f; // 每 0.5 秒为 1 个单位
         sliderValue = Math.max(1f, Math.min(16f, sliderValue)); // 限制在 0.5s-8.0s 范围
         mSliderDelay.setValue(sliderValue);
-        mTvDelayValue.setText(String.format("%.1fs", sliderValue * 500 / 1000));
+        mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", sliderValue * 500 / 1000));
 
         // Set auto editor switch
         mSwitchAutoEditor.setChecked(DataLoader.autoEnterEditor());
@@ -236,15 +261,22 @@ public class SettingFrag extends Fragment {
         // mTvNumberColumn.setText(TextUtils.isEmpty(numberColumn) ? "未选择" : numberColumn);
         
         // SMS Rate
-        mTvSmsRateValue.setText("￥" + DataLoader.getSmsRate());
+        mTvSmsRateValue.setText(getString(R.string.currency_sms_rate, DataLoader.getSmsRate()));
 
         // Display cache size
         try {
             String cacheSize = DataCleaner.getCacheSize(context.getCacheDir());
-            mTvCache.setText("当前缓存大小: " + cacheSize);
+            mTvCache.setText(getString(R.string.current_cache_size_prefix, cacheSize));
         } catch (Exception e) {
-            mTvCache.setText("无法计算缓存大小");
+            mTvCache.setText(getString(R.string.error_calc_cache_size));
         }
+
+        // Display language
+        String lang = DataLoader.getLanguage();
+        String langText = getString(R.string.language_auto);
+        if ("en".equals(lang)) langText = getString(R.string.language_en);
+        else if ("zh".equals(lang)) langText = getString(R.string.language_zh);
+        mTvLanguage.setText(langText);
         
         isUpdatingUI = false;
     }

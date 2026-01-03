@@ -67,7 +67,7 @@ public class EditActivity extends AppCompatActivity {
         mBtnSave.setOnClickListener(v->{
             DataLoader.setContent(mEt.getText().toString().trim());
             HistoryManager.addHistory(this, DataLoader.getDataContext());
-            ToastUtil.show(EditActivity.this, "信息保存成功！");
+            ToastUtil.show(EditActivity.this, getString(R.string.save_success));
             finish();
         });
 
@@ -76,7 +76,7 @@ public class EditActivity extends AppCompatActivity {
             MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
             switch (v.getItemId()) {
                 case R.id.btn_var:
-                    dialogBuilder.setTitle("变量选取")
+                    dialogBuilder.setTitle(getString(R.string.variable_selection_title))
                             .setItems(DataLoader.getTitles(), (dialog, which) -> {
                                 int loc = mEt.getSelectionStart();
                                 String pat = "${" + DataLoader.getTitles()[which] + "}";
@@ -86,12 +86,12 @@ public class EditActivity extends AppCompatActivity {
                             }).setCancelable(true).show();
                     return true;
                 case R.id.btn_clear:
-                    dialogBuilder.setTitle("确认清空")
-                            .setCancelable(true).setMessage("你的编辑将会丢失很久，真的很久很久...")
-                            .setPositiveButton("确定", (dialog, which) -> {
+                    dialogBuilder.setTitle(getString(R.string.confirm_clear_title))
+                            .setCancelable(true).setMessage(getString(R.string.confirm_clear_msg))
+                            .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                                 mEt.getText().clear();
                                 dialog.dismiss();
-                            }).setNegativeButton("取消", (dialog, which) -> {
+                            }).setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
                                 dialog.dismiss();
                             }).show();
                     // Respond to positive button press
@@ -135,13 +135,13 @@ public class EditActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (edited) {
                     new MaterialAlertDialogBuilder(EditActivity.this)
-                            .setTitle("您的编辑尚未保存哦")
-                            .setMessage("确定不保存就离开吗？")
-                            .setPositiveButton("确定", (dialog, which) -> {
+                            .setTitle(getString(R.string.edit_unsaved_title))
+                            .setMessage(getString(R.string.edit_unsaved_msg))
+                            .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                                 setEnabled(false); // 禁用此回调
                                 getOnBackPressedDispatcher().onBackPressed(); // 触发系统默认退出
                             })
-                            .setNegativeButton("取消", null)
+                            .setNegativeButton(getString(R.string.cancel), null)
                             .show();
                 } else {
                     setEnabled(false);
@@ -188,7 +188,7 @@ public class EditActivity extends AppCompatActivity {
      */
     public static void openEditor(Context context) {
         if (DataLoader.getDataModel() == null) {
-            ToastUtil.show(context, "请先点击“+”导入数据哦~");
+            ToastUtil.show(context, context.getString(R.string.error_import_data_first));
         } else {
             Intent intent = new Intent(context, EditActivity.class);
             context.startActivity(intent);

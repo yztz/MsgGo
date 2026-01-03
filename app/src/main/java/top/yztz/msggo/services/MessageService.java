@@ -58,7 +58,7 @@ public class MessageService extends Service {
             // Actually, ChooserActivity showed a toast if save failed.
             // Let's rely on FileUtil internal error handling or assume it works for now.
             // Ideally should propagate error.
-            ToastUtil.show(context, "短信服务启动失败: 文件保存错误");
+            ToastUtil.show(context, context.getString(R.string.service_start_failed));
             return;
         }
 
@@ -108,7 +108,7 @@ public class MessageService extends Service {
     public void onTimeout(int startId, int fgsType) {
         super.onTimeout(startId, fgsType);
         Log.w(TAG, "Foreground service timeout reached. Stopping service gracefully.");
-        SendingMonitor.getInstance().appendLog("服务已达到6小时限制，正在停止...");
+        SendingMonitor.getInstance().appendLog(getString(R.string.fgs_timeout_msg));
         isStopped = true;
         SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
         stopForeground(STOP_FOREGROUND_REMOVE);
@@ -182,7 +182,7 @@ public class MessageService extends Service {
         if (isStopped) return;
         
         if (allSentRequested && confirmedMessages >= totalMessages) {
-            Log.i(TAG, "所有消息已发送完成并确认");
+            Log.i(TAG, getString(R.string.all_messages_confirmed));
             SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.COMPLETED);
             showCompletedNotification();
             stopForeground(STOP_FOREGROUND_DETACH);
@@ -192,7 +192,7 @@ public class MessageService extends Service {
 
     private void stopSending() {
         isStopped = true;
-        SendingMonitor.getInstance().appendLog("发送任务已取消");
+        SendingMonitor.getInstance().appendLog(getString(R.string.sending_cancelled));
         SendingMonitor.getInstance().setStatus(SendingMonitor.SendingState.CANCELLED);
         stopForeground(STOP_FOREGROUND_REMOVE); // 移除通知
 
@@ -200,13 +200,13 @@ public class MessageService extends Service {
     }
 
     private void updateNotification(int done, int all) {
-        notificationBuilder.setContentText(String.format("正在发送: %d/%d", done, all))
+        notificationBuilder.setContentText(getString(R.string.notification_progress_format, done, all))
                 .setProgress(all, done, false);
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
     private void showCompletedNotification() {
-        notificationBuilder.setContentText("发送任务已完成")
+        notificationBuilder.setContentText(getString(R.string.sending_completed))
                 .setProgress(0, 0, false)
                 .setAutoCancel(true);
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
@@ -218,12 +218,12 @@ public class MessageService extends Service {
         PendingIntent cancelPendingIntent = PendingIntent.getService(this, 0, cancelIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("MsgGo 短信群发")
-                .setContentText("准备发送...")
+                .setContentTitle(getString(R.string.notification_title))
+                .setContentText(getString(R.string.preparing_to_send))
                 .setSmallIcon(R.drawable.send_small)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
-                .addAction(R.drawable.ic_close, "取消", cancelPendingIntent);
+                .addAction(R.drawable.ic_close, getString(R.string.cancel), cancelPendingIntent);
     }
 
     private void createNotificationChannel() {
@@ -243,9 +243,9 @@ public class MessageService extends Service {
                 boolean success = (resultCode == android.app.Activity.RESULT_OK);
             
                 if (success) {
-                    log = String.format("#%d [%s] 发送成功", code, phone != null ? phone : "未知");
+                    log = getString(R.string.sms_sent_success, code, phone != null ? phone : getString(R.string.unknown));
                 } else {
-                    log = String.format("#%d [%s] 发送失败 (代码 %d)", code, phone != null ? phone : "未知", resultCode);
+                    log = getString(R.string.sms_sent_failed, code, phone != null ? phone : getString(R.string.unknown), resultCode);
                 }
                 Log.i(TAG, log);
                 confirmedMessages++;

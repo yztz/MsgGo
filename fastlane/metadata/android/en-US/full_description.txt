@@ -1,0 +1,27 @@
+MsgGo is a powerful bulk SMS tool designed for the efficient management and delivery of large-scale messaging. Built with modern Android design standards, it supports data import from Excel spreadsheets combined with templates for personalized message distribution, providing a clean, fast, and private user experience.
+
+<b>Core Features</b>
+
+- <b>Data Import</b>: Directly import SMS data from Excel (.xls/.xlsx) files.
+
+- <b>Dynamic Templates</b>: Support for custom SMS templates with variable replacement (e.g., "%{#Name#}") to achieve bulk personalized distribution.
+
+- <b>Smart Column Selection</b>: Flexible configuration of phone number columns to adapt to various contact list formats.
+
+- <b>Multi-SIM Support</b>: Robust SIM card detection and selection, allowing you to specify a specific slot for sending tasks.
+
+- <b>Progress Monitoring</b>: Dual-track progress monitoring system to view sending status in real-time.
+
+- <b>History Management</b>: Automatically saves sending records and template configurations, supporting one-click reloading of historical tasks.
+
+- <b>Fault-Tolerant Design</b>: Configurable sending delays to effectively avoid carrier risk control and improve delivery success rates.
+
+<b>Permissions</b>
+
+- <b>Send SMS (SEND_SMS)</b>: To implement the core SMS delivery functionality.
+
+- <b>Read Phone State (READ_PHONE_STATE)</b>: Used to identify multi-SIM slot information and signal status.
+
+<b>License</b>
+
+Apache-2.0

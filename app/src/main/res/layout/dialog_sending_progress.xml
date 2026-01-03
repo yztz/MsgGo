@@ -10,7 +10,7 @@
         android:id="@+id/tv_progress_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="正在发送..."
+        android:text="@string/sending"
         style="?attr/textAppearanceTitleLarge"
         android:layout_marginBottom="16dp"/>
 
@@ -18,7 +18,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="发送进度"
+        android:text="@string/sent_progress"
         style="?attr/textAppearanceLabelMedium"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="4dp"/>
@@ -50,7 +50,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="确认进度"
+        android:text="@string/confirmed_progress"
         style="?attr/textAppearanceLabelMedium"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="4dp"/>
@@ -83,7 +83,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="详细日志"
+        android:text="@string/detailed_logs"
         style="?attr/textAppearanceLabelMedium"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
@@ -107,7 +107,7 @@
         android:id="@+id/btn_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="取消"
+        android:text="@string/cancel"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_marginTop="16dp"/>
 

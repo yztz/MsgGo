@@ -1,4 +1,144 @@
 <resources>
     <string name="app_name">MsgGo</string>
-    <string name="app_description">By yzTz</string>
+    <string name="app_description">A modern batch SMS utility</string>
+
+    <!-- General UI -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="help">Help</string>
+    <string name="loading">Loading…</string>
+    <string name="calculating">Calculating…</string>
+    <string name="switch_language">Language</string>
+    <string name="language_auto">Auto (System)</string>
+    <string name="language_en">English</string>
+    <string name="language_zh">Simplified Chinese</string>
+    <string name="language_prefix">Current: %1$s</string>
+    <string name="not_selected">Not selected</string>
+    <string name="unknown">Unknown</string>
+
+    <!-- Main Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home Fragment -->
+    <string name="import_excel">Import Table</string>
+    <string name="click_to_import">Tap to import Excel file</string>
+    <string name="select_number_column">Select Number Column</string>
+    <string name="edit_sms">Edit SMS</string>
+    <string name="no_template">Template not set</string>
+    <string name="select_sim">Select SIM Card</string>
+    <string name="click_to_select">Tap to select</string>
+    <string name="send_sms">Send SMS</string>
+    <string name="no_data_imported">No data imported</string>
+    <string name="send_section_title">Dashboard</string>
+    <string name="history_section_title">History</string>
+    <string name="empty_history">It\'s empty here~</string>
+
+    <!-- Setting Fragment -->
+    <string name="category_features">Features</string>
+    <string name="auto_open_editor">Auto Open Editor</string>
+    <string name="auto_open_editor_summary">Edit after import</string>
+    <string name="send_delay">Send Delay</string>
+    <string name="send_delay_summary">Delay between each SMS to avoid carrier blocks</string>
+    <string name="sms_cost">SMS Rate</string>
+    <string name="sms_cost_summary">Calculate cost</string>
+    <string name="category_storage">Storage</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="category_others">Others</string>
+    <string name="export_log">Export Debug Logs</string>
+    <string name="about_app">About App</string>
+
+    <!-- About Activity -->
+    <string name="version_format">Version %s</string>
+    <string name="source_code">Source Code</string>
+    <string name="disclaimer">Disclaimer</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="made_by">Made with ❤️ by Yztz</string>
+    <string name="visit_source_code">Visit Source Code</string>
+    <string name="going_to_url">Proceeding to %s</string>
+    <string name="visit">Visit</string>
+
+    <!-- Edit Activity -->
+    <string name="edit_info">Edit Info</string>
+
+    <!-- Sending Dialog -->
+    <string name="sending">Sending…</string>
+    <string name="sent_progress">Progress</string>
+    <string name="confirmed_progress">Confirmed</string>
+    <string name="detailed_logs">Detailed Logs</string>
+
+    <!-- Messages & Toasts -->
+    <string name="permission_denied_exit">Permission denied, app will exit</string>
+    <string name="disagree_exit">Disagree &amp; Exit</string>
+    <string name="read_and_agree">Read &amp; Agree</string>
+    <string name="no_sim_found_exit">No SIM card found for sending SMS, exiting</string>
+    <string name="load_success">Data loaded successfully</string>
+    <string name="load_failed">Data load failed: %s</string>
+    <string name="external_link_detected">External link detected, loading: %s</string>
+    <string name="history_data_found">History data found</string>
+    <string name="cannot_open_link">Cannot open link: %s</string>
+    <string name="fgs_timeout_msg">6-hour service limit reached, stopping…</string>
+    <string name="sending_cancelled">Sending task cancelled</string>
+    <string name="preparing_to_send">Preparing…</string>
+    <string name="sending_completed">Sending completed</string>
+    <string name="sms_sent_success">#%1$d [%2$s] Sent successfully</string>
+    <string name="sms_sent_failed">#%1$d [%2$s] Failed (Code %3$d)</string>
+    <string name="notification_title">MsgGo SMS Batch</string>
+    <string name="notification_progress_format">Sending: %1$d/%2$d</string>
+    <string name="select_number_column_dialog_title">Select Number Column</string>
+    <string name="preview_title">Message Preview</string>
+    <string name="preview_msg_format">Recipient: %1$s\nPreview:\n%2$s</string>
+    <string name="no_recipients_selected">No recipients selected yet~</string>
+    <string name="confirm_send_title">Confirm Sending</string>
+    <string name="confirm_send_msg_format">Are you sure you want to send SMS to %1$d selected contacts?\nEstimated cost: $%2$.2f</string>
+    <string name="send_now">Send Now</string>
+    <string name="unknown_sim">Unknown SIM Card</string>
+    <string name="sim_slot_format">Slot %1$d · %2$s</string>
+    <string name="done">Done</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="close">Close</string>
+    <string name="service_start_failed">service start failed</string>
+    <string name="all_messages_confirmed">All messages sent and confirmed</string>
+    <string name="error_no_header">Header row not found (empty content)</string>
+    <string name="error_non_continuous_columns">Data columns are not continuous</string>
+    <string name="error_empty_content">Content is empty</string>
+    <string name="error_empty_title_column">Header column (%1$d) is empty</string>
+    <string name="error_load_data_first">Please import data first</string>
+    <string name="error_edit_content_first">Please edit SMS content first</string>
+    <string name="error_no_sim">No available SIM card detected</string>
+    <string name="select_sim_dialog_title">Select Sending SIM Card</string>
+    <string name="selected_prefix">Selected: %1$s</string>
+    <string name="no_available_sim">No SIM available</string>
+    <string name="data_ready_format">%1$d entries ready</string>
+    <string name="template_ready">Template ready</string>
+    <string name="no_template_content">No template content</string>
+    <string name="set_sms_rate_title">Set SMS Rate</string>
+    <string name="error_invalid_rate_range">Please enter a number between 0–10</string>
+    <string name="error_invalid_number">Please enter a valid number</string>
+    <string name="confirm_clear_cache_msg">Are you sure you want to clear app cache and history?</string>
+    <string name="clear">Clear</string>
+    <string name="cache_cleared">Cache cleared</string>
+    <string name="export_log_failed_prefix">Export failed: %1$s</string>
+    <string name="current_cache_size_prefix">Current cache size: %1$s</string>
+    <string name="error_calc_cache_size">Unable to calculate cache size</string>
+    <string name="variable_selection_title">Select Variable</string>
+    <string name="confirm_clear_title">Confirm Clear</string>
+    <string name="confirm_clear_msg">Your edits will be lost forever (really!)</string>
+    <string name="edit_unsaved_title">Unsaved Edits</string>
+    <string name="edit_unsaved_msg">Are you sure you want to leave without saving?</string>
+    <string name="error_import_data_first">Please click \"+\" to import data first</string>
+    <string name="xiaomi_permission_title">SIM Access Restricted</string>
+    <string name="xiaomi_permission_msg">Xiaomi system has restricted phone information access. Please go to settings to manually enable \"Phone\" permission and ensure no \"Blank Pass\" is active for SMS and Phone.</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="exit_app">Exit App</string>
+    <string name="currency_sms_rate">$ %1$s</string>
+    <string name="save_success">saved</string>
+    <string name="title_home">Send</string>
+    <string name="title_settings">Settings</string>
+    <string name="currency_unit">$</string>
+    <string name="hint_sms_rate">input sms rate</string>
+    <string name="slot_description">slot %1$d · %2$s</string>
+    <string name="privacy_policy_content">\nLast Updated: January 02, 2026\n\nMsgGo (hereinafter referred to as \"this App\") understands the importance of privacy to you and is committed to protecting your personal data. This Privacy Policy is intended to explain how this App handles data, the reasons why we request permissions, and our efforts to protect your privacy.\n\n1. Core Principle: Zero Network Access, Local Processing\nMsgGo is designed to be a completely private and secure tool. This App does not request external network access permissions. This means:\n- All of your data (including Excel file content, phone numbers, SMS templates, etc.) will never be uploaded to any server or third-party cloud.\n- All logic processing (variable substitution, SMS generation, sending control) is completed entirely locally on your device.\n\n2. Permissions and Data Usage\nTo implement the core function of batch SMS sending, we need to request the following permissions:\n- Send SMS (SEND_SMS)\n- Read Phone State (READ_PHONE_STATE)\n- Storage Permissions\n- Foreground Service and Notification Permissions\n\n3. Third-Party Services\nMsgGo does not contain any third-party analysis tools, trackers, advertising SDKs, or SDK monitoring plugins.\n\n</string>
+    <string name="disclaimer_content">\n1. This application (MsgGo) is an open-source batch SMS tool designed to provide users with a convenient message sending service. Users should comply with local laws and regulations when using this application.\n2. Users are solely responsible for all content sent using this application. The developers of this application are not responsible for the content sent, the recipients, or any consequences resulting from the sending behavior.\n3. This application does not guarantee stable operation in all environments. The developers assume no liability for data loss, downtime, or other losses caused by application failure, operational errors, or force majeure.\n4. Using this application constitutes your full understanding and agreement to this disclaimer. If you do not agree, please stop using and uninstall this application immediately.</string>
 </resources>

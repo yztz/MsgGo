@@ -22,7 +22,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="4dp"
-            android:text="指尖驿站"
+            android:text="@string/send_section_title"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textColor="?attr/colorPrimary" />
 
@@ -67,7 +67,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="导入表格"
+                            android:text="@string/import_excel"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
                         <TextView
@@ -75,7 +75,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="点击导入 Excel 文件"
+                            android:text="@string/click_to_import"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:ellipsize="middle"
@@ -117,7 +117,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="选择号码列"
+                            android:text="@string/select_number_column"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
                         <TextView
@@ -125,7 +125,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="未选择"
+                            android:text="@string/not_selected"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
@@ -165,7 +165,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="编辑短信"
+                            android:text="@string/edit_sms"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
                         <TextView
@@ -173,7 +173,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="未设置模板"
+                            android:text="@string/no_template"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
@@ -213,7 +213,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="选择 SIM 卡"
+                            android:text="@string/select_sim"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
                         <TextView
@@ -221,7 +221,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="点击选择"
+                            android:text="@string/click_to_select"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
@@ -271,7 +271,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="发送短信"
+                        android:text="@string/send_sms"
                         android:textAppearance="?attr/textAppearanceBodyLargeEmphasized"
                         android:textColor="?attr/colorOnPrimaryContainer"
                         android:textStyle="bold" />
@@ -280,7 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="未导入数据"
+                        android:text="@string/no_data_imported"
                         android:textAppearance="?attr/textAppearanceBodySmall"
                         android:textColor="?attr/colorOnPrimaryContainer"
                         android:alpha="0.8" />
@@ -301,7 +301,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="4dp"
-            android:text="光影回廊"
+            android:text="@string/history_section_title"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textColor="?attr/colorPrimary" />
 
@@ -319,7 +319,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="32dp"
             android:gravity="center"
-            android:text="空空如也~"
+            android:text="@string/empty_history"
             android:visibility="gone"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />

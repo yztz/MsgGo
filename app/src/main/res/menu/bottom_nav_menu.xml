@@ -4,7 +4,7 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/home"
-        android:title="主页"
+        android:title="@string/nav_home"
         app:showAsAction="ifRoom" />
 
 
@@ -12,6 +12,6 @@
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/setting"
-        android:title="设置"
+        android:title="@string/nav_settings"
         app:showAsAction="ifRoom" />
 </menu>

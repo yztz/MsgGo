@@ -114,9 +114,9 @@ public class HomeFrag extends Fragment {
         // Send button
         rowSend.setOnClickListener(v -> {
             if (DataLoader.getDataModel() == null) {
-                ToastUtil.show(context, "请先导入数据");
+                ToastUtil.show(context, getString(R.string.error_load_data_first));
             } else if (TextUtils.isEmpty(DataLoader.getContent())) {
-                ToastUtil.show(context, "请先编辑短信内容");
+                ToastUtil.show(context, getString(R.string.error_edit_content_first));
             } else {
                 startActivity(new Intent(context, ChooserActivity.class));
             }
@@ -153,7 +153,7 @@ public class HomeFrag extends Fragment {
 
     private void showSimSelector() {
         if (subs == null || subs.isEmpty()) {
-            ToastUtil.show(context, "未检测到可用的 SIM 卡");
+            ToastUtil.show(context, getString(R.string.error_no_sim));
             return;
         }
 
@@ -162,19 +162,19 @@ public class HomeFrag extends Fragment {
         
         for (int i = 0; i < subs.size(); i++) {
             SubscriptionInfo sub = subs.get(i);
-            options[i] = String.format("卡槽 %d · %s", sub.getSimSlotIndex() + 1, sub.getCarrierName());
+            options[i] = getString(R.string.slot_description, sub.getSimSlotIndex() + 1, sub.getCarrierName());
             if (sub.getSubscriptionId() == simSubId) {
                 selected = i;
             }
         }
 
         new MaterialAlertDialogBuilder(context)
-                .setTitle("选择发送 SIM 卡")
+                .setTitle(getString(R.string.select_sim_dialog_title))
                 .setSingleChoiceItems(options, selected, (dialog, which) -> {
                     simSubId = subs.get(which).getSubscriptionId();
                     DataLoader.setSimSubId(simSubId);
                     updateSimDisplay();
-                    ToastUtil.show(context, "已选择: " + options[which]);
+                    ToastUtil.show(context, getString(R.string.selected_prefix, options[which]));
                     dialog.dismiss();
                 })
                 .show();
@@ -182,14 +182,14 @@ public class HomeFrag extends Fragment {
 
     private void updateSimDisplay() {
         if (subs == null || subs.isEmpty()) {
-            tvSimInfo.setText("无可用 SIM");
+            tvSimInfo.setText(getString(R.string.no_available_sim));
             return;
         }
 
         for (SubscriptionInfo sub : subs) {
             if (sub.getSubscriptionId() == simSubId) {
                 String carrierName = sub.getCarrierName().toString();
-                tvSimInfo.setText(String.format("卡槽 %d · %s", sub.getSimSlotIndex() + 1, carrierName));
+                tvSimInfo.setText(getString(R.string.slot_description, sub.getSimSlotIndex() + 1, carrierName));
                 return;
             }
         }
@@ -198,13 +198,13 @@ public class HomeFrag extends Fragment {
         simSubId = subs.get(0).getSubscriptionId();
         DataLoader.setSimSubId(simSubId);
         SubscriptionInfo first = subs.get(0);
-        tvSimInfo.setText(String.format("卡槽 %d · %s", first.getSimSlotIndex() + 1, first.getCarrierName()));
+        tvSimInfo.setText(getString(R.string.slot_description, first.getSimSlotIndex() + 1, first.getCarrierName()));
     }
 
     private void showNumberColumnSelector() {
         String[] titles = DataLoader.getTitles();
         if (titles == null || titles.length == 0) {
-            ToastUtil.show(context, "请先导入数据");
+            ToastUtil.show(context, getString(R.string.error_load_data_first));
             return;
         }
 
@@ -230,8 +230,6 @@ public class HomeFrag extends Fragment {
     }
 
     public void updateStatus() {
-        if (!isAdded()) return;
-        
         // Progressive Disclosure State
         boolean hasData = false;
         boolean hasContent = false;
@@ -242,24 +240,24 @@ public class HomeFrag extends Fragment {
         if (DataLoader.getDataModel() != null && !TextUtils.isEmpty(path)) {
             hasData = true;
             int count = DataLoader.getDataModel().getSize();
-            tvSubtitleSend.setText(count + " 条数据已就绪");
+            tvSubtitleSend.setText(getString(R.string.data_ready_format, count));
             
             String fileName = path;
             int lastSlash = path.lastIndexOf('/');
             if (lastSlash >= 0) fileName = path.substring(lastSlash + 1);
             tvCurrentFilePath.setText(fileName);
         } else {
-            tvSubtitleSend.setText("未导入数据");
-            tvCurrentFilePath.setText("点击导入 Excel 文件");
+            tvSubtitleSend.setText(getString(R.string.no_data_imported));
+            tvCurrentFilePath.setText(getString(R.string.click_to_import));
         }
 
         // 2. Content Status
         String content = DataLoader.getContent();
         if (!TextUtils.isEmpty(content)) {
             hasContent = true;
-            tvSubtitleEdit.setText("模板已就绪");
+            tvSubtitleEdit.setText(getString(R.string.template_ready));
         } else {
-            tvSubtitleEdit.setText("未设置模板");
+            tvSubtitleEdit.setText(getString(R.string.no_template));
         }
 
         // 3. SIM Status
@@ -349,7 +347,7 @@ public class HomeFrag extends Fragment {
             
             String template = item.template;
             if (TextUtils.isEmpty(template)) {
-                holder.tvTemplatePreview.setText("无模板内容");
+                holder.tvTemplatePreview.setText(getString(R.string.no_template_content));
             } else {
                 holder.tvTemplatePreview.setText(template.replace("\n", " "));
             }

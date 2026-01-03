@@ -49,7 +49,7 @@ public class LoadService extends Service {
             try {
                 postStatus(true, false, path);
 
-                DataLoader.__load(path);
+                DataLoader.__load(getApplicationContext(), path);
 
                 postStatus(false, true, path);
                 Log.d(TAG, "数据加载成功");

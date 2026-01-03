@@ -29,7 +29,6 @@ import top.yztz.msggo.fragments.HomeFrag;
 import top.yztz.msggo.fragments.SettingFrag;
 import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
-import top.yztz.msggo.util.Config;
 import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.util.XiaomiUtil;
@@ -48,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_PERMISSION = 200;
 
-    private HomeFrag home;
-    private SettingFrag setting;
+//    private HomeFrag home;
+//    private SettingFrag setting;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
@@ -61,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
      * 初始化fragment
      */
     public void initFragment() {
-        home = new HomeFrag();
-        setting = new SettingFrag();
-
         viewPager = findViewById(R.id.view_pager);
         viewPager.setUserInputEnabled(true); // Enable swipe
         
@@ -77,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             @NonNull
             public Fragment createFragment(int position) {
-                return position == 0 ? home : setting;
+                return position == 0 ? new HomeFrag() : new SettingFrag();
             }
         };
         
         viewPager.setAdapter(pagerAdapter);
-        mCollapsingToolbarLayout.setTitle("送 信");
+        mCollapsingToolbarLayout.setTitle(getString(R.string.title_home));
 
         // Sync ViewPager with BottomNavigationView
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -90,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                String newTitle = position == 0 ? "送 信" : "設 定";
+                String newTitle = position == 0 ? getString(R.string.title_home) : getString(R.string.title_settings);
                 int menuItemId = position == 0 ? R.id.nav_home : R.id.nav_settings;
 
                 if (!initiated) {
@@ -124,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+
+    private Fragment getCurrentFragment() {
+        int currentItem = viewPager.getCurrentItem();
+        return getSupportFragmentManager().findFragmentByTag("f" + currentItem);
+    }
+
 
     protected void onStart() {
         super.onStart();
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             if (allPermissionsGranted) {
                 initApp();
             } else {
-                ToastUtil.show(this, "权限被拒绝，应用将退出");
+                ToastUtil.show(this, getString(R.string.permission_denied_exit));
                 finish();
             }
         }
@@ -175,8 +177,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate: ");
+        DataLoader.init(this);
+        top.yztz.msggo.util.LocaleUtils.applyLocale(this);
         excelPickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -192,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
         setContentView(R.layout.activity_main);
-        DataLoader.init(this);
 
         // Check Privacy Policy and Disclaimer
         if (!DataLoader.isPrivacyAccepted()) {
@@ -206,10 +210,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void showPrivacyDialog() {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("隐私政策")
-                .setMessage(Config.PRIVACY_POLICY)
+                .setTitle(getString(R.string.privacy_policy))
+                .setMessage(getString(R.string.privacy_policy_content))
                 .setCancelable(false)
-                .setPositiveButton("同意并继续", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
                     DataLoader.setPrivacyAccepted(true);
                     if (!DataLoader.isDisclaimerAccepted()) {
                         showDisclaimerDialog();
@@ -217,25 +221,24 @@ public class MainActivity extends AppCompatActivity {
                         checkPermissionsAndInit();
                     }
                 })
-                .setNegativeButton("不同意并退出", (dialog, which) -> finish())
+                .setNegativeButton(getString(R.string.disagree_exit), (dialog, which) -> finish())
                 .show();
     }
 
     private void showDisclaimerDialog() {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("免责声明")
-                .setMessage(Config.DISCLAIMER)
+                .setTitle(getString(R.string.disclaimer))
+                .setMessage(getString(R.string.disclaimer_content))
                 .setCancelable(false)
-                .setPositiveButton("已阅读并同意", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
                     DataLoader.setDisclaimerAccepted(true);
                     checkPermissionsAndInit();
                 })
-                .setNegativeButton("不同意并退出", (dialog, which) -> finish())
+                .setNegativeButton(getString(R.string.disagree_exit), (dialog, which) -> finish())
                 .show();
     }
 
     private void checkPermissionsAndInit() {
-        observeLoadStatus();
         nMenu = findViewById(R.id.bottom_navigation);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         indicator = findViewById(R.id.progress);
@@ -263,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initApp() {
+        observeLoadStatus();
         initFragment();
         if (SMSSender.getSubs(this).isEmpty()) {
             if (XiaomiUtil.isXiaomi()) {
@@ -270,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 XiaomiUtil.showXiaomiPermissionDialog(this);
                 return;
             }
-            ToastUtil.show(this, "没发现可用于发送短信的 SIM 卡，即将退出");
+            ToastUtil.show(this, getString(R.string.no_sim_found_exit));
             finish();
         }
         // check share
@@ -285,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (uri != null) {
-            Log.i(TAG, "检测到外部链接，加载: " + uri);
+            Log.i(TAG, "load outside link: " + uri);
             DataLoader.load(FileUtil.getFilePathFromContentUri(this, uri), this);
         }
     }
@@ -342,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
                     DataLoader.setLastPath(status.path);
                     String currentSig = DataLoader.getLastSignature();
                     Log.i(TAG, "数据加载成功：" + status.path + " 签名: " + currentSig);
-                    ToastUtil.show(MainActivity.this, "数据加载成功");
+                    ToastUtil.show(MainActivity.this, getString(R.string.load_success));
 
                     DataContext historyItem = HistoryManager.getItem(MainActivity.this, status.path);
                     if (historyItem != null) {
@@ -358,10 +362,14 @@ public class MainActivity extends AppCompatActivity {
 
                     String[] titles = DataLoader.getTitles();
                     if (!TextUtils.isEmpty(DataLoader.getNumberColumn())) {
+                        Log.i(TAG, "使用现有历史记录");
                         HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), DataLoader.getNumberColumn(), currentSig);
-                        setting.showInfo();
-                        home.updateStatus();
+                        Fragment fragment = getCurrentFragment();
+                        if (fragment instanceof HomeFrag) {
+                            ((HomeFrag)fragment).updateStatus();
+                        }
                     } else if (titles != null && titles.length > 0) {
+                        Log.i(TAG, "提示选择号码列");
                         int checkedItem = -1;
                         String currentColumn = DataLoader.getNumberColumn();
                         for (int i = 0; i < titles.length; i++) {
@@ -372,13 +380,15 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
-                                .setTitle("选择号码列")
+                                .setTitle(getString(R.string.select_number_column_dialog_title))
                                 .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
                                     DataLoader.setNumberColumn(titles[which]);
                                     // Update history with new selection
                                     HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), titles[which], currentSig);
-                                    setting.showInfo();
-                                    home.updateStatus();
+                                    Fragment fragment = getCurrentFragment();
+                                    if (fragment instanceof HomeFrag) {
+                                        ((HomeFrag)fragment).updateStatus();
+                                    }
                                     dialog.dismiss();
                                     if (DataLoader.autoEnterEditor()) {
                                         EditActivity.openEditor(MainActivity.this);
@@ -390,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
                         EditActivity.openEditor(this);
                     }
                 } else {
-                    ToastUtil.show(MainActivity.this, "数据加载失败: " + status.errorMsg);
+                    ToastUtil.show(MainActivity.this, getString(R.string.load_failed, status.errorMsg));
                 }
             }
         });
