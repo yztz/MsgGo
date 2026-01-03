@@ -38,11 +38,22 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "34.0.0"
 
+      - name: Prepare Release Artifacts
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          mkdir -p release_artifacts
+          find app/build/outputs/apk/release -name "*-signed.apk" | while read -r apk; do
+            FILENAME=$(basename "$apk")
+            # Extract ABI name and rename to MsgGo-tag-abi.apk
+            ABI=$(echo "$FILENAME" | sed -E 's/app-(.*)-release-unsigned-signed\.apk/\1/; s/app-release-unsigned-signed\.apk/universal/')
+            mv "$apk" "release_artifacts/MsgGo-${TAG_NAME}-${ABI}.apk"
+          done
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          files: release_artifacts/*.apk
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
