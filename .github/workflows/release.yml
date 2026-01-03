@@ -55,5 +55,6 @@ jobs:
         with:
           files: release_artifacts/*.apk
           generate_release_notes: true
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
