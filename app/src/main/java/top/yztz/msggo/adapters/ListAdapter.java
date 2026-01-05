@@ -1,11 +1,9 @@
 package top.yztz.msggo.adapters;
 
 import android.content.Context;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,14 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.HashMap;
-
-import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.R;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
     private Context context;
-    private DataModel dataModel;
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
@@ -33,7 +28,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
 
     public ListAdapter(Context context) {
         this.context = context;
-        dataModel = DataLoader.getDataModel();
     }
 
     @NonNull
@@ -52,7 +46,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
             }
         });
         
-        HashMap<String, String> temp = dataModel.getMap(position);
+        HashMap<String, String> temp = DataModel.getRow(holder.getBindingAdapterPosition());
         DataAdapter adapter = new DataAdapter(context, temp);
         holder.mRv.setAdapter(adapter);
 
@@ -69,7 +63,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
 
     @Override
     public int getItemCount() {
-        return dataModel == null ? 0 : dataModel.getSize();
+        return DataModel.loaded() ? DataModel.getRowCount() : 0;
     }
 
     static class ListHolder extends RecyclerView.ViewHolder {
@@ -90,7 +84,7 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
     DataAdapter(Context context, HashMap<String, String> map) {
         this.context = context;
         this.map = map;
-        this.titles = DataLoader.getTitles();
+        this.titles = DataModel.getTitles();
     }
 
     @NonNull

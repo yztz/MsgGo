@@ -16,43 +16,48 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.transition.MaterialSharedAxis;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.transition.MaterialSharedAxis;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
+import androidx.transition.Fade;
+import androidx.transition.ChangeBounds;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import top.yztz.msggo.R;
+import top.yztz.msggo.activities.ChooserActivity;
 import top.yztz.msggo.activities.EditActivity;
 import top.yztz.msggo.activities.MainActivity;
-import top.yztz.msggo.data.DataContext;
-import top.yztz.msggo.data.DataLoader;
+import top.yztz.msggo.data.DataModel;
+import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.data.HistoryManager;
-import top.yztz.msggo.R;
 import top.yztz.msggo.services.SMSSender;
+import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.util.XiaomiUtil;
-import top.yztz.msggo.activities.ChooserActivity;
 
 public class HomeFrag extends Fragment {
     private static final String TAG = "HomeFrag";
     private Context context;
-    
-    private View cardCurrentFile, cardNumberColumn, rowEditContent, rowSelectSim, rowSend;
+
+    private View rowCurrentFile, rowNumberColumn, rowEditContent, rowSelectSim, rowSend, cardSend;
+    private ViewGroup containerHome;
     private TextView tvSimInfo, tvSubtitleSend, tvSubtitleEdit, tvEmptyHistory;
     private TextView tvCurrentFilePath, tvCurrentNumberColumn;
     private RecyclerView rvHistory;
     private HistoryAdapter historyAdapter;
 
-    
     private List<SubscriptionInfo> subs;
-    private int simSubId;
+//    private int simSubId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +68,8 @@ public class HomeFrag extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.layout_home, container, false);
     }
 
@@ -82,26 +88,28 @@ public class HomeFrag extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+
         // Initialize views
         tvSimInfo = view.findViewById(R.id.tv_sim_info);
         tvSubtitleSend = view.findViewById(R.id.tv_subtitle_send);
         tvSubtitleEdit = view.findViewById(R.id.tv_subtitle_edit);
         rvHistory = view.findViewById(R.id.rv_history);
         tvEmptyHistory = view.findViewById(R.id.tv_empty_history);
-        
-        cardCurrentFile = view.findViewById(R.id.card_current_file);
-        cardNumberColumn = view.findViewById(R.id.card_number_column);
+
+        rowCurrentFile = view.findViewById(R.id.row_current_file);
+        rowNumberColumn = view.findViewById(R.id.row_number_column);
         rowEditContent = view.findViewById(R.id.row_edit_content);
         rowSelectSim = view.findViewById(R.id.row_select_sim);
         rowSend = view.findViewById(R.id.row_send);
+        cardSend = view.findViewById(R.id.card_send);
+        containerHome = view.findViewById(R.id.container_home);
         tvCurrentFilePath = view.findViewById(R.id.tv_current_file_path);
         tvCurrentNumberColumn = view.findViewById(R.id.tv_current_number_column);
 
         setupHistoryList();
-        
-        simSubId = DataLoader.getSimSubId();
-        
+
+//        simSubId = DataModel.getSubId();
+
         setupClickListeners();
         loadSimInfo();
         updateStatus();
@@ -110,33 +118,33 @@ public class HomeFrag extends Fragment {
     private void setupClickListeners() {
         // Send button
         rowSend.setOnClickListener(v -> {
-            if (DataLoader.getDataModel() == null) {
+            if (!DataModel.loaded()) {
                 ToastUtil.show(context, getString(R.string.error_load_data_first));
-            } else if (TextUtils.isEmpty(DataLoader.getContent())) {
+            } else if (TextUtils.isEmpty(DataModel.getTemplate())) {
                 ToastUtil.show(context, getString(R.string.error_edit_content_first));
             } else {
                 startActivity(new Intent(context, ChooserActivity.class));
             }
         });
-        
+
         // Content editing
         rowEditContent.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditActivity.class);
             startActivity(intent);
         });
-        
+
         // SIM selection
         rowSelectSim.setOnClickListener(v -> showSimSelector());
 
         // File import
-        cardCurrentFile.setOnClickListener(v -> {
+        rowCurrentFile.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).openFileChooser();
             }
         });
 
         // Number column selection
-        cardNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
+        rowNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
     }
 
     private void loadSimInfo() {
@@ -156,11 +164,11 @@ public class HomeFrag extends Fragment {
 
         String[] options = new String[subs.size()];
         int selected = 0;
-        
+
         for (int i = 0; i < subs.size(); i++) {
             SubscriptionInfo sub = subs.get(i);
             options[i] = getString(R.string.slot_description, sub.getSimSlotIndex() + 1, sub.getCarrierName());
-            if (sub.getSubscriptionId() == simSubId) {
+            if (sub.getSubscriptionId() == DataModel.getSubId()) {
                 selected = i;
             }
         }
@@ -168,8 +176,9 @@ public class HomeFrag extends Fragment {
         new MaterialAlertDialogBuilder(context)
                 .setTitle(getString(R.string.select_sim_dialog_title))
                 .setSingleChoiceItems(options, selected, (dialog, which) -> {
-                    simSubId = subs.get(which).getSubscriptionId();
-                    DataLoader.setSimSubId(simSubId);
+                    int simSubId = subs.get(which).getSubscriptionId();
+                    DataModel.setSubId(simSubId);
+                    DataModel.saveAsHistory(getContext());
                     updateSimDisplay();
                     ToastUtil.show(context, getString(R.string.selected_prefix, options[which]));
                     dialog.dismiss();
@@ -184,29 +193,29 @@ public class HomeFrag extends Fragment {
         }
 
         for (SubscriptionInfo sub : subs) {
-            if (sub.getSubscriptionId() == simSubId) {
+            if (sub.getSubscriptionId() == DataModel.getSubId()) {
                 String carrierName = sub.getCarrierName().toString();
                 tvSimInfo.setText(getString(R.string.slot_description, sub.getSimSlotIndex() + 1, carrierName));
                 return;
             }
         }
-        
+
         // Default to first SIM if saved one not found
-        simSubId = subs.get(0).getSubscriptionId();
-        DataLoader.setSimSubId(simSubId);
+        int simSubId = subs.get(0).getSubscriptionId();
+        DataModel.setSubId(simSubId);
         SubscriptionInfo first = subs.get(0);
         tvSimInfo.setText(getString(R.string.slot_description, first.getSimSlotIndex() + 1, first.getCarrierName()));
     }
 
     private void showNumberColumnSelector() {
-        String[] titles = DataLoader.getTitles();
+        String[] titles = DataModel.getTitles();
         if (titles == null || titles.length == 0) {
             ToastUtil.show(context, getString(R.string.error_load_data_first));
             return;
         }
 
         int checkedItem = -1;
-        String currentColumn = DataLoader.getNumberColumn();
+        String currentColumn = DataModel.getNumberColumn();
         for (int i = 0; i < titles.length; i++) {
             if (titles[i].equals(currentColumn)) {
                 checkedItem = i;
@@ -215,11 +224,11 @@ public class HomeFrag extends Fragment {
         }
 
         new MaterialAlertDialogBuilder(context)
-                .setTitle("选择号码列")
+                .setTitle(getString(R.string.select_number_column_dialog_title))
                 .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
                     Log.i(TAG, "选择号码列: " + titles[which]);
-                    DataLoader.setNumberColumn(titles[which]);
-                    HistoryManager.addHistory(context, DataLoader.getDataContext());
+                    DataModel.setNumberColumn(titles[which]);
+                    DataModel.saveAsHistory(context);
                     updateStatus();
                     dialog.dismiss();
                 })
@@ -227,74 +236,73 @@ public class HomeFrag extends Fragment {
     }
 
     public void updateStatus() {
+        if (!isAdded()) return;
         // Progressive Disclosure State
         boolean hasData = false;
         boolean hasContent = false;
-        boolean hasSim = false;
+//        boolean hasSim = false;
+
+        // 3. SIM Status
+        // SIM Info is updated in updateSimDisplay() which is called on creation and
+        // when SIM changes.
+        // We consider SIM "set" if simSubId is valid.
+//        if (DataModel.getSubId() != -1) {
+//            hasSim = true;
+//        }
+        assert DataModel.getSubId() != -1;
+        assert subs != null;
+        assert !subs.isEmpty();
+
+        TransitionSet transitionSet = new TransitionSet()
+                .addTransition(new Fade())
+                .addTransition(new ChangeBounds())
+                .setDuration(150)
+                .setInterpolator(new FastOutSlowInInterpolator());
+        TransitionManager.beginDelayedTransition(containerHome, transitionSet);
+
+        // Always show Data row
+        rowCurrentFile.setVisibility(View.VISIBLE);
 
         // 1. Data Status
-        String path = DataLoader.getLastPath();
-        if (DataLoader.getDataModel() != null && !TextUtils.isEmpty(path)) {
+        if (DataModel.loaded() && !TextUtils.isEmpty(DataModel.getPath())) {
             hasData = true;
-            int count = DataLoader.getDataModel().getSize();
-            tvSubtitleSend.setText(getString(R.string.data_ready_format, count));
-            
-            String fileName = path;
-            int lastSlash = path.lastIndexOf('/');
-            if (lastSlash >= 0) fileName = path.substring(lastSlash + 1);
-            tvCurrentFilePath.setText(fileName);
+            String fileName = DataModel.getPath();
+            tvCurrentFilePath.setText(FileUtil.getBriefFilename(fileName));
         } else {
-            tvSubtitleSend.setText(getString(R.string.no_data_imported));
             tvCurrentFilePath.setText(getString(R.string.click_to_import));
+        }
+        // Show Column & Content rows only after Data is loaded
+        if (hasData) {
+            rowNumberColumn.setVisibility(View.VISIBLE);
+            rowEditContent.setVisibility(View.VISIBLE);
+
+            String numberColumn = DataModel.getNumberColumn();
+            tvCurrentNumberColumn.setText(TextUtils.isEmpty(numberColumn) ? "未选择" : numberColumn);
+//            rowSelectSim.setVisibility(View.VISIBLE);
+        } else {
+            rowNumberColumn.setVisibility(View.GONE);
+            rowEditContent.setVisibility(View.GONE);
+            rowSelectSim.setVisibility(View.GONE);
+            cardSend.setVisibility(View.GONE);
         }
 
         // 2. Content Status
-        String content = DataLoader.getContent();
-        if (!TextUtils.isEmpty(content)) {
+        String template = DataModel.getTemplate();
+        if (!TextUtils.isEmpty(template)) {
             hasContent = true;
-            tvSubtitleEdit.setText(getString(R.string.template_ready));
+            tvSubtitleEdit.setText(template.replace("\n", " "));
         } else {
             tvSubtitleEdit.setText(getString(R.string.no_template));
         }
 
-        // 3. SIM Status
-        // SIM Info is updated in updateSimDisplay() which is called on creation and when SIM changes.
-        // We consider SIM "set" if simSubId is valid.
-        if (simSubId != -1) {
-            hasSim = true;
-        }
-
-        // Progressive Visibility Logic
-        // Always show Data row
-        cardCurrentFile.setVisibility(View.VISIBLE);
-        
-        // Show Column & Content rows only after Data is loaded
-        if (hasData) {
-            cardNumberColumn.setVisibility(View.VISIBLE);
-            rowEditContent.setVisibility(View.VISIBLE);
-        } else {
-            cardNumberColumn.setVisibility(View.GONE);
-            rowEditContent.setVisibility(View.GONE);
-        }
-        
-        // Show SIM row only after Content is set
         if (hasData && hasContent) {
+            cardSend.setVisibility(View.VISIBLE);
             rowSelectSim.setVisibility(View.VISIBLE);
+            tvSubtitleSend.setText(getString(R.string.data_ready_format, DataModel.getRowCount()));
         } else {
+            cardSend.setVisibility(View.GONE);
             rowSelectSim.setVisibility(View.GONE);
         }
-        
-        // Show Send row only after SIM information is retrieved (or just always after SIM row is shown if SIM is usually pre-available)
-        // Let's require SIM and Data and Content for Send row to appear.
-        if (hasData && hasContent && hasSim && subs != null && !subs.isEmpty()) {
-            rowSend.setVisibility(View.VISIBLE);
-        } else {
-            rowSend.setVisibility(View.GONE);
-        }
-
-        // Update Number Column Text
-        String numberColumn = DataLoader.getNumberColumn();
-        tvCurrentNumberColumn.setText(TextUtils.isEmpty(numberColumn) ? "未选择" : numberColumn);
 
         loadHistory();
     }
@@ -307,9 +315,9 @@ public class HomeFrag extends Fragment {
 
     private void loadHistory() {
         if (historyAdapter != null) {
-            List<DataContext> history = HistoryManager.getHistory(context);
+            List<HistoryManager.HistoryItem> history = HistoryManager.getHistory(context);
             historyAdapter.setItems(history);
-            
+
             if (history.isEmpty()) {
                 rvHistory.setVisibility(View.GONE);
                 tvEmptyHistory.setVisibility(View.VISIBLE);
@@ -321,10 +329,10 @@ public class HomeFrag extends Fragment {
     }
 
     private class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
-        private List<DataContext> items = new ArrayList<>();
+        private List<HistoryManager.HistoryItem> items = new ArrayList<>();
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
 
-        public void setItems(List<DataContext> items) {
+        public void setItems(List<HistoryManager.HistoryItem> items) {
             this.items = items;
             notifyDataSetChanged();
         }
@@ -338,10 +346,10 @@ public class HomeFrag extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            DataContext item = items.get(position);
-            holder.tvFileName.setText(item.getFileName());
+            HistoryManager.HistoryItem item = items.get(position);
+            holder.tvFileName.setText(FileUtil.getBriefFilename(item.path));
             holder.tvDate.setText(dateFormat.format(new Date(item.timestamp)));
-            
+
             String template = item.template;
             if (TextUtils.isEmpty(template)) {
                 holder.tvTemplatePreview.setText(getString(R.string.no_template_content));
@@ -350,7 +358,8 @@ public class HomeFrag extends Fragment {
             }
 
             holder.itemView.setOnClickListener(v -> {
-                DataLoader.load(item.path, context);
+                Log.i(TAG, "从历史记录加载：" + item.path);
+                LoadService.load(context, item.path);
             });
         }
 

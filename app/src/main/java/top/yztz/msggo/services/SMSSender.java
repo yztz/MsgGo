@@ -25,6 +25,17 @@ public class SMSSender {
         return null;
     }
 
+    public static SubscriptionInfo getSubBySubscriptionId(Context context, int subId) {
+        SubscriptionManager subscriptionManager = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+        @SuppressLint("MissingPermission") List<SubscriptionInfo> subscriptionInfoList = subscriptionManager.getActiveSubscriptionInfoList();
+        if (subscriptionInfoList == null) return null;
+
+        for (SubscriptionInfo sub : subscriptionInfoList) {
+            if (sub.getSubscriptionId() == subId) return sub;
+        }
+        return null;
+    }
+
     public static int getDefaultSubID() {
         return SmsManager.getDefaultSmsSubscriptionId();
     }

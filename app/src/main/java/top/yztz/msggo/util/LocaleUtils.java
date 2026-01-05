@@ -1,15 +1,14 @@
 package top.yztz.msggo.util;
 
-import android.content.Context;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 
-import top.yztz.msggo.data.DataLoader;
+import top.yztz.msggo.data.SettingManager;
 
 public class LocaleUtils {
 
-    public static void applyLocale(Context context) {
-        String lang = DataLoader.getLanguage();
+    public static void applyLocale() {
+        String lang = SettingManager.getLanguage();
         if ("auto".equals(lang)) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
         } else {
@@ -18,7 +17,7 @@ public class LocaleUtils {
     }
 
     public static void setLocale(String lang) {
-        DataLoader.setLanguage(lang);
+        SettingManager.setLanguage(lang);
         if ("auto".equals(lang)) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
         } else {

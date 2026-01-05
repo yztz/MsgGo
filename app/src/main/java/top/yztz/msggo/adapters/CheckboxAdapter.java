@@ -11,12 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.data.DataLoader;
 import top.yztz.msggo.data.DataModel;
 
 public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.CheckboxHolder> {
     private Context context;
-    private DataModel dataModel;
     private SparseBooleanArray checkedMap;
     // Callback to notify activity about selection changes if needed
     private OnSelectionChangedListener selectionListener;
@@ -28,9 +26,8 @@ public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.Checkb
     public CheckboxAdapter(Context context) {
         this.context = context;
         checkedMap = new SparseBooleanArray();
-        dataModel = DataLoader.getDataModel();
 
-        if (dataModel != null) {
+        if (DataModel.loaded()) {
             for (int i = 0; i < getItemCount(); i++) {
                 checkedMap.put(i, false);
             }
@@ -64,7 +61,7 @@ public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.Checkb
 
     @Override
     public int getItemCount() {
-        return dataModel == null ? 0 : dataModel.getSize();
+        return DataModel.loaded() ? DataModel.getRowCount() : 0;
     }
 
     public void setAllCheckBoxChosen(boolean flag) {

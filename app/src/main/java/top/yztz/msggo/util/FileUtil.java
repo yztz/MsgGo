@@ -186,4 +186,13 @@ public class FileUtil {
             }
         }
     }
+
+    public static String getBriefFilename(String path) {
+        if (TextUtils.isEmpty(path)) return "";
+        int lastSlash = path.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            return path.substring(lastSlash + 1);
+        }
+        return path;
+    }
 }

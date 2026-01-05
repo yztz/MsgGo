@@ -24,12 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.data.DataLoader;
-import top.yztz.msggo.data.HistoryManager;
+import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.util.ToastUtil;
 
 public class EditActivity extends AppCompatActivity {
-    private RecyclerView mRv;
     private EditText mEt;
 //    private DrawerLayout mDrawerLayout;
     private BottomAppBar mBottomAppBar;
@@ -45,21 +43,21 @@ public class EditActivity extends AppCompatActivity {
         mEt = findViewById(R.id.et_editor);
         mBtnSave = findViewById(R.id.btn_save);
         mBtnSave.setOnClickListener(v->{
-            DataLoader.setContent(mEt.getText().toString().trim());
-            HistoryManager.addHistory(this, DataLoader.getDataContext());
+            DataModel.setTemplate(mEt.getText().toString().trim());
+            DataModel.saveAsHistory(EditActivity.this);
             ToastUtil.show(EditActivity.this, getString(R.string.save_success));
             finish();
         });
 
         mBottomAppBar = findViewById(R.id.bottomAppBar);
         mBottomAppBar.setOnMenuItemClickListener(v->{
-            MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
+            MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(EditActivity.this);
             switch (v.getItemId()) {
                 case R.id.btn_var:
                     dialogBuilder.setTitle(getString(R.string.variable_selection_title))
-                            .setItems(DataLoader.getTitles(), (dialog, which) -> {
+                            .setItems(DataModel.getTitles(), (dialog, which) -> {
                                 int loc = mEt.getSelectionStart();
-                                String pat = "${" + DataLoader.getTitles()[which] + "}";
+                                String pat = "${" + DataModel.getTitles()[which] + "}";
                                 if (loc == -1)  mEt.getText().append(pat);
                                 else mEt.getText().insert(loc, pat);
                                 dialog.dismiss();
@@ -82,7 +80,7 @@ public class EditActivity extends AppCompatActivity {
 
 
         //获取已经保存的内容并显示
-        mEt.setText(DataLoader.getContent());
+        mEt.setText(DataModel.getTemplate());
         highLight(mEt.getText());
 
 
@@ -163,7 +161,7 @@ public class EditActivity extends AppCompatActivity {
      * 打开编辑器
      */
     public static void openEditor(Context context) {
-        if (DataLoader.getDataModel() == null) {
+        if (!DataModel.loaded()) {
             ToastUtil.show(context, context.getString(R.string.error_import_data_first));
         } else {
             Intent intent = new Intent(context, EditActivity.class);

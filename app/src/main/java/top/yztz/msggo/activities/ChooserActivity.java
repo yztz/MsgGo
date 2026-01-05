@@ -32,8 +32,9 @@ import java.util.Map;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.adapters.ListAdapter;
-import top.yztz.msggo.data.DataLoader;
+import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.Message;
+import top.yztz.msggo.data.SettingManager;
 import top.yztz.msggo.services.MessageService;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.services.SendingMonitor;
@@ -83,10 +84,10 @@ public class ChooserActivity extends AppCompatActivity {
         final ListAdapter adapter = new ListAdapter(this);
         mRv.setAdapter(adapter);
         adapter.setOnItemClickListener(position -> {
-            String template = DataLoader.getContent();
-            Map<String, String> dataMap = DataLoader.getDataModel().getMap(position);
+            String template = DataModel.getTemplate();
+            Map<String, String> dataMap = DataModel.getRow(position);
             String content = TextParser.parse(template, dataMap);
-            String recipient = dataMap.get(DataLoader.getNumberColumn());
+            String recipient = dataMap.get(DataModel.getNumberColumn());
 
             new MaterialAlertDialogBuilder(this)
                     .setTitle(getString(R.string.preview_title))
@@ -143,7 +144,7 @@ public class ChooserActivity extends AppCompatActivity {
 
             double rate = 0.1;
             try {
-                rate = Double.parseDouble(DataLoader.getSmsRate());
+                rate = Double.parseDouble(SettingManager.getSmsRate());
             } catch (Exception ignored) {}
             double cost = itemIndices.size() * rate;
 
@@ -170,7 +171,7 @@ public class ChooserActivity extends AppCompatActivity {
     private void updateSelectionSummary() {
         if (checkboxAdapter == null || tvSelectionCount == null || tvEstimatedCost == null) return;
         
-        int total = DataLoader.getDataModel() == null ? 0 : DataLoader.getDataModel().getSize();
+        int total = DataModel.loaded() ? DataModel.getRowCount() : 0;
         int selected = 0;
         SparseBooleanArray checkedMap = checkboxAdapter.getCheckedMap();
         for (int i = 0; i < total; i++) {
@@ -181,7 +182,7 @@ public class ChooserActivity extends AppCompatActivity {
 
         double rate = 0.1;
         try {
-            rate = Double.parseDouble(DataLoader.getSmsRate());
+            rate = Double.parseDouble(SettingManager.getSmsRate());
         } catch (Exception ignored) {}
 
         double cost = selected * rate;
@@ -190,16 +191,18 @@ public class ChooserActivity extends AppCompatActivity {
     }
     
     private void setupInfoCard() {
-        String path = DataLoader.getLastPath();
+        String path = DataModel.getPath();
         if (!TextUtils.isEmpty(path)) {
             File file = new File(path);
             tvFileName.setText(file.getName());
         }
         
-        int subId = DataLoader.getSimSubId();
+        int subId = DataModel.getSubId();
+        assert subId != -1;
         List<SubscriptionInfo> subs = SMSSender.getSubs(this);
         String simName = getString(R.string.unknown_sim);
         for (SubscriptionInfo sub : subs) {
+            Log.d(TAG, "sub id: " + sub.getSubscriptionId());
             if (sub.getSubscriptionId() == subId) {
                 simName = getString(R.string.sim_slot_format, sub.getSimSlotIndex() + 1, sub.getCarrierName());
                 break;
@@ -210,8 +213,8 @@ public class ChooserActivity extends AppCompatActivity {
     }
     
     private void setupTableHeader() {
-        String[] titles = DataLoader.getTitles();
-        if (titles == null) return;
+        String[] titles = DataModel.getTitles();
+        assert titles != null;
         
         layoutHeader.removeAllViews();
         float density = getResources().getDisplayMetrics().density;
@@ -236,7 +239,7 @@ public class ChooserActivity extends AppCompatActivity {
     }
 
 
-    
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -264,18 +267,18 @@ public class ChooserActivity extends AppCompatActivity {
 //    }
 
     private void startSending(ArrayList<Integer> itemIndices) {
-        String rawContent = DataLoader.getContent();
-        String numberCol = DataLoader.getNumberColumn();
+        String rawContent = DataModel.getTemplate();
+        String numberCol = DataModel.getNumberColumn();
 
         List<Message> messages = new ArrayList<>();
         for (int i : itemIndices) {
-            Map<String, String> tmp = DataLoader.getDataModel().getMap(i);
+            Map<String, String> tmp = DataModel.getRow(i);
             String content = TextParser.parse(rawContent, tmp);
             String phoneNumber = tmp.get(numberCol);
             messages.add(new Message(phoneNumber, content));
         }
 
-        MessageService.startSending(this, messages, DataLoader.getSimSubId(), DataLoader.getDelay());
+        MessageService.startSending(this, messages, DataModel.getSubId(), SettingManager.getDelay());
         showProgressDialog();
     }
     

@@ -22,9 +22,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.data.DataContext;
-import top.yztz.msggo.data.DataLoader;
+import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.HistoryManager;
+import top.yztz.msggo.data.SettingManager;
 import top.yztz.msggo.fragments.HomeFrag;
 import top.yztz.msggo.fragments.SettingFrag;
 import top.yztz.msggo.services.LoadService;
@@ -178,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.d(TAG, "onCreate: ");
-        DataLoader.init(this);
-        top.yztz.msggo.util.LocaleUtils.applyLocale(this);
+        SettingManager.init(this);
+
+        top.yztz.msggo.util.LocaleUtils.applyLocale();
         excelPickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                         if (uri != null) {
                             Log.d(TAG, "File URI: " + uri.getEncodedPath());
                             String path = getFilePathFromContentUri(this, uri);
-                            DataLoader.load(path, this);
+                            LoadService.load(this, path);
                         }
                     }
                 }
@@ -199,9 +199,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Check Privacy Policy and Disclaimer
-        if (!DataLoader.isPrivacyAccepted()) {
+        if (!SettingManager.isPrivacyAccepted()) {
             showPrivacyDialog();
-        } else if (!DataLoader.isDisclaimerAccepted()) {
+        } else if (!SettingManager.isDisclaimerAccepted()) {
             showDisclaimerDialog();
         } else {
             checkPermissionsAndInit();
@@ -214,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage(getString(R.string.privacy_policy_content))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
-                    DataLoader.setPrivacyAccepted(true);
-                    if (!DataLoader.isDisclaimerAccepted()) {
+                    SettingManager.setPrivacyAccepted(true);
+                    if (!SettingManager.isDisclaimerAccepted()) {
                         showDisclaimerDialog();
                     } else {
                         checkPermissionsAndInit();
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage(getString(R.string.disclaimer_content))
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
-                    DataLoader.setDisclaimerAccepted(true);
+                    SettingManager.setDisclaimerAccepted(true);
                     checkPermissionsAndInit();
                 })
                 .setNegativeButton(getString(R.string.disagree_exit), (dialog, which) -> finish())
@@ -265,19 +265,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initApp() {
-        observeLoadStatus();
-        initFragment();
-        if (SMSSender.getSubs(this).isEmpty()) {
-            if (XiaomiUtil.isXiaomi()) {
-                Log.d(TAG, "xiaomi: check perm");
-                XiaomiUtil.showXiaomiPermissionDialog(this);
-                return;
-            }
-            ToastUtil.show(this, getString(R.string.no_sim_found_exit));
-            finish();
-        }
-        // check share
+    private void checkShare() {
         Intent intent = getIntent();
         String action = intent.getAction();
         Uri uri = null;
@@ -290,22 +278,25 @@ public class MainActivity extends AppCompatActivity {
 
         if (uri != null) {
             Log.i(TAG, "load outside link: " + uri);
-            DataLoader.load(FileUtil.getFilePathFromContentUri(this, uri), this);
+            LoadService.load(this, FileUtil.getFilePathFromContentUri(this, uri));
         }
     }
 
+    private void initApp() {
+        observeLoadStatus();
+        initFragment();
+        if (SMSSender.getSubs(this).isEmpty()) {
+            if (XiaomiUtil.isXiaomi()) {
+                Log.d(TAG, "xiaomi: check perm");
+                XiaomiUtil.showXiaomiPermissionDialog(this);
+                return;
+            }
+            ToastUtil.show(this, getString(R.string.no_sim_found_exit));
+            finish();
+        }
+        checkShare();
+    }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 1) {
-//            if (data == null || data.getData() == null) return;
-//            Uri uri = data.getData();
-//            Log.d(TAG, "File URI: " + uri.getEncodedPath());
-//            String path = getFilePathFromContentUri(this, data.getData());
-//            DataLoader.load(path, this);
-//        }
-//    }
 
     /**
      * 打开文件选择器
@@ -319,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
         String[] mimeTypes = {
                 "application/vnd.ms-excel",
                 "application/x-excel",
+                "application/wps-office.xls",
+                "application/wps-office.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         };
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -341,67 +334,67 @@ public class MainActivity extends AppCompatActivity {
                     indicator.hide();
                 }
 
-                
-                if (status.isSuccessful) {
-                    DataLoader.setLastPath(status.path);
-                    String currentSig = DataLoader.getLastSignature();
-                    Log.i(TAG, "数据加载成功：" + status.path + " 签名: " + currentSig);
-                    ToastUtil.show(MainActivity.this, getString(R.string.load_success));
-
-                    DataContext historyItem = HistoryManager.getItem(MainActivity.this, status.path);
-                    if (historyItem != null) {
-                        Log.i(TAG, "发现历史数据：" + historyItem.path + " 签名: " + historyItem.signature);
-                        if (currentSig.equals(historyItem.signature)) {
-                            DataLoader.setNumberColumn(historyItem.numberColumn);
-                            DataLoader.setContent(historyItem.template);
-                        } else {
-                             DataLoader.setNumberColumn("");
-                             DataLoader.setContent("");
-                        }
-                    }
-
-                    String[] titles = DataLoader.getTitles();
-                    if (!TextUtils.isEmpty(DataLoader.getNumberColumn())) {
-                        Log.i(TAG, "使用现有历史记录");
-                        HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), DataLoader.getNumberColumn(), currentSig);
-                        Fragment fragment = getCurrentFragment();
-                        if (fragment instanceof HomeFrag) {
-                            ((HomeFrag)fragment).updateStatus();
-                        }
-                    } else if (titles != null && titles.length > 0) {
-                        Log.i(TAG, "提示选择号码列");
-                        int checkedItem = -1;
-                        String currentColumn = DataLoader.getNumberColumn();
-                        for (int i = 0; i < titles.length; i++) {
-                            if (titles[i].equals(currentColumn)) {
-                                checkedItem = i;
-                                break;
-                            }
-                        }
-
-                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
-                                .setTitle(getString(R.string.select_number_column_dialog_title))
-                                .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
-                                    DataLoader.setNumberColumn(titles[which]);
-                                    // Update history with new selection
-                                    HistoryManager.addHistory(MainActivity.this, status.path, DataLoader.getContent(), titles[which], currentSig);
-                                    Fragment fragment = getCurrentFragment();
-                                    if (fragment instanceof HomeFrag) {
-                                        ((HomeFrag)fragment).updateStatus();
-                                    }
-                                    dialog.dismiss();
-                                    if (DataLoader.autoEnterEditor()) {
-                                        EditActivity.openEditor(MainActivity.this);
-                                    }
-                                })
-                                .setCancelable(false)
-                                .show();
-                    } else if (DataLoader.autoEnterEditor()) {
-                        EditActivity.openEditor(this);
-                    }
-                } else {
+                if (!status.isSuccessful) {
                     ToastUtil.show(MainActivity.this, getString(R.string.load_failed, status.errorMsg));
+                    return;
                 }
+                assert DataModel.loaded();
+                ToastUtil.show(MainActivity.this, getString(R.string.load_success));
+                String currentSig = DataModel.getSignature();
+                Log.i(TAG, "数据加载成功：" + status.path + " 签名: " + currentSig);
+
+                HistoryManager.HistoryItem historyItem = HistoryManager.getItem(MainActivity.this, status.path);
+                if (historyItem != null) {
+                    Log.i(TAG, "发现历史数据：" + historyItem.path + " 签名: " + historyItem.signature);
+                    if (currentSig.equals(historyItem.signature)) {
+                        DataModel.setNumberColumn(historyItem.numberColumn);
+                        DataModel.setTemplate(historyItem.template);
+                        if (SMSSender.getSubBySubscriptionId(MainActivity.this, historyItem.subId) == null) {
+                            ToastUtil.show(MainActivity.this, getString(R.string.unknown_sim));
+                        } else {
+                            DataModel.setSubId(historyItem.subId);
+                        }
+                    }
+                }
+
+                String[] titles = DataModel.getTitles();
+                if (!TextUtils.isEmpty(DataModel.getNumberColumn())) {
+                    Log.i(TAG, "使用现有历史记录");
+                    DataModel.saveAsHistory(MainActivity.this);
+                    Fragment fragment = getCurrentFragment();
+                    if (fragment instanceof HomeFrag) {
+                        ((HomeFrag)fragment).updateStatus();
+                    }
+                } else if (titles != null && titles.length > 0) {
+                    Log.i(TAG, "提示选择号码列");
+                    int checkedItem = -1;
+                    String currentColumn = DataModel.getNumberColumn();
+                    for (int i = 0; i < titles.length; i++) {
+                        if (titles[i].equals(currentColumn)) {
+                            checkedItem = i;
+                            break;
+                        }
+                    }
+                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
+                            .setTitle(getString(R.string.select_number_column_dialog_title))
+                            .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
+                                DataModel.setNumberColumn(titles[which]);
+                                DataModel.saveAsHistory(MainActivity.this);
+                                Fragment fragment = getCurrentFragment();
+                                if (fragment instanceof HomeFrag) {
+                                    ((HomeFrag)fragment).updateStatus();
+                                }
+                                dialog.dismiss();
+                                if (SettingManager.autoEnterEditor()) {
+                                    EditActivity.openEditor(MainActivity.this);
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
+                } else if (SettingManager.autoEnterEditor()) {
+                    EditActivity.openEditor(this);
+                }
+
             }
         });
     }

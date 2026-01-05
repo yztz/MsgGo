@@ -5,6 +5,7 @@
     android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/container_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -41,7 +42,7 @@
 
                 <!-- Current File Card -->
                 <LinearLayout
-                    android:id="@+id/card_current_file"
+                    android:id="@+id/row_current_file"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -91,7 +92,7 @@
 
                 <!-- Phone Number Column Card -->
                 <LinearLayout
-                    android:id="@+id/card_number_column"
+                    android:id="@+id/row_number_column"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -170,9 +171,11 @@
                             android:textColor="?attr/colorOnSurface" />
                         <TextView
                             android:id="@+id/tv_subtitle_edit"
-                            android:layout_width="wrap_content"
+                            android:layout_width="150dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:text="@string/no_template"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
@@ -237,6 +240,7 @@
 
         <!-- Send Button (separated) -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_send"
             style="?attr/materialCardViewFilledStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package top.yztz.msggo.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -8,7 +9,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import top.yztz.msggo.data.DataLoader;
+import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.exception.DataLoadFailed;
 
 public class LoadService extends Service {
@@ -35,6 +36,13 @@ public class LoadService extends Service {
         }
     }
 
+    public static void load(Context context, String path) {
+        Log.d(TAG, "开始加载path: " + path);
+        Intent intent = new Intent(context, LoadService.class);
+        intent.putExtra("path", path);
+        context.startService(intent);
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,7 +57,7 @@ public class LoadService extends Service {
             try {
                 postStatus(true, false, path);
 
-                DataLoader.__load(getApplicationContext(), path);
+                DataModel.load(getApplicationContext(), path);
 
                 postStatus(false, true, path);
                 Log.d(TAG, "数据加载成功");

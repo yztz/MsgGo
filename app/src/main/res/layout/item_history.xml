@@ -39,7 +39,7 @@
 
             <TextView
                 android:id="@+id/tv_template_preview"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 tools:text="你好，这是测试短信..."
