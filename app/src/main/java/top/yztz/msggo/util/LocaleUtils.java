@@ -1,8 +1,14 @@
 package top.yztz.msggo.util;
 
+import android.content.Context;
+
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import top.yztz.msggo.R;
 import top.yztz.msggo.data.SettingManager;
 
 public class LocaleUtils {
@@ -23,5 +29,9 @@ public class LocaleUtils {
         } else {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang));
         }
+    }
+
+    public static String[] getSupportedLanguages(Context context) {
+        return context.getResources().getStringArray(R.array.supported_languages);
     }
 }

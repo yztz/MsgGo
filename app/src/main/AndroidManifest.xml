@@ -29,6 +29,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.MarkdownActivity" />
         <activity android:name=".activities.ChooserActivity" />
         <activity android:name=".activities.AboutActivity" />
         <activity android:name=".activities.EditActivity"

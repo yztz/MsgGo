@@ -2,8 +2,15 @@ package top.yztz.msggo.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import java.util.Arrays;
 import java.util.HashMap;
+
+import top.yztz.msggo.util.LocaleUtils;
+
 public class SettingManager {
+    private static final String TAG = "SettingManager";
     private static final String PREF_NAME = "setting_prefs";
     private static SharedPreferences mSp;
     private static SharedPreferences.Editor mEditor;

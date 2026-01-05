@@ -11,11 +11,13 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -204,5 +206,22 @@ public class FileUtil {
             return path.substring(lastSlash + 1);
         }
         return path;
+    }
+
+    public static String loadFromRaw(Context context, int resId) {
+        try {
+            InputStream is = context.getResources().openRawResource(resId);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            is.close();
+            return sb.toString();
+        } catch (Exception e) {
+            // Fallback to base path if localized version fails
+            return "Failed to load content from id: " + resId;
+        }
     }
 }

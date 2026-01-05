@@ -66,18 +66,10 @@ public class AboutActivity extends AppCompatActivity {
                 .show());
 
         findViewById(R.id.row_privacy_policy).setOnClickListener(v ->
-                new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.privacy_policy))
-                .setMessage(getString(R.string.privacy_policy_content))
-                .setPositiveButton(getString(R.string.ok), null)
-                .show());
+                MarkdownActivity.open(this, getString(R.string.privacy_policy), R.raw.privacy));
 
         findViewById(R.id.row_disclaimer).setOnClickListener(v ->
-                new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.disclaimer))
-                .setMessage(getString(R.string.disclaimer_content))
-                .setPositiveButton(getString(R.string.ok), null)
-                .show());
+                MarkdownActivity.open(this, getString(R.string.disclaimer), R.raw.disclaimer));
     }
 
 }

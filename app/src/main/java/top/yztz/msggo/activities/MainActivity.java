@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.TextView;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataModel;
@@ -30,6 +31,7 @@ import top.yztz.msggo.fragments.SettingFrag;
 import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.FileUtil;
+import top.yztz.msggo.util.LocaleUtils;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.util.XiaomiUtil;
 
@@ -39,6 +41,8 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+import io.noties.markwon.Markwon;
+import io.noties.markwon.ext.tables.TablePlugin;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: ");
         SettingManager.init(this);
 
-        top.yztz.msggo.util.LocaleUtils.applyLocale();
+        LocaleUtils.applyLocale();
         excelPickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -221,31 +225,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPrivacyDialog() {
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.privacy_policy))
-                .setMessage(getString(R.string.privacy_policy_content))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
-                    SettingManager.setPrivacyAccepted(true);
-                    if (!SettingManager.isDisclaimerAccepted()) {
-                        showDisclaimerDialog();
-                    } else {
-                        checkPermissionsAndInit();
-                    }
-                })
-                .setNegativeButton(getString(R.string.disagree_exit), (dialog, which) -> finish())
-                .show();
+        showLawDialog(getString(R.string.privacy_policy), R.raw.privacy, () -> {
+            SettingManager.setPrivacyAccepted(true);
+            if (!SettingManager.isDisclaimerAccepted()) {
+                showDisclaimerDialog();
+            } else {
+                checkPermissionsAndInit();
+            }
+        });
     }
 
     private void showDisclaimerDialog() {
+        showLawDialog(getString(R.string.disclaimer), R.raw.disclaimer, () -> {
+            SettingManager.setDisclaimerAccepted(true);
+            checkPermissionsAndInit();
+        });
+    }
+
+    private void showLawDialog(String title, int res_id, Runnable onAgree) {
+        androidx.core.widget.NestedScrollView scrollView = new androidx.core.widget.NestedScrollView(this);
+        TextView textView = new TextView(this);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        textView.setPadding(padding, padding / 2, padding, padding);
+        textView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
+        textView.setLineSpacing(0, 1.2f);
+        scrollView.addView(textView);
+
+        Markwon markwon = Markwon.builder(this)
+                .usePlugin(TablePlugin.create(this))
+                .build();
+
+        String content = FileUtil.loadFromRaw(this, res_id);
+        content = content.replaceFirst("(?m)^#\\s.*(?:\\r?\\n)?", "");
+        markwon.setMarkdown(textView, content);
+
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.disclaimer))
-                .setMessage(getString(R.string.disclaimer_content))
+                .setTitle(title)
+                .setView(scrollView)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> {
-                    SettingManager.setDisclaimerAccepted(true);
-                    checkPermissionsAndInit();
-                })
+                .setPositiveButton(getString(R.string.read_and_agree), (dialog, which) -> onAgree.run())
                 .setNegativeButton(getString(R.string.disagree_exit), (dialog, which) -> finish())
                 .show();
     }

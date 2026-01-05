@@ -1,7 +1,5 @@
 package top.yztz.msggo.fragments;
 
-import static top.yztz.msggo.util.XiaomiUtil.showXiaomiPermissionDialog;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,6 +34,7 @@ import java.util.Locale;
 import top.yztz.msggo.R;
 import top.yztz.msggo.activities.ChooserActivity;
 import top.yztz.msggo.activities.EditActivity;
+import top.yztz.msggo.activities.MarkdownActivity;
 import top.yztz.msggo.activities.MainActivity;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.services.LoadService;
@@ -43,7 +42,6 @@ import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.ToastUtil;
-import top.yztz.msggo.util.XiaomiUtil;
 
 public class HomeFrag extends Fragment {
     private static final String TAG = "HomeFrag";
@@ -146,6 +144,11 @@ public class HomeFrag extends Fragment {
 
         // Number column selection
         rowNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
+
+        // Help button
+        View btnHelp = requireView().findViewById(R.id.btn_help);
+//        btnHelp.setOnClickListener(v -> MarkdownActivity.open(context, getString(R.string.help), "raw-zh-rCN/HELP.md"));
+        btnHelp.setOnClickListener(v -> MarkdownActivity.open(context, getString(R.string.help), R.raw.help));
     }
 
 

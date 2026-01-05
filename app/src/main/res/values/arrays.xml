@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="supported_languages">
+        <item>auto</item>
+        <item>en-US</item>
+        <item>zh-CN</item>
+    </string-array>
+</resources>

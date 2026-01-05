@@ -35,6 +35,7 @@ import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.SettingManager;
+import top.yztz.msggo.util.LocaleUtils;
 import top.yztz.msggo.util.ToastUtil;
 
 public class SettingFrag extends Fragment {
@@ -165,7 +166,7 @@ public class SettingFrag extends Fragment {
                     getString(R.string.language_en),
                     getString(R.string.language_zh)
             };
-            String[] tags = {"auto", "en", "zh"};
+            String[] tags = LocaleUtils.getSupportedLanguages(context);
             String current = SettingManager.getLanguage();
             int checkedItem = 0;
             for (int i = 0; i < tags.length; i++) {
