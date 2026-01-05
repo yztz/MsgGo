@@ -17,11 +17,12 @@
 距该项目发布已经将近 4 年了，本次更新带来了全新的外观材质（Material 3），更加优秀的交互，欢迎大家下载体验！
 
 ## 截图
-
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
 <img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="24%">
 <img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="24%">
 <img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="24%">
 <img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="24%">
+</div>
 
 ## 注意事项
 
