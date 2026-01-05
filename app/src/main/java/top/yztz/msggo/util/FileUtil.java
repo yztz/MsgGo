@@ -1,24 +1,13 @@
 package top.yztz.msggo.util;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.core.content.FileProvider;
-import androidx.loader.content.CursorLoader;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -30,11 +19,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.security.MessageDigest;
-import java.util.List;
 
 import top.yztz.msggo.data.Message;
 

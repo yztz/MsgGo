@@ -11,7 +11,7 @@ android {
         versionName "3.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 //        buildConfigField "long", "BUILD_TIME", "${System.currentTimeMillis()}L"
-        multiDexEnabled true
+//        multiDexEnabled true
     }
     buildFeatures {
         buildConfig = true

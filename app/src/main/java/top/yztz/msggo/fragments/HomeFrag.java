@@ -106,12 +106,13 @@ public class HomeFrag extends Fragment {
         tvCurrentFilePath = view.findViewById(R.id.tv_current_file_path);
         tvCurrentNumberColumn = view.findViewById(R.id.tv_current_number_column);
 
-        setupHistoryList();
+        rvHistory.setLayoutManager(new LinearLayoutManager(context));
+        historyAdapter = new HistoryAdapter();
+        rvHistory.setAdapter(historyAdapter);
 
-//        simSubId = DataModel.getSubId();
+        subs = SMSSender.getSubs(requireContext());
 
         setupClickListeners();
-        loadSimInfo();
         updateStatus();
     }
 
@@ -147,14 +148,6 @@ public class HomeFrag extends Fragment {
         rowNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
     }
 
-    private void loadSimInfo() {
-        subs = SMSSender.getSubs(getContext());
-        if (subs.isEmpty() && XiaomiUtil.isXiaomi()) {
-            showXiaomiPermissionDialog(getActivity());
-            return;
-        }
-        updateSimDisplay();
-    }
 
     private void showSimSelector() {
         if (subs == null || subs.isEmpty()) {
@@ -240,15 +233,7 @@ public class HomeFrag extends Fragment {
         // Progressive Disclosure State
         boolean hasData = false;
         boolean hasContent = false;
-//        boolean hasSim = false;
 
-        // 3. SIM Status
-        // SIM Info is updated in updateSimDisplay() which is called on creation and
-        // when SIM changes.
-        // We consider SIM "set" if simSubId is valid.
-//        if (DataModel.getSubId() != -1) {
-//            hasSim = true;
-//        }
         assert DataModel.getSubId() != -1;
         assert subs != null;
         assert !subs.isEmpty();
@@ -306,12 +291,6 @@ public class HomeFrag extends Fragment {
         }
 
         loadHistory();
-    }
-
-    private void setupHistoryList() {
-        rvHistory.setLayoutManager(new LinearLayoutManager(context));
-        historyAdapter = new HistoryAdapter();
-        rvHistory.setAdapter(historyAdapter);
     }
 
     private void loadHistory() {

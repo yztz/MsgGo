@@ -13,11 +13,12 @@
         android:isScrollContainer="true">
 
         <EditText
+            android:id="@+id/et_editor"
             android:paddingHorizontal="18dp"
             android:inputType="textMultiLine"
             android:textSize="22sp"
+            android:lineSpacingMultiplier="1.3"
             android:hint="@string/edit_hint"
-            android:id="@+id/et_editor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
