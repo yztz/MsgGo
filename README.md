@@ -18,10 +18,10 @@
 
 ## 截图
 
-![](./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png)
-![](./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png)
-![](./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png)
-![](./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png)
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="24%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="24%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="24%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="24%">
 
 ## 注意事项
 
