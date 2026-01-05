@@ -176,6 +176,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Log.i(TAG, "onNewIntent: ");
+        checkShare();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: ");
@@ -190,6 +198,10 @@ public class MainActivity extends AppCompatActivity {
                         Uri uri = data.getData();
                         if (uri != null) {
                             Log.d(TAG, "File URI: " + uri.getEncodedPath());
+                            if (FileUtil.getFileSize(this, uri) > FileUtil.MAX_FILE_SIZE) {
+                                ToastUtil.show(this, getString(R.string.file_too_large));
+                                return;
+                            }
                             String path = getFilePathFromContentUri(this, uri);
                             LoadService.load(this, path);
                         }
@@ -278,6 +290,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (uri != null) {
             Log.i(TAG, "load outside link: " + uri);
+            if (FileUtil.getFileSize(this, uri) > FileUtil.MAX_FILE_SIZE) {
+                ToastUtil.show(this, getString(R.string.file_too_large));
+                return;
+            }
             LoadService.load(this, FileUtil.getFilePathFromContentUri(this, uri));
         }
     }

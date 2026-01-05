@@ -143,4 +143,5 @@
     <string name="tip_sms_preview">提示：点击数据行预览短信内容</string>
     <string name="preview_and_send">预览与发送</string>
     <string name="edit_hint">写点什么吧~</string>
+    <string name="file_too_large">文件大小超过 50MB 限制</string>
 </resources>

@@ -41,6 +41,7 @@ import top.yztz.msggo.data.Message;
 public class FileUtil {
 
     private static final String TAG = "FileUtil";
+    public static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
     public static String getFilePathFromContentUri(Context context, Uri contentUri) {
         String fileName = getFileName(context, contentUri);
@@ -77,6 +78,29 @@ public class FileUtil {
             }
         }
         return fileName;
+    }
+
+    public static long getFileSize(Context context, Uri uri) {
+        if (uri == null) return 0;
+        if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
+            String path = uri.getPath();
+            if (path != null) {
+                File file = new File(path);
+                if (file.exists()) return file.length();
+            }
+        } else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (sizeIndex != -1) {
+                        return cursor.getLong(sizeIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to get file size from content URI", e);
+            }
+        }
+        return 0;
     }
 
     private static void copyFile(Context context, Uri srcUri, File dstFile) {

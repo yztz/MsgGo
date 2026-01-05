@@ -57,6 +57,11 @@ public class LoadService extends Service {
             try {
                 postStatus(true, false, path);
 
+                java.io.File file = new java.io.File(path);
+                if (file.exists() && file.length() > top.yztz.msggo.util.FileUtil.MAX_FILE_SIZE) {
+                    throw new DataLoadFailed(getApplicationContext().getString(top.yztz.msggo.R.string.file_too_large));
+                }
+
                 DataModel.load(getApplicationContext(), path);
 
                 postStatus(false, true, path);

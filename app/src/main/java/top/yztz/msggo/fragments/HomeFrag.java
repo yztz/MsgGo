@@ -296,8 +296,9 @@ public class HomeFrag extends Fragment {
         }
 
         if (hasData && hasContent) {
-            cardSend.setVisibility(View.VISIBLE);
             rowSelectSim.setVisibility(View.VISIBLE);
+            cardSend.setVisibility(View.VISIBLE);
+            updateSimDisplay();
             tvSubtitleSend.setText(getString(R.string.data_ready_format, DataModel.getRowCount()));
         } else {
             cardSend.setVisibility(View.GONE);
