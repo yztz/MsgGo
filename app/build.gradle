@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "top.yztz.msggo"
-    compileSdk 35
+    compileSdk = 35
     defaultConfig {
         applicationId "top.yztz.msggo"
         minSdkVersion 26
@@ -16,14 +16,14 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    aaptOptions {
-        noCompress 'ttf', 'otf'
-    }
     buildTypes {
         release {
 //            minifyEnabled true
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    androidResources {
+        noCompress 'ttf', 'otf'
     }
 
     // splits {
