@@ -16,7 +16,7 @@
             android:paddingHorizontal="18dp"
             android:inputType="textMultiLine"
             android:textSize="22sp"
-            android:hint="写点什么吧~"
+            android:hint="@string/edit_hint"
             android:id="@+id/et_editor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

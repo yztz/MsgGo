@@ -111,7 +111,6 @@
     <string name="selected_prefix">已选择: %1$s</string>
     <string name="no_available_sim">无可用 SIM</string>
     <string name="data_ready_format">%1$d 条数据已就绪</string>
-    <string name="template_ready">模板已就绪</string>
     <string name="no_template_content">无模板内容</string>
     <string name="set_sms_rate_title">设置短信资费</string>
     <string name="error_invalid_rate_range">请输入 0–10 之间的数字</string>
@@ -127,7 +126,7 @@
     <string name="confirm_clear_msg">你的编辑将会丢失很久，真的很久很久…</string>
     <string name="edit_unsaved_title">您的编辑尚未保存哦</string>
     <string name="edit_unsaved_msg">确定不保存就离开吗？</string>
-    <string name="error_import_data_first">请先点击“+”导入数据哦~</string>
+    <string name="error_import_data_first">请先导入数据哦~</string>
     <string name="xiaomi_permission_title">SIM 卡信息读取受限</string>
     <string name="xiaomi_permission_msg">小米系统“静默拒绝”了读取电话信息的权限。请前往设置手动开启“电话”权限，并确认没有开启短信与电话的“空白通行证”。</string>
     <string name="go_to_settings">前往设置</string>
@@ -141,4 +140,7 @@
     <string name="slot_description">卡槽 %1$d · %2$s</string>
     <string name="privacy_policy_content">\n最后更新日期：2026年01月02日\n\nMsgGo（以下简称“本应用”）深知隐私对您的重要性，并致力于保护您的个人数据。本隐私政策旨在向您说明本应用如何处理数据、我们请求权限的原因，以及我们为保护您的隐私所做的努力。\n\n1. 核心原则：零网络访问，本地处理\nMsgGo 的设计初衷是提供一个完全私密、安全的工具。本应用未请求外部网络访问权限。这意味着：\n- 您的所有数据（包括 Excel 文件内容、手机号码、短信模板等）绝不会被上传到任何服务器或第三方云端。\n- 所有的逻辑处理（变量替换、短信生成、发送控制）均完全在您的设备本地完成。\n\n2. 我们通过哪些权限使用您的数据\n为了实现批量发送短信的核心功能，我们需要请求以下权限：\n- 发送短信 (SEND_SMS)\n- 读取电话状态 (READ_PHONE_STATE)\n- 存储权限\n- 前台服务与通知权限\n\n3. 第三方服务\nMsgGo 不包含任何第三方分析工具、追踪器、广告 SDK 或 SDK 监控插件。\n\n</string>
     <string name="disclaimer_content">\n1. 本应用（MsgGo）是一款开源的批量短信发送工具，旨在为用户提供便捷的消息发送服务。用户在使用本应用时，应遵守当地法律法规。\n2. 用户应对其使用本应用发送的所有内容承担全部责任。本应用开发者不对用户发送的内容、发送的对象或因发送行为产生的任何后果负责。\n3. 本应用不承诺在所有环境下都能稳定运行。对于因应用故障、操作失误或不可抗力导致的数据丢失、停机或其他损失，开发者不承担任何赔偿责任。\n4. 使用本应用即表示您已充分理解并同意本声明。如果您不同意，请立即停止使用并卸载本应用。</string>
+    <string name="tip_sms_preview">提示：点击数据行预览短信内容</string>
+    <string name="preview_and_send">预览与发送</string>
+    <string name="edit_hint">写点什么吧~</string>
 </resources>

@@ -26,7 +26,7 @@
                 android:minHeight="?attr/actionBarSize"
                 app:menu="@menu/top_send_menu"
                 app:navigationIcon="@drawable/left"
-                app:title="预览与发送" />
+                app:title="@string/preview_and_send" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -273,7 +273,8 @@
         android:layout_marginVertical="2dp"
         android:layout_gravity="bottom"
         android:gravity="center"
-        android:text="提示：点击数据行预览短信内容"
+        android:textStyle="italic"
+        android:text="@string/tip_sms_preview"
         android:textAppearance="?attr/textAppearanceBodySmall"
         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -288,7 +289,7 @@
         app:cornerRadius="28dp"
         app:icon="@drawable/send_small"
         app:iconGravity="textStart"
-        android:text="立即发送"
+        android:text="@string/send_now"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
