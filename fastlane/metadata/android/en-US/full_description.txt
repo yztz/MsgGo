@@ -1,27 +1,13 @@
-MsgGo is a powerful bulk SMS tool designed for the efficient management and delivery of large-scale messaging. Built with modern Android design standards, it supports data import from Excel spreadsheets combined with templates for personalized message distribution, providing a clean, fast, and private user experience.
+MsgGo is a lightweight, modern bulk SMS tool for Android. Built with Material Design 3, it allows you to import data from Excel spreadsheets and use custom templates for efficient, personalized message distribution.
 
-<b>Core Features</b>
-
-- <b>Data Import</b>: Directly import SMS data from Excel (.xls/.xlsx) files.
-
-- <b>Dynamic Templates</b>: Support for custom SMS templates with variable replacement (e.g., "%{#Name#}") to achieve bulk personalized distribution.
-
-- <b>Smart Column Selection</b>: Flexible configuration of phone number columns to adapt to various contact list formats.
-
-- <b>Multi-SIM Support</b>: Robust SIM card detection and selection, allowing you to specify a specific slot for sending tasks.
-
-- <b>Progress Monitoring</b>: Dual-track progress monitoring system to view sending status in real-time.
-
-- <b>History Management</b>: Automatically saves sending records and template configurations, supporting one-click reloading of historical tasks.
-
-- <b>Fault-Tolerant Design</b>: Configurable sending delays to effectively avoid carrier risk control and improve delivery success rates.
-
-<b>Permissions</b>
-
-- <b>Send SMS (SEND_SMS)</b>: To implement the core SMS delivery functionality.
-
-- <b>Read Phone State (READ_PHONE_STATE)</b>: Used to identify multi-SIM slot information and signal status.
-
-<b>License</b>
-
-Apache-2.0
+<b>Features</b>
+<ul>
+<li><b>Excel Import</b>: Supports importing contact lists from .xls and .xlsx files.</li>
+<li><b>Magic Variables</b>: Automatically detects headers and supports inserting variables (e.g., "${Name}") into message templates for personalized bulk sending.</li>
+<li><b>Multi-SIM Support</b>: Fully compatible with multi-SIM devices; choose which SIM card to use.</li>
+<li><b>Progress Monitoring</b>: View sending progress and delivery status in real-time.</li>
+<li><b>History Management</b>: Automatically saves sending records and templates for easy reuse.</li>
+<li><b>Privacy Focused</b>: No INTERNET permission required; all data is processed locally.</li>
+<li><b>Delay Mechanism</b>: Supports randomized sending delays to reduce the risk of being blocked by carriers.</li>
+<li><b>Modern Design</b>: Follows Material Design 3 guidelines.</li>
+</ul>
