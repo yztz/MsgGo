@@ -1,13 +1,13 @@
-name: Android Release
+name: Nightly Build
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - '[0-9]*'
+  schedule:
+    - cron: '0 18 * * *' # 每天凌晨 2 点 (北京时间)
+  workflow_dispatch: # 允许手动触发
 
 jobs:
   build:
+    name: Build Nightly APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,20 +38,33 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Prepare Release Artifacts
+      - name: Prepare Nightly Artifacts
         run: |
-          mkdir -p release_artifacts
+          mkdir -p nightly_artifacts
+          DATE=$(date +'%Y%m%d')
           find app/build/outputs/apk/release -name "MsgGo-*-signed.apk" | while read -r apk; do
-            NEW_NAME=$(basename "$apk" | sed 's/-signed//')
-            mv "$apk" "release_artifacts/$NEW_NAME"
+            NAME=$(basename "$apk" | sed 's/-signed//')
+            NEW_NAME="${NAME%.apk}-nightly-$DATE.apk"
+            mv "$apk" "nightly_artifacts/$NEW_NAME"
           done
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: release_artifacts/*.apk
-          generate_release_notes: true
+          name: nightly-apks
+          path: nightly_artifacts/*.apk
+
+      - name: Update Nightly Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          body: |
+            This is an automated nightly build.
+            Built on: ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+            Revision: ${{ github.sha }}
+          files: nightly_artifacts/*.apk
           prerelease: true
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
