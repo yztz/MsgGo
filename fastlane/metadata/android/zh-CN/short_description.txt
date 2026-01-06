@@ -1,1 +1,1 @@
-A powerful bulk SMS tool.
+一款功能强大的批量短信发送工具。
