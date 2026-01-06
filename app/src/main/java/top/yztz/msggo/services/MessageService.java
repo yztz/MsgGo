@@ -131,9 +131,12 @@ public class MessageService extends Service {
         String serPath = intent.getStringExtra(EXTRA_FILE_PATH);
 
         if (serPath == null) {
+            Log.e(TAG, "onStartCommand: serPath is null, stopping service");
             stopSelf();
             return START_NOT_STICKY;
         }
+
+        Log.i(TAG, String.format("onStartCommand: delay=%d, subId=%d, randomize=%b, path=%s", delay, subId, randomize, serPath));
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build());
         totalMessages = 0;
@@ -150,6 +153,7 @@ public class MessageService extends Service {
             }
 
             totalMessages = messages.length;
+            Log.i(TAG, "Starting message send loop. Total messages: " + totalMessages);
             SendingMonitor.getInstance().setTotal(totalMessages);
             for (int i = 0; i < messages.length && !isStopped; i++) {
                 Message message = messages[i];
@@ -159,6 +163,7 @@ public class MessageService extends Service {
                         int currentDelay = delay;
                         if (randomize && delay > 1000) {
                             currentDelay = (int) (1000 + Math.random() * (delay - 1000));
+                            Log.d(TAG, "Applying randomized delay: " + currentDelay + "ms");
                         }
                         Thread.sleep(currentDelay);
                     }
@@ -177,6 +182,7 @@ public class MessageService extends Service {
             }
 
             allSentRequested = true;
+            Log.i(TAG, "All message send requests have been submitted.");
 
             // Clean up
             getApplicationContext().deleteFile(serPath);
@@ -257,7 +263,7 @@ public class MessageService extends Service {
                 } else {
                     log = getString(R.string.sms_sent_failed, code, phone != null ? phone : getString(R.string.unknown), resultCode);
                 }
-                Log.i(TAG, log);
+                Log.i(TAG, "SMS status received: " + log + " (ResultCode: " + resultCode + ")");
                 confirmedMessages++;
                 SendingMonitor.getInstance().incrementConfirmed(success);
                 SendingMonitor.getInstance().appendLog(log);

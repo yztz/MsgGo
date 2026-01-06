@@ -71,6 +71,7 @@ public class SMSSender {
         PendingIntent sentPI = PendingIntent.getBroadcast(context, code, sentIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         if (content.length() > 70) {
+            android.util.Log.i("SMSSender", "Sending multipart SMS to: " + phoneNumber + " (length: " + content.length() + ")");
             ArrayList<String> msgs = manager.divideMessage(content);
             ArrayList<PendingIntent> sentIntents = new ArrayList<>();
 
@@ -79,6 +80,7 @@ public class SMSSender {
             }
             manager.sendMultipartTextMessage(phoneNumber, null, msgs, sentIntents, null);
         } else {
+            android.util.Log.i("SMSSender", "Sending standard SMS to: " + phoneNumber);
             manager.sendTextMessage(phoneNumber, null, content, sentPI, null);
         }
     }

@@ -2,6 +2,7 @@ package top.yztz.msggo.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -35,10 +36,12 @@ public class SettingManager {
     public static void init(Context context) {
         mSp = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         mEditor = mSp.edit();
+        Log.i(TAG, "Initializing SettingManager");
         for (String key : DefaultPropMap.keySet()) {
             //不包含key时使用默认值初始化
             if (!mSp.contains(key)) {
                 Object obj = DefaultPropMap.get(key);
+                Log.d(TAG, "Setting default value for: " + key + " -> " + obj);
                 if (obj instanceof Integer) mEditor.putInt(key, (Integer) obj);
                 else if (obj instanceof String) mEditor.putString(key, (String) obj);
                 else if (obj instanceof Boolean) mEditor.putBoolean(key, (Boolean) obj);

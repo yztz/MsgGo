@@ -171,8 +171,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (allPermissionsGranted) {
+                Log.i(TAG, "All requested permissions granted.");
                 initApp();
             } else {
+                Log.w(TAG, "Some permissions were denied.");
                 ToastUtil.show(this, getString(R.string.permission_denied_exit));
                 finish();
             }
@@ -207,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                                 return;
                             }
                             String path = getFilePathFromContentUri(this, uri);
+                            Log.i(TAG, "Importing file from picker: " + path);
                             LoadService.load(this, path);
                         }
                     }
@@ -369,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (!status.isSuccessful) {
+                    Log.e(TAG, "Data load failed: " + status.errorMsg);
                     ToastUtil.show(MainActivity.this, getString(R.string.load_failed, status.errorMsg));
                     return;
                 }
