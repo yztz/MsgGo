@@ -2,12 +2,8 @@ package top.yztz.msggo.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import java.util.Arrays;
 import java.util.HashMap;
-
-import top.yztz.msggo.util.LocaleUtils;
 
 public class SettingManager {
     private static final String TAG = "SettingManager";
@@ -15,6 +11,26 @@ public class SettingManager {
     private static SharedPreferences mSp;
     private static SharedPreferences.Editor mEditor;
     private static final HashMap<String, Object> DefaultPropMap = new HashMap<>();
+
+    private static final String SEND_DELAY_KEY = "send_delay_v1";
+    private static final String SEND_DELAY_RANDOMIZATION_KEY = "send_delay_randomization_v1";
+    private static final String EDIT_AFTER_IMPORT_KEY = "edit_after_import_v1";
+    private static final String SMS_RATE_KEY = "sms_rate_v1";
+    private static final String LANGUAGE_KEY = "language_v1";
+    private static final String PRIVACY_ACCEPTED_KEY = "privacy_accepted";
+    private static final String DISCLAIMER_ACCEPTED_KEY = "disclaimer_accepted";
+
+
+    // Default values
+    static {
+        DefaultPropMap.put(SEND_DELAY_KEY, Settings.SEND_DELAY_DEFAULT);
+        DefaultPropMap.put(SEND_DELAY_RANDOMIZATION_KEY, Settings.SEND_DELAY_RANDOMIZATION_DEFAULT);
+        DefaultPropMap.put(EDIT_AFTER_IMPORT_KEY, Settings.EDIT_AFTER_IMPORT_DEFAULT);
+        DefaultPropMap.put(SMS_RATE_KEY, Settings.SMS_RATE_DEFAULT);
+        DefaultPropMap.put(LANGUAGE_KEY, Settings.LANGUAGE_DEFAULT);
+        DefaultPropMap.put(PRIVACY_ACCEPTED_KEY, Settings.PRIVACY_ACCEPTED_DEFAULT);
+        DefaultPropMap.put(DISCLAIMER_ACCEPTED_KEY, Settings.DISCLAIMER_ACCEPTED_DEFAULT);
+    }
 
     public static void init(Context context) {
         mSp = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -31,70 +47,63 @@ public class SettingManager {
         mEditor.apply();
     }
 
-    // Default values
-    static {
-        //发送间隔
-        DefaultPropMap.put("send_delay", 3000);
-        //加载完成是否自动进入编辑界面
-        DefaultPropMap.put("auto_enter_editor", false);
-        // 短信资费
-        DefaultPropMap.put("sms_rate", "0.1");
-        // 是否同意隐私协议
-        DefaultPropMap.put("privacy_accepted", false);
-        // 是否同意免责声明
-        DefaultPropMap.put("disclaimer_accepted", false);
-        // 语言设置 (auto, en, zh)
-        DefaultPropMap.put("language", "auto");
-    }
 
     public static boolean autoEnterEditor() {
-        return mSp.getBoolean("auto_enter_editor", false);
+        return mSp.getBoolean(EDIT_AFTER_IMPORT_KEY, Settings.EDIT_AFTER_IMPORT_DEFAULT);
     }
 
     public static void setAutoEnterEditor(boolean flag) {
-        mEditor.putBoolean("auto_enter_editor", flag);
+        mEditor.putBoolean(EDIT_AFTER_IMPORT_KEY, flag);
         mEditor.apply();
     }
 
     public static int getDelay() {
-        return mSp.getInt("send_delay", 5000);
+        return mSp.getInt(SEND_DELAY_KEY, Settings.SEND_DELAY_DEFAULT);
     }
 
     public static void setDelay(int num) {
-        mEditor.putInt("send_delay", num);
+        mEditor.putInt(SEND_DELAY_KEY, num);
         mEditor.apply();
     }
 
-    public static String getSmsRate() {
-        return mSp.getString("sms_rate", "0.1");
+    public static float getSmsRate() {
+        return mSp.getFloat(SMS_RATE_KEY, Settings.SMS_RATE_DEFAULT);
     }
 
-    public static void setSmsRate(String rate) {
-        mEditor.putString("sms_rate", rate).apply();
+    public static void setSmsRate(float rate) {
+        mEditor.putFloat(SMS_RATE_KEY, rate).apply();
     }
 
     public static boolean isPrivacyAccepted() {
-        return mSp.getBoolean("privacy_accepted", false);
+        return mSp.getBoolean(PRIVACY_ACCEPTED_KEY, Settings.PRIVACY_ACCEPTED_DEFAULT);
     }
 
     public static void setPrivacyAccepted(boolean flag) {
-        mEditor.putBoolean("privacy_accepted", flag).apply();
+        mEditor.putBoolean(PRIVACY_ACCEPTED_KEY, flag).apply();
     }
 
     public static boolean isDisclaimerAccepted() {
-        return mSp.getBoolean("disclaimer_accepted", false);
+        return mSp.getBoolean(DISCLAIMER_ACCEPTED_KEY, Settings.DISCLAIMER_ACCEPTED_DEFAULT);
     }
 
     public static void setDisclaimerAccepted(boolean flag) {
-        mEditor.putBoolean("disclaimer_accepted", flag).apply();
+        mEditor.putBoolean(DISCLAIMER_ACCEPTED_KEY, flag).apply();
     }
 
     public static String getLanguage() {
-        return mSp.getString("language", "auto");
+        return mSp.getString(LANGUAGE_KEY, Settings.LANGUAGE_DEFAULT);
     }
 
     public static void setLanguage(String lang) {
-        mEditor.putString("language", lang).apply();
+        mEditor.putString(LANGUAGE_KEY, lang).apply();
+    }
+
+    public static boolean isRandomizeDelay() {
+        return mSp.getBoolean(SEND_DELAY_RANDOMIZATION_KEY, Settings.SEND_DELAY_RANDOMIZATION_DEFAULT);
+    }
+
+    public static void setRandomizeDelay(boolean flag) {
+        mEditor.putBoolean(SEND_DELAY_RANDOMIZATION_KEY, flag).apply();
     }
 
 }

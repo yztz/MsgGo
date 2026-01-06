@@ -142,12 +142,8 @@ public class ChooserActivity extends AppCompatActivity {
                 return;
             }
 
-            double rate = 0.1;
-            try {
-                rate = Double.parseDouble(SettingManager.getSmsRate());
-            } catch (Exception ignored) {}
+            double rate = SettingManager.getSmsRate();
             double cost = itemIndices.size() * rate;
-
             new MaterialAlertDialogBuilder(this)
                     .setTitle(getString(R.string.confirm_send_title))
                     .setMessage(getString(R.string.confirm_send_msg_format, itemIndices.size(), cost))
@@ -180,11 +176,7 @@ public class ChooserActivity extends AppCompatActivity {
             }
         }
 
-        double rate = 0.1;
-        try {
-            rate = Double.parseDouble(SettingManager.getSmsRate());
-        } catch (Exception ignored) {}
-
+        double rate = SettingManager.getSmsRate();
         double cost = selected * rate;
         tvSelectionCount.setText(String.format(Locale.getDefault(), "%d / %d", selected, total));
         tvEstimatedCost.setText(String.format(Locale.getDefault(), "%.2f", cost));
@@ -278,7 +270,7 @@ public class ChooserActivity extends AppCompatActivity {
             messages.add(new Message(phoneNumber, content));
         }
 
-        MessageService.startSending(this, messages, DataModel.getSubId(), SettingManager.getDelay());
+        MessageService.startSending(this, messages, DataModel.getSubId(), SettingManager.getDelay(), SettingManager.isRandomizeDelay());
         showProgressDialog();
     }
     

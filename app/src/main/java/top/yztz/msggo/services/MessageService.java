@@ -28,6 +28,7 @@ public class MessageService extends Service {
     private static final String ACTION_CANCEL = "top.yztz.msggo.action.CANCEL_SENDING";
     private static final String EXTRA_DELAY = "delay";
     private static final String EXTRA_SUB_ID = "subId";
+    private static final String EXTRA_RANDOMIZE = "randomize";
     private static final String EXTRA_FILE_PATH = "message_file";
 
     private NotificationManager notificationManager;
@@ -45,8 +46,9 @@ public class MessageService extends Service {
      * @param messages List of messages to send
      * @param subId    Subscription ID (SIM card)
      * @param delay    Delay between messages in milliseconds
+     * @param randomize Whether to randomize the delay
      */
-    public static void startSending(Context context, java.util.List<Message> messages, int subId, int delay) {
+    public static void startSending(Context context, java.util.List<Message> messages, int subId, int delay, boolean randomize) {
         if (context == null || messages == null || messages.isEmpty()) return;
 
         // Serialize messages to file
@@ -65,6 +67,7 @@ public class MessageService extends Service {
         Intent serviceIntent = new Intent(context, MessageService.class);
         serviceIntent.putExtra(EXTRA_DELAY, delay);
         serviceIntent.putExtra(EXTRA_SUB_ID, subId);
+        serviceIntent.putExtra(EXTRA_RANDOMIZE, randomize);
         serviceIntent.putExtra(EXTRA_FILE_PATH, serPath);
 
         ContextCompat.startForegroundService(context, serviceIntent);
@@ -124,6 +127,7 @@ public class MessageService extends Service {
 
         int delay = intent.getIntExtra(EXTRA_DELAY, 5000);
         int subId = intent.getIntExtra(EXTRA_SUB_ID, SMSSender.getDefaultSubID());
+        boolean randomize = intent.getBooleanExtra(EXTRA_RANDOMIZE, true);
         String serPath = intent.getStringExtra(EXTRA_FILE_PATH);
 
         if (serPath == null) {
@@ -151,7 +155,13 @@ public class MessageService extends Service {
                 Message message = messages[i];
                 try {
                     // Delay
-                    if (i != 0) Thread.sleep(delay);
+                    if (i != 0) {
+                        int currentDelay = delay;
+                        if (randomize && delay > 1000) {
+                            currentDelay = (int) (1000 + Math.random() * (delay - 1000));
+                        }
+                        Thread.sleep(currentDelay);
+                    }
                     SMSSender.sendMessage(getApplicationContext(), message.getContent(), message.getPhone(), subId, i + 1);
 
                     // Update progress (requests sent)

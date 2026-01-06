@@ -31,6 +31,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def abi = filters.find { it.filterType == 'ABI' }?.identifier ?: "universal"
+            def typeSuffix = variant.buildType.name == 'release' ? "" : "-unsigned"
+            outputFileName = "MsgGo-${variant.versionName}-${abi}${typeSuffix}.apk"
+        }
+    }
+
 }
 
 repositories {

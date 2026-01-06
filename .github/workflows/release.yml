@@ -40,13 +40,11 @@ jobs:
 
       - name: Prepare Release Artifacts
         run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
           mkdir -p release_artifacts
-          find app/build/outputs/apk/release -name "*-signed.apk" | while read -r apk; do
-            FILENAME=$(basename "$apk")
-            # Extract ABI name and rename to MsgGo-tag-abi.apk
-            ABI=$(echo "$FILENAME" | sed -E 's/app-(.*)-release-unsigned-signed\.apk/\1/; s/app-release-unsigned-signed\.apk/universal/')
-            mv "$apk" "release_artifacts/MsgGo-${TAG_NAME}-${ABI}.apk"
+          find app/build/outputs/apk/release -name "MsgGo-*-signed.apk" | while read -r apk; do
+            # Remove the -signed suffix added by the signing action
+            NEW_NAME=$(basename "$apk" | sed 's/-signed//')
+            mv "$apk" "release_artifacts/$NEW_NAME"
           done
 
       - name: Create Release

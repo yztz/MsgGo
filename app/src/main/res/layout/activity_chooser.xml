@@ -136,7 +136,7 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_rmb"
+                                android:src="@drawable/ic_currency"
                                 app:tint="?attr/colorPrimary" />
                             <TextView
                                 android:id="@+id/tv_estimated_cost"

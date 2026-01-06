@@ -7,6 +7,7 @@ import androidx.core.os.LocaleListCompat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.SettingManager;
@@ -33,5 +34,13 @@ public class LocaleUtils {
 
     public static String[] getSupportedLanguages(Context context) {
         return context.getResources().getStringArray(R.array.supported_languages);
+    }
+
+    public static String getLanguageDisplayName(Context context, String langCode) {
+        if ("auto".equalsIgnoreCase(langCode)) {
+            return context.getString(R.string.language_auto);
+        }
+        Locale locale = Locale.forLanguageTag(langCode);
+        return locale.getDisplayLanguage(locale);
     }
 }

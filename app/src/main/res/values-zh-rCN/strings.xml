@@ -11,8 +11,6 @@
     <string name="calculating">计算中…</string>
     <string name="switch_language">界面语言</string>
     <string name="language_auto">跟随系统</string>
-    <string name="language_en">English</string>
-    <string name="language_zh">简体中文</string>
     <string name="language_prefix">当前: %1$s</string>
     <string name="not_selected">未选择</string>
     <string name="unknown">未知</string>
@@ -40,7 +38,9 @@
     <string name="auto_open_editor">自动打开编辑器</string>
     <string name="auto_open_editor_summary">导入数据后自动进入编辑界面</string>
     <string name="send_delay">发送间隔</string>
-    <string name="send_delay_summary">设置每条短信发送后的延迟时间，规避运营拦截</string>
+    <string name="send_delay_summary">设置每条短信发送后的延迟时间，规避运营商拦截</string>
+    <string name="randomize_delay">随机化延迟</string>
+    <string name="randomize_delay_summary">在最小值与设定值之间取随机延迟</string>
     <string name="sms_cost">短信资费</string>
     <string name="sms_cost_summary">用于计算发送费用</string>
     <string name="category_storage">存储</string>

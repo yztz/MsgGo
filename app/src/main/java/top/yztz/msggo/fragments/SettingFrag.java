@@ -2,6 +2,7 @@ package top.yztz.msggo.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,13 +36,14 @@ import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.SettingManager;
+import top.yztz.msggo.data.Settings;
 import top.yztz.msggo.util.LocaleUtils;
 import top.yztz.msggo.util.ToastUtil;
 
 public class SettingFrag extends Fragment {
     private static final String TAG = "SettingFrag";
     private Context context;
-    private MaterialSwitch mSwitchAutoEditor;
+    private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay;
     private MaterialCardView mCardClearCache;
     private View mRowExportLog, mRowAboutApp, mRowLanguage;
     private TextView mTvCache, mTvDelayValue, mTvSmsRateValue, mTvLanguage;
@@ -67,9 +69,9 @@ public class SettingFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
 
-        mSliderDelay = view.findViewById(R.id.slider_delay);
         mTvDelayValue = view.findViewById(R.id.tv_delay_value);
         mSwitchAutoEditor = view.findViewById(R.id.switch_auto_editor);
+        mSwitchRandomizeDelay = view.findViewById(R.id.switch_randomize_delay);
         mTvCache = view.findViewById(R.id.tv_cache);
         mCardClearCache = view.findViewById(R.id.card_clear_cache);
         mCardSmsRate = view.findViewById(R.id.card_sms_rate);
@@ -78,6 +80,11 @@ public class SettingFrag extends Fragment {
         mRowAboutApp = view.findViewById(R.id.row_about_app);
         mRowLanguage = view.findViewById(R.id.row_language);
         mTvLanguage = view.findViewById(R.id.tv_language);
+
+        mSliderDelay = view.findViewById(R.id.slider_delay);
+        mSliderDelay.setValueFrom(Settings.SEND_DELAY_MIN);
+        mSliderDelay.setValueTo(Settings.SEND_DELAY_MAX);
+        mSliderDelay.setStepSize(Settings.SEND_DELAY_STEP_UNIT);
 
         setupListeners();
         showInfo();
@@ -91,18 +98,23 @@ public class SettingFrag extends Fragment {
             }
         });
 
+        mSwitchRandomizeDelay.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!isUpdatingUI) {
+                SettingManager.setRandomizeDelay(isChecked);
+            }
+        });
+
         // Auto-save: Slider Delay
         mSliderDelay.addOnChangeListener((slider, value, fromUser) -> {
             if (fromUser) {
-                int delayMs = (int) (value * 500); // 转换回毫秒
-                SettingManager.setDelay(delayMs);
-                float seconds = value * 0.5f;
+                SettingManager.setDelay((int)value);
+                float seconds = value / 1000f;
                 mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", seconds));
             }
         });
 
         mSliderDelay.setLabelFormatter(value -> {
-            float seconds = value * 0.5f; // 转换回秒数
+            float seconds = value / 1000f; // 转换回秒数
             return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
 
@@ -110,7 +122,7 @@ public class SettingFrag extends Fragment {
         mCardSmsRate.setOnClickListener(v -> {
             View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_text, null);
             EditText editText = dialogView.findViewById(R.id.edit_text);
-            editText.setText(SettingManager.getSmsRate());
+            editText.setText(SettingManager.getSmsRate() + "");
             editText.setSelection(editText.getText().length());
 
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
@@ -119,12 +131,12 @@ public class SettingFrag extends Fragment {
                     .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                         String input = editText.getText().toString().trim();
                         if (TextUtils.isEmpty(input)) {
-                            SettingManager.setSmsRate("0");
+                            SettingManager.setSmsRate(0.0f);
                         } else {
                             try {
-                                double rate = Double.parseDouble(input);
-                                if (rate >= 0 && rate <= 10) {
-                                    SettingManager.setSmsRate(input);
+                                float rate = Float.parseFloat(input);
+                                if (rate >= Settings.SMS_RATE_MIN && rate <= Settings.SMS_RATE_MAX) {
+                                    SettingManager.setSmsRate(rate);
                                 } else {
                                     ToastUtil.show(context, getString(R.string.error_invalid_rate_range));
                                 }
@@ -161,18 +173,14 @@ public class SettingFrag extends Fragment {
 
         // Language
         mRowLanguage.setOnClickListener(v -> {
-            String[] langs = {
-                    getString(R.string.language_auto),
-                    getString(R.string.language_en),
-                    getString(R.string.language_zh)
-            };
-            String[] tags = LocaleUtils.getSupportedLanguages(context);
             String current = SettingManager.getLanguage();
+            String[] tags = LocaleUtils.getSupportedLanguages(context);
+            String[] langs = new String[tags.length];
             int checkedItem = 0;
             for (int i = 0; i < tags.length; i++) {
+                langs[i] = LocaleUtils.getLanguageDisplayName(context, tags[i]);
                 if (tags[i].equals(current)) {
                     checkedItem = i;
-                    break;
                 }
             }
 
@@ -246,14 +254,13 @@ public class SettingFrag extends Fragment {
         isUpdatingUI = true;
         
         // Display delay
-        int delayMs = SettingManager.getDelay();
-        float sliderValue = delayMs / 500f; // 每 0.5 秒为 1 个单位
-        sliderValue = Math.max(1f, Math.min(16f, sliderValue)); // 限制在 0.5s-8.0s 范围
-        mSliderDelay.setValue(sliderValue);
-        mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", sliderValue * 500 / 1000));
+        float delay = SettingManager.getDelay();
+        mSliderDelay.setValue(delay);
+        mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", delay/1000f));
 
-        // Set auto editor switch
+        // Set switches
         mSwitchAutoEditor.setChecked(SettingManager.autoEnterEditor());
+        mSwitchRandomizeDelay.setChecked(SettingManager.isRandomizeDelay());
 
         // Display number column
         // mTvNumberColumn.setText(TextUtils.isEmpty(numberColumn) ? "未选择" : numberColumn);
@@ -270,10 +277,7 @@ public class SettingFrag extends Fragment {
         }
 
         // Display language
-        String lang = SettingManager.getLanguage();
-        String langText = getString(R.string.language_auto);
-        if ("en".equals(lang)) langText = getString(R.string.language_en);
-        else if ("zh".equals(lang)) langText = getString(R.string.language_zh);
+        String langText = LocaleUtils.getLanguageDisplayName(context, SettingManager.getLanguage());
         mTvLanguage.setText(langText);
         
         isUpdatingUI = false;

@@ -11,8 +11,6 @@
     <string name="calculating">Calculating…</string>
     <string name="switch_language">Language</string>
     <string name="language_auto">Auto (System)</string>
-    <string name="language_en">English</string>
-    <string name="language_zh">Simplified Chinese</string>
     <string name="language_prefix">Current: %1$s</string>
     <string name="not_selected">Not selected</string>
     <string name="unknown">Unknown</string>
@@ -41,6 +39,8 @@
     <string name="auto_open_editor_summary">Edit after import</string>
     <string name="send_delay">Send Delay</string>
     <string name="send_delay_summary">Delay between each SMS to avoid carrier blocks</string>
+    <string name="randomize_delay">Randomize Delay</string>
+    <string name="randomize_delay_summary">Wait a random time (min-current)</string>
     <string name="sms_cost">SMS Rate</string>
     <string name="sms_cost_summary">Calculate cost</string>
     <string name="category_storage">Storage</string>
