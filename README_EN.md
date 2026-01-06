@@ -6,7 +6,15 @@ A lightweight bulk SMS application for the Android platform.
 
 ![](https://img.shields.io/github/downloads/yztz/MsgGo/total?color=green)
 
-[中文](./README.md) | [EN](./README_EN.md)
+[中文](./README.md) | [English](./README_EN.md)
+
+> [!IMPORTANT]
+> The bulk messaging functionality provided by this software is implemented based on the mobile device's native system SMS interface.
+>
+> 1. This software does not provide any third-party relay or distribution services. All transmission activities are directly associated with your SIM card number and are legally recognized as your personal communication.
+> 2. The volume of messages sent, content compliance, and delivery rates are subject to real-time monitoring and restrictions imposed by your mobile network operator.
+> 3. This software cannot intervene in the operator's filtering mechanisms or billing standards. Users shall bear full legal responsibility for the legality of the content sent and any resulting consequences.
+> 4. It is strictly forbidden to use this tool for telecommunications fraud, the dissemination of spam, or any other illegal or non-compliant activities.
 
 ## Updates
 

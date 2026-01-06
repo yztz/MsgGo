@@ -1,6 +1,9 @@
-# Disclaimer
+MsgGo is an open-source bulk SMS tool. Before using this application, please read and understand the following terms carefully. **By using this application, you acknowledge that you have fully understood and accepted all contents of this statement:**
 
-1. This application (MsgGo) is an open-source bulk SMS tool designed to provide users with convenient messaging services. Users shall comply with local laws and regulations when using this application.
-2. Users shall bear full responsibility for all content sent using this application. The developer of this application is not responsible for the content sent, the recipients, or any consequences arising from the sending behavior.
-3. This application does not guarantee stable operation in all environments. The developer shall not be liable for any compensation for data loss, downtime, or other losses caused by application failure, operational errors, or force majeure.
-4. Using this application indicates that you have fully understood and agreed to this statement. If you do not agree, please stop using and uninstall this application immediately.
+1. **Technical Principles and Service Nature**: This functionality is implemented based on the mobile device's native system SMS interface and does not provide any third-party relay or distribution services. All transmission activities are directly associated with your device's SIM card number and are legally recognized as your personal communication.
+2. **Operator Constraints and Supervision**: The volume of messages sent, content compliance, and delivery quality are subject to the limitations of your telecommunications operator (e.g., billing standards, risk control audits, etc.). This application cannot intervene in the operator's monitoring mechanisms, nor is it responsible for sending failures or account suspensions caused by operator restrictions.
+3. **Compliance Requirements and Prohibitions**: Users must comply with local laws and regulations. It is strictly forbidden to use this tool for telecommunications fraud, the dissemination of spam, illegal marketing, or any other unlawful activities that infringe upon the privacy of others.
+4. **Disclaimer of Liability**:
+    1. **Content Responsibility**: Users shall bear full legal responsibility for the authenticity and legality of the sent content and the recipients.
+    2. **Operational Risk**: This application does not guarantee stable operation in all environments. The developers shall not be held liable for any data loss, communication abnormalities, or economic losses resulting from software failures, operational errors, or force majeure.
+5. **Effectiveness Confirmation**: If you do not agree with any terms of this statement, please stop using and uninstall this application immediately.
