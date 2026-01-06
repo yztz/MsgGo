@@ -1,3 +1,20 @@
+<!--
+  ~ Copyright (C) 2026 yztz
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU General Public License as published by the Free Software
+  ~ Foundation; either version 3 of the License, or (at your option) any later
+  ~ version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  ~ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with
+  ~ this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chooser_container"
@@ -25,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:menu="@menu/top_send_menu"
-                app:navigationIcon="@drawable/left"
+                app:navigationIcon="@drawable/ic_arrow_back"
                 app:title="@string/preview_and_send" />
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -95,7 +112,7 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/sim"
+                                android:src="@drawable/ic_sim"
                                 app:tint="?attr/colorPrimary"/>
                             <TextView
                                 android:id="@+id/tv_sim_info"
@@ -161,8 +178,8 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:src="@drawable/ic_checklist"
                                 app:tint="?attr/colorPrimary" />
                             <TextView
@@ -287,7 +304,7 @@
         android:layout_marginHorizontal="16dp"
         android:elevation="4dp"
         app:cornerRadius="28dp"
-        app:icon="@drawable/send_small"
+        app:icon="@drawable/ic_send_small"
         app:iconGravity="textStart"
         android:text="@string/send_now"
         android:textSize="16sp"

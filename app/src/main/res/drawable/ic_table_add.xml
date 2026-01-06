@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright (C) 2026 yztz
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU General Public License as published by the Free Software
+  ~ Foundation; either version 3 of the License, or (at your option) any later
+  ~ version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  ~ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with
+  ~ this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+  <path
+      android:pathData="M85.3,213.3a85.3,85.3 0,0 1,85.3 -85.3h597.3a85.3,85.3 0,0 1,85.3 85.3v170.7a42.7,42.7 0,1 1,-85.3 0V213.3H170.7v597.3h298.7a42.7,42.7 0,1 1,0 85.3H170.7a85.3,85.3 0,0 1,-85.3 -85.3V213.3z"
+      android:fillColor="#14181F"/>
+  <path
+      android:pathData="M597.3,682.7a42.7,42.7 0,0 1,42.7 -42.7h256a42.7,42.7 0,1 1,0 85.3h-256a42.7,42.7 0,0 1,-42.7 -42.7zM85.3,640a42.7,42.7 0,0 1,42.7 -42.7h341.3a42.7,42.7 0,1 1,0 85.3H128a42.7,42.7 0,0 1,-42.7 -42.7z"
+      android:fillColor="#14181F"/>
+  <path
+      android:pathData="M768,512a42.7,42.7 0,0 1,42.7 42.7v256a42.7,42.7 0,1 1,-85.3 0v-256a42.7,42.7 0,0 1,42.7 -42.7zM469.3,128a42.7,42.7 0,0 1,42.7 42.7v682.7a42.7,42.7 0,1 1,-85.3 0V170.7a42.7,42.7 0,0 1,42.7 -42.7z"
+      android:fillColor="#14181F"/>
+  <path
+      android:pathData="M85.3,384a42.7,42.7 0,0 1,42.7 -42.7h682.7a42.7,42.7 0,1 1,0 85.3H128a42.7,42.7 0,0 1,-42.7 -42.7z"
+      android:fillColor="#14181F"/>
+</vector>
