@@ -239,6 +239,7 @@ public class EditActivity extends AppCompatActivity {
             
             // Restore size to not affect other spans
             paint.setTextSize(originalSize);
+            paint.setFakeBoldText(false);
             return (int) (textWidth + 2 * horizontalPadding + 2 * margin);
         }
 
