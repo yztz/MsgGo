@@ -66,7 +66,7 @@ public class HomeFrag extends Fragment {
 
     private View rowCurrentFile, rowNumberColumn, rowEditContent, rowSelectSim, rowSend, cardSend;
     private ViewGroup containerHome;
-    private TextView tvSimInfo, tvSubtitleSend, tvSubtitleEdit, tvEmptyHistory;
+    private TextView tvSimInfo, tvSubtitleEdit, tvEmptyHistory;
     private TextView tvCurrentFilePath, tvCurrentNumberColumn;
     private RecyclerView rvHistory;
     private HistoryAdapter historyAdapter;
@@ -106,7 +106,7 @@ public class HomeFrag extends Fragment {
 
         // Initialize views
         tvSimInfo = view.findViewById(R.id.tv_sim_info);
-        tvSubtitleSend = view.findViewById(R.id.tv_subtitle_send);
+//        tvSubtitleSend = view.findViewById(R.id.tv_subtitle_send);
         tvSubtitleEdit = view.findViewById(R.id.tv_subtitle_edit);
         rvHistory = view.findViewById(R.id.rv_history);
         tvEmptyHistory = view.findViewById(R.id.tv_empty_history);
@@ -139,6 +139,11 @@ public class HomeFrag extends Fragment {
             } else if (TextUtils.isEmpty(DataModel.getTemplate())) {
                 ToastUtil.show(context, getString(R.string.error_edit_content_first));
             } else {
+                int removed = DataModel.deduplicate();
+                if (removed > 0) {
+                    ToastUtil.show(context, getString(R.string.deduplication_result, removed));
+                    // updateStatus(); 
+                }
                 startActivity(new Intent(context, ChooserActivity.class));
             }
         });
@@ -304,7 +309,7 @@ public class HomeFrag extends Fragment {
             rowSelectSim.setVisibility(View.VISIBLE);
             cardSend.setVisibility(View.VISIBLE);
             updateSimDisplay();
-            tvSubtitleSend.setText(getString(R.string.data_ready_format, DataModel.getRowCount()));
+//            tvSubtitleSend.setText(getString(R.string.data_ready_format, DataModel.getRowCount()));
         } else {
             cardSend.setVisibility(View.GONE);
             rowSelectSim.setVisibility(View.GONE);

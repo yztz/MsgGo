@@ -46,7 +46,6 @@ import top.yztz.msggo.data.Message;
 public class FileUtil {
 
     private static final String TAG = "FileUtil";
-    public static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
     public static String getFilePathFromContentUri(Context context, Uri contentUri) {
         String fileName = getFileName(context, contentUri);

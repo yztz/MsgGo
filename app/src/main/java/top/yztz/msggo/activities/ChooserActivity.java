@@ -29,9 +29,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,6 +43,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -287,9 +291,100 @@ public class ChooserActivity extends AppCompatActivity {
             messages.add(new Message(phoneNumber, content));
         }
 
-        MessageService.startSending(this, messages, DataModel.getSubId(), SettingManager.getDelay(), SettingManager.isRandomizeDelay());
-        showProgressDialog();
+        // Start sensitive word check process
+        checkAndSendMessages(messages, 0);
     }
+
+    /**
+     * Recursively check messages for sensitive words and prompt user for action if found.
+     * @param messages The list of messages to send
+     * @param index The current index being checked
+     */
+    private void checkAndSendMessages(List<Message> messages, int index) {
+        // Skip already-null (skipped) messages
+        while (index < messages.size() && messages.get(index) == null) {
+            index++;
+        }
+
+        if (index >= messages.size()) {
+            // All messages checked, filter out nulls and send
+            List<Message> validMessages = new ArrayList<>();
+            for (Message m : messages) {
+                if (m != null) {
+                    validMessages.add(m);
+                }
+            }
+            if (validMessages.isEmpty()) {
+                ToastUtil.show(this, R.string.sending_completed);
+                return;
+            }
+            MessageService.startSending(this, validMessages, DataModel.getSubId(), SettingManager.getDelay(), SettingManager.isRandomizeDelay());
+            showProgressDialog();
+            return;
+        }
+
+        Message message = messages.get(index);
+        List<String> sensitiveWords = top.yztz.msggo.util.SensitiveWordUtil.findAll(message.getContent());
+
+        if (sensitiveWords.isEmpty()) {
+            // No sensitive words, proceed to next message
+            checkAndSendMessages(messages, index + 1);
+        } else {
+            // Sensitive words detected, show dialog
+            final int currentIndex = index;
+            String wordsDisplay = TextUtils.join(", ", sensitiveWords);
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.sensitive_word_detected_title))
+                    .setMessage(getString(R.string.sensitive_word_detected_msg, currentIndex + 1, wordsDisplay))
+                    .setCancelable(false)
+                    .setPositiveButton(getString(R.string.skip_message), (dialog, which) -> {
+                        // Skip this message
+                        messages.set(currentIndex, null);
+                        checkAndSendMessages(messages, currentIndex + 1);
+                    })
+                    .setNeutralButton(getString(R.string.edit_message), (dialog, which) -> {
+                        // Show edit dialog
+                        showEditMessageDialog(messages, currentIndex);
+                    })
+                    .setNegativeButton(getString(R.string.cancel_send), (dialog, which) -> {
+                        // Cancel entire sending process
+                        ToastUtil.show(this, getString(R.string.sending_cancelled));
+                    })
+                    .show();
+        }
+    }
+
+    /**
+     * Show a dialog to edit the message content. Re-checks for sensitive words after saving.
+     */
+    private void showEditMessageDialog(List<Message> messages, int index) {
+        Message message = messages.get(index);
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_text, null);
+        TextInputLayout container = dialogView.findViewById(R.id.edit_text_container);
+
+        EditText editText = dialogView.findViewById(R.id.edit_text);
+        editText.setText(message.getContent());
+        editText.setSelection(editText.getText().length());
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.edit_sensitive_message_title))
+                .setView(dialogView)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.save), (dialog, which) -> {
+                    String newContent = editText.getText().toString();
+                    messages.set(index, new Message(message.getPhone(), newContent));
+                    // Re-check this message
+                    checkAndSendMessages(messages, index);
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                    // Go back to the check dialog
+                    checkAndSendMessages(messages, index);
+                })
+                .show();
+    }
+
     
     private void showProgressDialog() {
         if (progressDialog == null) {
@@ -404,7 +499,7 @@ public class ChooserActivity extends AppCompatActivity {
                         tvProgressTitle.setText(getString(R.string.sending));
                         progressDialog.setCancelable(false);
                         progressDialog.setCanceledOnTouchOutside(false);
-                        btnCancel.setText(getString(R.string.cancel));
+                        btnCancel.setText(getString(R.string.cancel_send));
                         break;
                 }
             }

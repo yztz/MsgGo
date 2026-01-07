@@ -31,6 +31,7 @@
     <string name="language_prefix">当前: %1$s</string>
     <string name="not_selected">未选择</string>
     <string name="unknown">未知</string>
+    <string name="unknown_error">未知错误</string>
 
     <!-- Main Navigation -->
     <string name="nav_home">主页</string>
@@ -120,14 +121,14 @@
     <string name="error_no_header">未找到首行标题（内容为空）</string>
     <string name="error_non_continuous_columns">数据内容列非连续</string>
     <string name="error_empty_content">内容为空</string>
-    <string name="error_empty_title_column">标题内容列(%1$d)为空</string>
+    <string name="error_empty_title_column">标题内容列存在空位</string>
     <string name="error_load_data_first">请先导入数据</string>
     <string name="error_edit_content_first">请先编辑短信内容</string>
     <string name="error_no_sim">未检测到可用的 SIM 卡</string>
     <string name="select_sim_dialog_title">选择发送 SIM 卡</string>
     <string name="selected_prefix">已选择: %1$s</string>
     <string name="no_available_sim">无可用 SIM</string>
-    <string name="data_ready_format">%1$d 条数据已就绪</string>
+    <string name="data_ready_format">数据已就绪</string>
     <string name="no_template_content">无模板内容</string>
     <string name="set_sms_rate_title">设置短信资费</string>
     <string name="error_invalid_rate_range">请输入 0–10 之间的数字</string>
@@ -159,4 +160,14 @@
     <string name="preview_and_send">预览与发送</string>
     <string name="edit_hint">写点什么吧~</string>
     <string name="file_too_large">文件大小超过 50MB 限制</string>
+    <string name="file_too_much_row">文件行数超过限制（100行）</string>
+    <string name="deduplication_result">移除 %1$d 条重复收信人</string>
+
+    <string name="sensitive_word_detected_title">检测到敏感词</string>
+    <string name="sensitive_word_detected_msg">第 %1$d 条消息包含敏感词：\n\n%2$s</string>
+    <string name="skip_message">跳过此条</string>
+    <string name="edit_message">编辑消息</string>
+    <string name="cancel_send">取消发送</string>
+    <string name="edit_sensitive_message_title">编辑消息内容</string>
+    <string name="checking_sensitive_words">正在检查敏感词…</string>
 </resources>

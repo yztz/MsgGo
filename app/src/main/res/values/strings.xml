@@ -31,6 +31,7 @@
     <string name="language_prefix">Current: %1$s</string>
     <string name="not_selected">Not selected</string>
     <string name="unknown">Unknown</string>
+    <string name="unknown_error">Unknown error</string>
 
     <!-- Main Navigation -->
     <string name="nav_home">Home</string>
@@ -120,14 +121,14 @@
     <string name="error_no_header">Header row not found (empty content)</string>
     <string name="error_non_continuous_columns">Data columns are not continuous</string>
     <string name="error_empty_content">Content is empty</string>
-    <string name="error_empty_title_column">Header column (%1$d) is empty</string>
+    <string name="error_empty_title_column">Header column exists empty</string>
     <string name="error_load_data_first">Please import data first</string>
     <string name="error_edit_content_first">Please edit SMS content first</string>
     <string name="error_no_sim">No available SIM card detected</string>
     <string name="select_sim_dialog_title">Select Sending SIM Card</string>
     <string name="selected_prefix">Selected: %1$s</string>
     <string name="no_available_sim">No SIM available</string>
-    <string name="data_ready_format">%1$d entries ready</string>
+    <string name="data_ready_format">Ready to send</string>
     <string name="no_template_content">No template content</string>
     <string name="set_sms_rate_title">Set SMS Rate</string>
     <string name="error_invalid_rate_range">Please enter a number between 0–10</string>
@@ -158,5 +159,15 @@
     <string name="tip_sms_preview">tip: click the row to preview</string>
     <string name="preview_and_send">Preview &amp; Send</string>
     <string name="edit_hint">Write something~</string>
-    <string name="file_too_large">File size exceeds 50MB limit</string>
+    <string name="file_too_large">File size exceeds limit(> 50MB)</string>
+    <string name="file_too_much_row">File contains too many rows(> 100)</string>
+    <string name="deduplication_result">Removed %1$d duplicated recipients</string>
+
+    <string name="sensitive_word_detected_title">Sensitive Word Detected</string>
+    <string name="sensitive_word_detected_msg">Message #%1$d contains sensitive words:\n\n%2$s</string>
+    <string name="skip_message">Skip</string>
+    <string name="edit_message">Edit Message</string>
+    <string name="cancel_send">Cancel Send</string>
+    <string name="edit_sensitive_message_title">Edit Message Content</string>
+    <string name="checking_sensitive_words">Checking for sensitive words…</string>
 </resources>

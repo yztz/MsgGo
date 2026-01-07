@@ -17,13 +17,21 @@
 
 package top.yztz.msggo.exception;
 
-public class DataLoadFailed extends Exception {
-    public final String msg;
+import top.yztz.msggo.R;
 
-    public DataLoadFailed(String msg) {
-        this.msg = msg;
+public class DataLoadFailed extends Exception {
+//    public final String msg;
+    public final int res_id;
+    public Exception e = null;
+//    public DataLoadFailed(String msg) {
+//        this.msg = msg;
+//    }
+
+    public DataLoadFailed(int res_id) {
+        this.res_id = res_id;
     }
-    public DataLoadFailed() {
-        this.msg = "unknown error";
+    public DataLoadFailed(Exception e) {
+        this.res_id = R.string.unknown_error;
+        this.e = e;
     }
 }

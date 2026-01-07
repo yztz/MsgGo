@@ -221,10 +221,6 @@ public class MainActivity extends AppCompatActivity {
                         Uri uri = data.getData();
                         if (uri != null) {
                             Log.d(TAG, "File URI: " + uri.getEncodedPath());
-                            if (FileUtil.getFileSize(this, uri) > FileUtil.MAX_FILE_SIZE) {
-                                ToastUtil.show(this, getString(R.string.file_too_large));
-                                return;
-                            }
                             String path = getFilePathFromContentUri(this, uri);
                             Log.i(TAG, "Importing file from picker: " + path);
                             LoadService.load(this, path);
@@ -328,10 +324,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (uri != null) {
             Log.i(TAG, "load outside link: " + uri);
-            if (FileUtil.getFileSize(this, uri) > FileUtil.MAX_FILE_SIZE) {
-                ToastUtil.show(this, getString(R.string.file_too_large));
-                return;
-            }
             LoadService.load(this, FileUtil.getFilePathFromContentUri(this, uri));
         }
     }

@@ -22,7 +22,10 @@ import android.content.Context;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import top.yztz.msggo.exception.DataLoadFailed;
 import top.yztz.msggo.services.SMSSender;
@@ -48,12 +51,11 @@ public class DataModel implements Serializable {
     /**
      * Must be called in the non-UI thread
      *
-     * @param context context
      * @param path    excel file to load
      */
-    public static synchronized void load(Context context, String path) throws DataLoadFailed {
+    public static synchronized void load(String path) throws DataLoadFailed {
         ExcelReader reader = new ExcelReader();
-        reader.read(context, path);
+        reader.read(path);
         DataModel.data = reader.readExcelContent();
         DataModel.titles = reader.getTitles();
         DataModel.path = path;
@@ -118,6 +120,34 @@ public class DataModel implements Serializable {
 
     public static void setSubId(int subId) {
         DataModel.subId = subId;
+    }
+
+    public static int deduplicate() {
+        if (!loaded || numberColumn == null || numberColumn.isEmpty()) {
+            return 0;
+        }
+
+        int originalCount = data.size();
+        
+        Set<String> seen = new HashSet<>();
+        Iterator<HashMap<String, String>> iterator = data.iterator();
+        
+        while (iterator.hasNext()) {
+            HashMap<String, String> row = iterator.next();
+            String number = row.get(numberColumn);
+            // normalization might be needed? User just said "deduplicate based on number column"
+            // Let's assume exact string match for now, or basic trimming.
+            if (number == null) number = "";
+            number = number.trim();
+
+            if (number.isEmpty() || seen.contains(number)) {
+                iterator.remove();
+            } else {
+                seen.add(number);
+            }
+        }
+
+        return originalCount - data.size();
     }
 
     public static void clear() {

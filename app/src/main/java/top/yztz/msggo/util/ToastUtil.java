@@ -31,5 +31,15 @@ public class ToastUtil {
             toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         }
         toast.show();
-}
+    }
+
+    public static void show(Context context, int strResId) {
+        if (toast == null) {
+            toast = Toast.makeText(context, strResId, Toast.LENGTH_SHORT);
+        } else {
+            toast.cancel();
+            toast = Toast.makeText(context, strResId, Toast.LENGTH_SHORT);
+        }
+        toast.show();
+    }
 }

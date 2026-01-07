@@ -7,8 +7,8 @@ android {
         applicationId "top.yztz.msggo"
         minSdkVersion 26
         targetSdkVersion 35
-        versionCode 26000303
-        versionName "3.3"
+        versionCode 26000304
+        versionName "3.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 //        buildConfigField "long", "BUILD_TIME", "${System.currentTimeMillis()}L"
 //        multiDexEnabled true
@@ -68,4 +68,6 @@ dependencies {
 
     implementation "io.noties.markwon:core:4.6.2"
     implementation "io.noties.markwon:ext-tables:4.6.2"
+
+    implementation 'com.github.houbb:sensitive-word:0.29.4'
 }

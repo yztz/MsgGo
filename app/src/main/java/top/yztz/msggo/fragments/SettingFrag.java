@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.slider.Slider;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.transition.MaterialSharedAxis;
 
 import top.yztz.msggo.data.DataCleaner;
@@ -138,8 +140,13 @@ public class SettingFrag extends Fragment {
         // SMS Rate
         mCardSmsRate.setOnClickListener(v -> {
             View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_text, null);
+            TextInputLayout container = dialogView.findViewById(R.id.edit_text_container);
+            container.setHint(R.string.hint_sms_rate);
+            container.setPrefixText(getString(R.string.currency_unit));
+
             EditText editText = dialogView.findViewById(R.id.edit_text);
-            editText.setText(SettingManager.getSmsRate() + "");
+            editText.setInputType(EditorInfo.TYPE_NUMBER_FLAG_DECIMAL | EditorInfo.TYPE_CLASS_NUMBER);
+            editText.setText(String.format(Locale.getDefault(), "%f", SettingManager.getSmsRate()));
             editText.setSelection(editText.getText().length());
 
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)

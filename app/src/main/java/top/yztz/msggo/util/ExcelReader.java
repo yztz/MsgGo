@@ -32,6 +32,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 import top.yztz.msggo.R;
+import top.yztz.msggo.data.Settings;
 import top.yztz.msggo.exception.DataLoadFailed;
 
 public class ExcelReader {
@@ -54,7 +56,11 @@ public class ExcelReader {
     private List<Integer> titleColumns = null;
 
 
-    public void read(Context context, String path) throws DataLoadFailed {
+    public void read(String path) throws DataLoadFailed {
+        File file = new File(path);
+        if (file.exists() && file.length() > Settings.EXCEL_FILE_SIZE_MAX)
+            throw new DataLoadFailed(R.string.file_too_large);
+
         try (FileInputStream is = new FileInputStream(path)) {
             //创建工作簿
             String postfix = path.substring(path.lastIndexOf("."));
@@ -69,25 +75,24 @@ public class ExcelReader {
             sheet = wb.getSheetAt(0);
             //获取行的列数（可自定）
             Row firstRow = sheet.getRow(0);
-            if (firstRow == null) throw new DataLoadFailed(context.getString(R.string.error_no_header));
+            if (firstRow == null) throw new DataLoadFailed(R.string.error_no_header);
             colNum = firstRow.getPhysicalNumberOfCells();
 
-            if (firstRow.getLastCellNum() - firstRow.getFirstCellNum() != colNum) throw new DataLoadFailed(context.getString(R.string.error_non_continuous_columns));
+            if (firstRow.getLastCellNum() - firstRow.getFirstCellNum() != colNum) throw new DataLoadFailed(R.string.error_non_continuous_columns);
             //获取标题
-            readExcelTitle(context);
+            readExcelTitle();
             //得到总行数（不包含标题）
             int lastRowNum = sheet.getLastRowNum();
-            if (lastRowNum == -1 || lastRowNum == 0) throw new DataLoadFailed(context.getString(R.string.error_empty_content));
+            if (lastRowNum > Settings.EXCEL_ROW_COUNT_MAX) throw new DataLoadFailed(R.string.file_too_large);
+            if (lastRowNum == -1 || lastRowNum == 0) throw new DataLoadFailed(R.string.error_empty_content);
             Log.i(TAG, String.format("lastRowNum=%d, colNum=%d(%d-%d)", lastRowNum, colNum, firstRow.getFirstCellNum(), firstRow.getLastCellNum() - 1));
         } catch (IOException e) {
-            //抛出读取异常
-            e.printStackTrace();
-            throw new DataLoadFailed(e.getMessage());
+            throw new DataLoadFailed(e);
         }
     }
 
 
-    private void readExcelTitle(Context context) throws DataLoadFailed {
+    private void readExcelTitle() throws DataLoadFailed {
         Row row = sheet.getRow(0);
         titles = new String[colNum];
         titleColumns = new ArrayList<>(colNum);
@@ -95,7 +100,7 @@ public class ExcelReader {
         for (int i = 0; i < titles.length; i++) {
             titles[i] = (getCellFormatValue(row.getCell(startCol + i)));
             titleColumns.add(startCol + i);
-            if (TextUtils.isEmpty(titles[i])) throw new DataLoadFailed(context.getString(R.string.error_empty_title_column, (startCol + i)));
+            if (TextUtils.isEmpty(titles[i])) throw new DataLoadFailed(R.string.error_empty_title_column);
         }
     }
 

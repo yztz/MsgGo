@@ -26,6 +26,9 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.Locale;
+
+import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.exception.DataLoadFailed;
 
@@ -38,13 +41,13 @@ public class LoadService extends Service {
     public static MutableLiveData<LoadStatus> getLoadStatus() {
         return loadStatus;
     }
-    
+
     public static class LoadStatus {
         public final boolean isLoading;
         public final boolean isSuccessful;
         public final String errorMsg;
         public final String path;
-        
+
         public LoadStatus(boolean isLoading, boolean isSuccessful, String path, String errorMsg) {
             this.isLoading = isLoading;
             this.isSuccessful = isSuccessful;
@@ -74,19 +77,18 @@ public class LoadService extends Service {
             try {
                 postStatus(true, false, path);
 
-                java.io.File file = new java.io.File(path);
-                if (file.exists() && file.length() > top.yztz.msggo.util.FileUtil.MAX_FILE_SIZE) {
-                    throw new DataLoadFailed(getApplicationContext().getString(top.yztz.msggo.R.string.file_too_large));
-                }
-
-                DataModel.load(getApplicationContext(), path);
+                DataModel.load(path);
 
                 postStatus(false, true, path);
                 Log.d(TAG, "数据加载成功");
                 stopSelf();
             } catch (DataLoadFailed dataLoadFailed) {
-                Log.d(TAG, "数据加载失败: " + dataLoadFailed.msg);
-                postStatus(false, false, path, dataLoadFailed.msg);
+                String msg = getString(dataLoadFailed.res_id);
+                if (dataLoadFailed.res_id == R.string.unknown_error) {
+                    msg = String.format(Locale.getDefault(), "%s (%s)", msg, dataLoadFailed.e.getMessage());
+                }
+                Log.d(TAG, "数据加载失败: " + msg);
+                postStatus(false, false, path, msg);
                 stopSelf();
             }
         }).start();
