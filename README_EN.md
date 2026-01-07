@@ -15,6 +15,7 @@ A lightweight bulk SMS application for the Android platform.
 > 2. The volume of messages sent, content compliance, and delivery rates are subject to real-time monitoring and restrictions imposed by your mobile network operator.
 > 3. This software cannot intervene in the operator's filtering mechanisms or billing standards. Users shall bear full legal responsibility for the legality of the content sent and any resulting consequences.
 > 4. It is strictly forbidden to use this tool for telecommunications fraud, the dissemination of spam, or any other illegal or non-compliant activities.
+> 5. This software is strictly intended for personal or internal corporate communications. Use for commercial marketing or advertising distribution is strictly prohibited. For marketing-related services, please consult a qualified professional SMS service provider.
 
 ## Updates
 
