@@ -38,6 +38,8 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 
@@ -151,7 +153,7 @@ public class FileUtil {
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(messages);  // 序列化Message数组
-            Log.d(TAG, "Message array has been serialized to file: " + fileName);
+            Log.i(TAG, "Message array has been serialized to file: " + fileName);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -239,5 +241,36 @@ public class FileUtil {
             // Fallback to base path if localized version fails
             return "Failed to load content from id: " + resId;
         }
+    }
+
+    public static String getFormatSize(long size) {
+        double kiloByte = (double) size / 1024;
+        if (kiloByte < 1) {
+            return size + "Byte";
+        }
+
+        double megaByte = kiloByte / 1024;
+        if (megaByte < 1) {
+            BigDecimal result1 = new BigDecimal(Double.toString(kiloByte));
+            return result1.setScale(2, RoundingMode.HALF_UP)
+                    .toPlainString() + "KiB";
+        }
+
+        double gigaByte = megaByte / 1024;
+        if (gigaByte < 1) {
+            BigDecimal result2 = new BigDecimal(Double.toString(megaByte));
+            return result2.setScale(2, RoundingMode.HALF_UP)
+                    .toPlainString() + "MiB";
+        }
+
+        double teraBytes = gigaByte / 1024;
+        if (teraBytes < 1) {
+            BigDecimal result3 = new BigDecimal(Double.toString(gigaByte));
+            return result3.setScale(2, RoundingMode.HALF_UP)
+                    .toPlainString() + "GiB";
+        }
+        BigDecimal result4 = new BigDecimal(teraBytes);
+        return result4.setScale(2, RoundingMode.HALF_UP).toPlainString()
+                + "TiB";
     }
 }
