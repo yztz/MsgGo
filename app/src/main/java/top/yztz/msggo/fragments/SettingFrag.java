@@ -64,7 +64,7 @@ public class SettingFrag extends Fragment {
     private Context context;
     private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay;
     private MaterialCardView mCardClearCache;
-    private View mRowExportLog, mRowAboutApp, mRowLanguage;
+    private View mRowExportLog, mRowAboutApp, mRowLanguage, mRowCheckUpdate;
     private TextView mTvCache, mTvDelayValue, mTvSmsRateValue, mTvLanguage;
     private LinearLayout mCardSmsRate;
     private boolean isUpdatingUI = false;
@@ -99,6 +99,7 @@ public class SettingFrag extends Fragment {
         mRowAboutApp = view.findViewById(R.id.row_about_app);
         mRowLanguage = view.findViewById(R.id.row_language);
         mTvLanguage = view.findViewById(R.id.tv_language);
+        mRowCheckUpdate = view.findViewById(R.id.row_check_update);
 
         mSliderDelay = view.findViewById(R.id.slider_delay);
         mSliderDelay.setValueFrom(Settings.SEND_DELAY_MIN);
@@ -214,6 +215,24 @@ public class SettingFrag extends Fragment {
                         top.yztz.msggo.util.LocaleUtils.setLocale(tags[which]);
                         dialog.dismiss();
                         showInfo();
+                    })
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show();
+        });
+
+        // Check Update
+        mRowCheckUpdate.setOnClickListener(v -> {
+            String releaseUrl = "https://github.com/yztz/MsgGo/releases";
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle(getString(R.string.check_update))
+                    .setMessage(getString(R.string.going_to_url, releaseUrl))
+                    .setPositiveButton(getString(R.string.visit), (dialog, which) -> {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(releaseUrl));
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            ToastUtil.show(context, getString(R.string.cannot_open_link, e.getMessage()));
+                        }
                     })
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show();
