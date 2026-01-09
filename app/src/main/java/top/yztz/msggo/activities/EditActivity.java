@@ -17,6 +17,8 @@
 
 package top.yztz.msggo.activities;
 
+import static top.yztz.msggo.util.TextParser.VARIABLE_PATTERN;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -25,6 +27,7 @@ import androidx.core.view.WindowCompat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -50,13 +53,12 @@ import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.util.ToastUtil;
 
 public class EditActivity extends AppCompatActivity {
+    private static final String TAG = "EditActivity";
     private EditText mEt;
 //    private DrawerLayout mDrawerLayout;
     private BottomAppBar mBottomAppBar;
     private FloatingActionButton mBtnSave;
     private boolean edited;
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,10 +110,34 @@ public class EditActivity extends AppCompatActivity {
         highlight(mEt.getText());
 
 
-        //自动高亮变量
         mEt.addTextChangedListener(new TextWatcher() {
+            private int pendingDeleteStart = -1;
+            private int pendingDeleteLength = -1;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                pendingDeleteStart = -1;
+                pendingDeleteLength = -1;
+                
+                // Detect deletion: count > after means characters are being removed
+                if (count > after && count > 0) {
+                    Editable editable = mEt.getText();
+                    if (editable != null) {
+                        // Check if any part of a variable is being deleted
+                        VariableChipSpan[] spans = editable.getSpans(start, start + count, VariableChipSpan.class);
+                        for (VariableChipSpan span : spans) {
+                            int spanStart = editable.getSpanStart(span);
+                            int spanEnd = editable.getSpanEnd(span);
+                            // If only part of the variable is deleted, we need to delete the whole thing
+                            if (!(start <= spanStart && start + count >= spanEnd)) {
+                                // Partial deletion detected - record the whole span for deletion
+                                pendingDeleteStart = spanStart;
+                                pendingDeleteLength = spanEnd - spanStart;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             @Override
@@ -120,8 +146,31 @@ public class EditActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                //高亮显示
-                mEt.removeTextChangedListener(this); // 暂时移除监听
+                if (pendingDeleteStart >= 0 && pendingDeleteLength > 0) {
+                    pendingDeleteStart = -1;
+                    pendingDeleteLength = -1;
+                    
+                    mEt.removeTextChangedListener(this);
+                    // Calculate remaining part to delete
+                    // The deletion already happened, so we need to find and remove any leftover
+                    VariableChipSpan[] leftoverSpans = s.getSpans(0, s.length(), VariableChipSpan.class);
+                    for (VariableChipSpan span : leftoverSpans) {
+                        int spanStart = s.getSpanStart(span);
+                        int spanEnd = s.getSpanEnd(span);
+                        // Check if this is a broken span (text doesn't match pattern)
+                        String spanText = s.subSequence(spanStart, spanEnd).toString();
+                        if (!VARIABLE_PATTERN.matcher(spanText).matches()) {
+                            s.delete(spanStart, spanEnd);
+                            break;
+                        }
+                    }
+                    highlight(s);
+                    mEt.addTextChangedListener(this);
+                    edited = true;
+                    return;
+                }
+                
+                mEt.removeTextChangedListener(this);
                 highlight(s);
                 mEt.addTextChangedListener(this);
                 edited = true;
@@ -221,7 +270,8 @@ public class EditActivity extends AppCompatActivity {
         int padding = (int) (10 * getResources().getDisplayMetrics().density);
 
         while (m.find()) {
-            String varName = m.group(1); // Get variable name without ${}
+            String varName = m.group(1);
+            Log.d(TAG, "find var: " + varName);
             VariableChipSpan span = new VariableChipSpan(varName, bgColor, textColor, strokeColor, padding);
             s.setSpan(span, m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }

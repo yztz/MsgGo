@@ -22,11 +22,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextParser {
+    public static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
 
     public static String parse(String content, Map<String, String> data) {
-
-        Pattern p = Pattern.compile("\\$\\{(.*?)\\}");
-        Matcher m = p.matcher(content);
+        Matcher m = VARIABLE_PATTERN.matcher(content);
 
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
