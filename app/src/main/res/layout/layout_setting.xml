@@ -28,10 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
         android:paddingBottom="32dp">
-
-
 
         <!-- Settings Section -->
         <TextView
@@ -74,17 +72,11 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_timer"
-                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="12dp"
                             android:text="@string/send_delay"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
@@ -93,6 +85,7 @@
                             android:id="@+id/tv_delay_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="999s"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
                             android:textColor="?attr/colorPrimary" />
                     </LinearLayout>
@@ -204,17 +197,11 @@
                     android:paddingVertical="16dp"
                     android:background="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_message"
-                        app:tint="?attr/colorOnSurfaceVariant" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
                         android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
@@ -372,10 +359,47 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_translate"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+                <!-- Check Update row -->
+                <LinearLayout
+                    android:id="@+id/row_check_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/check_update"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/ic_update"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
@@ -403,7 +427,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/export_log"
+                            android:text="@string/debug_log"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -461,8 +485,8 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_info"
                         app:tint="?attr/colorOnSurfaceVariant" />

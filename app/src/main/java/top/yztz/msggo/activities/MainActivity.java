@@ -37,15 +37,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.data.SettingManager;
+import top.yztz.msggo.data.Settings;
 import top.yztz.msggo.fragments.HomeFrag;
 import top.yztz.msggo.fragments.SettingFrag;
-import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.LocaleUtils;
@@ -63,17 +64,16 @@ import io.noties.markwon.ext.tables.TablePlugin;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoader {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_PERMISSION = 200;
 
-//    private HomeFrag home;
-//    private SettingFrag setting;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
     private ViewPager2 viewPager;
+    private ImageView ivHeaderImage;
+    private List<String> permissionsToRequest;
 
     private ActivityResultLauncher<Intent> excelPickerLauncher;
 
@@ -110,17 +110,33 @@ public class MainActivity extends AppCompatActivity {
                 String newTitle = position == 0 ? getString(R.string.title_home) : getString(R.string.title_settings);
                 int menuItemId = position == 0 ? R.id.nav_home : R.id.nav_settings;
 
+                int newImageRes = position == 0 ? R.drawable.red_panda_bamboo : R.drawable.red_panda_grape;
+
                 if (!initiated) {
                     mCollapsingToolbarLayout.setTitle(newTitle);
+                    ivHeaderImage.setImageResource(newImageRes);
                     initiated = true;
                 } else {
+                    // Animate title
                     mCollapsingToolbarLayout.animate()
                             .alpha(0.1f)
                             .setDuration(120)
                             .withEndAction(() -> {
                                 mCollapsingToolbarLayout.setTitle(newTitle);
-                                // Slide in and fade new title
                                 mCollapsingToolbarLayout.animate()
+                                        .alpha(1f)
+                                        .setDuration(120)
+                                        .start();
+                            })
+                            .start();
+
+                    // Animate image with same animation
+                    ivHeaderImage.animate()
+                            .alpha(0.1f)
+                            .setDuration(120)
+                            .withEndAction(() -> {
+                                ivHeaderImage.setImageResource(newImageRes);
+                                ivHeaderImage.animate()
                                         .alpha(1f)
                                         .setDuration(120)
                                         .start();
@@ -157,11 +173,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause: ");
-        // Save current state to history
-//        String lastPath = DataLoader.getLastPath();
-//        if (!TextUtils.isEmpty(lastPath)) {
-//            HistoryManager.addHistory(this, lastPath, DataLoader.getContent(), DataLoader.getNumberColumn(), DataLoader.getLastSignature());
-//        }
     }
 
     @Override
@@ -173,7 +184,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
+        Log.d(TAG, "onDestroy: reset DataModel");
+        DataModel.clear();
     }
 
     @Override
@@ -181,10 +193,11 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION) {
             boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
+            for (int i = 0; i < grantResults.length; i++) {
+                int result = grantResults[i];
                 if (result != PackageManager.PERMISSION_GRANTED) {
+                    Log.i(TAG, "Permission: " + permissionsToRequest.get(i) + " is denied");
                     allPermissionsGranted = false;
-                    break;
                 }
             }
             if (allPermissionsGranted) {
@@ -202,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        Log.i(TAG, "onNewIntent: ");
+        Log.i(TAG, "onNewIntent: checkShare");
         checkShare();
     }
 
@@ -223,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "File URI: " + uri.getEncodedPath());
                             String path = getFilePathFromContentUri(this, uri);
                             Log.i(TAG, "Importing file from picker: " + path);
-                            LoadService.load(this, path);
+                            loadData(path);
                         }
                     }
                 }
@@ -288,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
         nMenu = findViewById(R.id.bottom_navigation);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         indicator = findViewById(R.id.progress);
+        ivHeaderImage = findViewById(R.id.iv_header_image);
         
         // Check permissions
         List<String> permissions = new ArrayList<>();
@@ -296,14 +310,14 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) permissions.add(Manifest.permission.FOREGROUND_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) permissions.add(Manifest.permission.POST_NOTIFICATIONS);
 
-        List<String> permissionsToRequest = new ArrayList<>();
+        permissionsToRequest = new ArrayList<>();
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(permission);
             }
         }
         if (!permissionsToRequest.isEmpty()) {
-            Log.d(TAG, "Requesting permissions");
+            Log.i(TAG, "Requesting permissions");
             ActivityCompat.requestPermissions(this,
                     permissionsToRequest.toArray(new String[0]), REQUEST_PERMISSION);
         } else {
@@ -324,12 +338,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (uri != null) {
             Log.i(TAG, "load outside link: " + uri);
-            LoadService.load(this, FileUtil.getFilePathFromContentUri(this, uri));
+            loadData(FileUtil.getFilePathFromContentUri(this, uri));
         }
     }
 
     private void initApp() {
-        observeLoadStatus();
+        // observeLoadStatus(); 
         initFragment();
         if (SMSSender.getSubs(this).isEmpty()) {
             if (XiaomiUtil.isXiaomi()) {
@@ -364,85 +378,107 @@ public class MainActivity extends AppCompatActivity {
         excelPickerLauncher.launch(intent);
     }
 
-    /**
-     * 使用 LiveData 观察加载状态
-     */
-    private void observeLoadStatus() {
-        LoadService.getLoadStatus().observe(this, status -> {
-            if (status == null) return;
-            
-            if (status.isLoading) {
-                if (!indicator.isShown()) {
-                    indicator.show();
-                }
-            } else {
-                if (indicator.isShown()) {
-                    indicator.hide();
-                }
+    public void loadData(String path) {
+        Log.d(TAG, "Start loading path: " + path);
+        if (!indicator.isShown()) {
+            indicator.show();
+        }
 
-                if (!status.isSuccessful) {
-                    Log.e(TAG, "Data load failed: " + status.errorMsg);
-                    ToastUtil.show(MainActivity.this, getString(R.string.load_failed, status.errorMsg));
-                    return;
+        new Thread(() -> {
+            boolean isSuccess = false;
+            String errorMsg = null;
+            try {
+                DataModel.load(path);
+                isSuccess = true;
+            } catch (top.yztz.msggo.exception.DataLoadFailed e) {
+                if (e.res_id == R.string.unknown_error) {
+                    errorMsg = getString( e.res_id, e.e.getMessage());
+                } else if (e.res_id == R.string.file_too_large) {
+                    errorMsg = getString(e.res_id, FileUtil.getFormatSize(Settings.EXCEL_FILE_SIZE_MAX));
+                } else if (e.res_id == R.string.file_too_much_row) {
+                    errorMsg = getString(e.res_id, Settings.EXCEL_ROW_COUNT_MAX);
+                } else {
+                    errorMsg = getString(e.res_id);
                 }
-                assert DataModel.loaded();
-                ToastUtil.show(MainActivity.this, getString(R.string.load_success));
-                String currentSig = DataModel.getSignature();
-                Log.i(TAG, "数据加载成功：" + status.path + " 签名: " + currentSig);
-
-                HistoryManager.HistoryItem historyItem = HistoryManager.getItem(MainActivity.this, status.path);
-                if (historyItem != null) {
-                    Log.i(TAG, "发现历史数据：" + historyItem.path + " 签名: " + historyItem.signature);
-                    if (currentSig.equals(historyItem.signature)) {
-                        DataModel.setNumberColumn(historyItem.numberColumn);
-                        DataModel.setTemplate(historyItem.template);
-                        if (SMSSender.getSubBySubscriptionId(MainActivity.this, historyItem.subId) == null) {
-                            ToastUtil.show(MainActivity.this, getString(R.string.unknown_sim));
-                        } else {
-                            DataModel.setSubId(historyItem.subId);
-                        }
-                    }
-                }
-
-                String[] titles = DataModel.getTitles();
-                if (!TextUtils.isEmpty(DataModel.getNumberColumn())) {
-                    Log.i(TAG, "使用现有历史记录");
-                    DataModel.saveAsHistory(MainActivity.this);
-                    Fragment fragment = getCurrentFragment();
-                    if (fragment instanceof HomeFrag) {
-                        ((HomeFrag)fragment).updateStatus();
-                    }
-                } else if (titles != null && titles.length > 0) {
-                    Log.i(TAG, "提示选择号码列");
-                    int checkedItem = -1;
-                    String currentColumn = DataModel.getNumberColumn();
-                    for (int i = 0; i < titles.length; i++) {
-                        if (titles[i].equals(currentColumn)) {
-                            checkedItem = i;
-                            break;
-                        }
-                    }
-                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
-                            .setTitle(getString(R.string.select_number_column_dialog_title))
-                            .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
-                                DataModel.setNumberColumn(titles[which]);
-                                DataModel.saveAsHistory(MainActivity.this);
-                                Fragment fragment = getCurrentFragment();
-                                if (fragment instanceof HomeFrag) {
-                                    ((HomeFrag)fragment).updateStatus();
-                                }
-                                dialog.dismiss();
-                                if (SettingManager.autoEnterEditor()) {
-                                    EditActivity.openEditor(MainActivity.this);
-                                }
-                            })
-                            .setCancelable(false)
-                            .show();
-                } else if (SettingManager.autoEnterEditor()) {
-                    EditActivity.openEditor(this);
-                }
-
+            } catch (Exception e) {
+                errorMsg = e.getMessage();
             }
-        });
+
+            // UI updates on main thread
+            boolean finalIsSuccess = isSuccess;
+            String finalErrorMsg = errorMsg;
+            runOnUiThread(() -> afterDataLoaded(finalIsSuccess, finalErrorMsg));
+        }).start();
     }
+
+    private void afterDataLoaded(boolean success, String errMsg) {
+        if (indicator.isShown()) {
+            indicator.hide();
+        }
+
+        if (!success) {
+            Log.e(TAG, "Data load failed: " + errMsg);
+            ToastUtil.show(MainActivity.this, getString(R.string.load_failed, errMsg));
+            return;
+        }
+
+        assert DataModel.loaded();
+        String path = DataModel.getPath();
+        ToastUtil.show(MainActivity.this, getString(R.string.load_success));
+        String currentSig = DataModel.getSignature();
+        Log.i(TAG, "Data loaded successfully: " + path + " sig: " + currentSig);
+
+        HistoryManager.HistoryItem historyItem = HistoryManager.getItem(MainActivity.this, path);
+        if (historyItem != null) {
+            Log.i(TAG, "Found history: " + historyItem.path + " sig: " + historyItem.signature);
+            if (currentSig.equals(historyItem.signature)) {
+                DataModel.setNumberColumn(historyItem.numberColumn);
+                DataModel.setTemplate(historyItem.template);
+                if (SMSSender.getSubBySubscriptionId(MainActivity.this, historyItem.subId) == null) {
+                    ToastUtil.show(MainActivity.this, getString(R.string.unknown_sim));
+                } else {
+                    DataModel.setSubId(historyItem.subId);
+                }
+            }
+        }
+
+        String[] titles = DataModel.getTitles();
+        if (!TextUtils.isEmpty(DataModel.getNumberColumn())) {
+            Log.i(TAG, "Use existing history");
+            DataModel.saveAsHistory(MainActivity.this);
+            Fragment fragment = getCurrentFragment();
+            if (fragment instanceof HomeFrag) {
+                ((HomeFrag)fragment).updateStatus();
+            }
+        } else if (titles != null && titles.length > 0) {
+            Log.i(TAG, "Prompt for column selection");
+            int checkedItem = -1;
+            String currentColumn = DataModel.getNumberColumn();
+            for (int i = 0; i < titles.length; i++) {
+                if (titles[i].equals(currentColumn)) {
+                    checkedItem = i;
+                    break;
+                }
+            }
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
+                    .setTitle(getString(R.string.select_number_column_dialog_title))
+                    .setSingleChoiceItems(titles, checkedItem, (dialog, which) -> {
+                        DataModel.setNumberColumn(titles[which]);
+                        DataModel.saveAsHistory(MainActivity.this);
+                        Fragment fragment = getCurrentFragment();
+                        if (fragment instanceof HomeFrag) {
+                            ((HomeFrag)fragment).updateStatus();
+                        }
+                        dialog.dismiss();
+                        if (SettingManager.autoEnterEditor()) {
+                            EditActivity.openEditor(MainActivity.this);
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+        } else if (SettingManager.autoEnterEditor()) {
+            EditActivity.openEditor(MainActivity.this);
+        }
+    }
+
 }

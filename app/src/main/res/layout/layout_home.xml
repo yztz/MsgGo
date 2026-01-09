@@ -28,7 +28,7 @@
         android:orientation="vertical"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
         android:paddingBottom="32dp">
 
 

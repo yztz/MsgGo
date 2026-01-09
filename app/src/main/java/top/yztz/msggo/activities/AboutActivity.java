@@ -20,6 +20,7 @@ package top.yztz.msggo.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -34,6 +35,9 @@ import top.yztz.msggo.util.ToastUtil;
 
 public class AboutActivity extends AppCompatActivity {
 
+    private int easterEggClickCount = 0;
+    private static final int EASTER_EGG_THRESHOLD = 5;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,29 +47,28 @@ public class AboutActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
 
         TextView tvVersion = findViewById(R.id.tv_version);
-//        TextView tvBuildDate = findViewById(R.id.tv_build_date);
-        
         tvVersion.setText(getString(R.string.version_format, BuildConfig.VERSION_NAME));
-        
-        // Format build date
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-//        // Note: BuildConfig.BUILD_TIME is expected to be a long
-//        // If it's not generated yet, this might error in IDE but works after build.
-//        // We will assume the Gradle change is applied.
-//        try {
-//             // Accessing the field reflectively or directly if generated.
-//             // Since we modified build.gradle, it should be available as BuildConfig.BUILD_TIME
-//             // However, for safety in case of sync issues, we'll try/catch or just use it.
-//             // Direct access:
-//             Date buildDate = new Date(BuildConfig.BUILD_TIME);
-//             tvBuildDate.setText("Built on " + sdf.format(buildDate));
-//        } catch (Exception e) {
-//            tvBuildDate.setText("Build Date Unknown");
-//        }
 
         // Show Arch
         TextView tvArch = findViewById(R.id.tv_arch);
         tvArch.setText(android.os.Build.SUPPORTED_ABIS[0]);
+
+        // Easter egg: tap app icon 5 times
+        ImageView ivAppIcon = findViewById(R.id.iv_app_icon);
+        ivAppIcon.setOnClickListener(v -> {
+            easterEggClickCount++;
+            // Show watermelons: 1, 2, 3, 4, 5
+            StringBuilder watermelons = new StringBuilder();
+            for (int i = 0; i < Math.min(easterEggClickCount, EASTER_EGG_THRESHOLD); i++) {
+                watermelons.append("🍉");
+            }
+            ToastUtil.show(this, watermelons.toString());
+            
+            if (easterEggClickCount >= EASTER_EGG_THRESHOLD) {
+                ivAppIcon.setImageResource(R.drawable.red_panda_watermelon);
+                easterEggClickCount = 0; // Reset for next time
+            }
+        });
 
         findViewById(R.id.row_source_code).setOnClickListener(v ->
                 new MaterialAlertDialogBuilder(this)
@@ -90,3 +93,4 @@ public class AboutActivity extends AppCompatActivity {
     }
 
 }
+
