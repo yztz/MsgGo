@@ -28,10 +28,11 @@ It has been nearly 4 years since this project was launched. This update brings a
 ## Screenshots
 
 <div style="display: flex; flex-direction: row; justify-content: space-between;">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="24%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="24%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="24%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="24%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="18%">
 </div>
 
 ## Important Notes

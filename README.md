@@ -27,10 +27,11 @@
 
 ## 截图
 <div style="display: flex; flex-direction: row; justify-content: space-between;">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="24%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="24%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="24%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="24%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/5.png" width="18%">
 </div>
 
 ## 注意事项
