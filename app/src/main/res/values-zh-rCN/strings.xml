@@ -31,7 +31,7 @@
     <string name="language_prefix">当前: %1$s</string>
     <string name="not_selected">未选择</string>
     <string name="unknown">未知</string>
-    <string name="unknown_error">未知错误</string>
+    <string name="unknown_error">未知错误（%1$s）</string>
 
     <!-- Main Navigation -->
     <string name="nav_home">主页</string>
@@ -64,10 +64,9 @@
     <string name="category_storage">存储</string>
     <string name="clear_cache">清除缓存</string>
     <string name="category_others">其他</string>
-    <string name="export_log">导出调试日志</string>
+    <string name="debug_log">调试日志</string>
     <string name="about_app">关于应用</string>
 
-    <!-- About Activity -->
     <string name="version_format">Version %s</string>
     <string name="source_code">源代码</string>
     <string name="disclaimer">免责声明</string>
@@ -76,17 +75,10 @@
     <string name="visit_source_code">访问源代码</string>
     <string name="going_to_url">即将前往 %s</string>
     <string name="visit">访问</string>
+    <string name="check_update">检查更新</string>
 
-    <!-- Edit Activity -->
     <string name="edit_info">编辑信息</string>
 
-    <!-- Sending Dialog -->
-    <string name="sending">正在发送…</string>
-    <string name="sent_progress">发送进度</string>
-    <string name="confirmed_progress">确认进度</string>
-    <string name="detailed_logs">详细日志</string>
-
-    <!-- Messages & Toasts -->
     <string name="permission_denied_exit">权限被拒绝，应用将退出</string>
     <string name="disagree_exit">不同意并退出</string>
     <string name="read_and_agree">已阅读并同意</string>
@@ -99,7 +91,7 @@
     <string name="fgs_timeout_msg">服务已达到6小时限制，正在停止…</string>
     <string name="sending_cancelled">发送任务已取消</string>
     <string name="preparing_to_send">准备发送…</string>
-    <string name="sending_completed">发送任务已完成</string>
+    <string name="sending_completed">发送完成</string>
     <string name="sms_sent_success">#%1$d [%2$s] 发送成功</string>
     <string name="sms_sent_failed">#%1$d [%2$s] 发送失败 (代码 %3$d)</string>
     <string name="notification_title">MsgGo 短信群发</string>
@@ -143,31 +135,49 @@
     <string name="confirm_clear_title">确认清空</string>
     <string name="confirm_clear_msg">你的编辑将会丢失很久，真的很久很久…</string>
     <string name="edit_unsaved_title">您的编辑尚未保存哦</string>
-    <string name="edit_unsaved_msg">确定不保存就离开吗？</string>
+
     <string name="error_import_data_first">请先导入数据哦~</string>
     <string name="xiaomi_permission_title">SIM 卡信息读取受限</string>
     <string name="xiaomi_permission_msg">小米系统“静默拒绝”了读取电话信息的权限。请前往设置手动开启“电话”权限，并确认没有开启短信与电话的“空白通行证”。</string>
-    <string name="go_to_settings">前往设置</string>
-    <string name="exit_app">退出应用</string>
-    <string name="currency_sms_rate">￥%1$s</string>
-    <string name="save_success">保存成功</string>
-    <string name="title_home">送 信</string>
-    <string name="title_settings">設 定</string>
-    <string name="currency_unit">￥</string>
-    <string name="hint_sms_rate">请输入资费</string>
+
     <string name="slot_description">卡槽 %1$d · %2$s</string>
     <string name="tip_sms_preview">提示：点击数据行预览短信内容</string>
-    <string name="preview_and_send">预览与发送</string>
-    <string name="edit_hint">写点什么吧~</string>
-    <string name="file_too_large">文件大小超过 50MB 限制</string>
-    <string name="file_too_much_row">文件行数超过限制（100行）</string>
-    <string name="deduplication_result">移除 %1$d 条重复收信人</string>
 
+    <!--  Titles  -->
+    <string name="preview_and_send">预览与发送</string>
     <string name="sensitive_word_detected_title">检测到敏感词</string>
+    <string name="title_home">送 信</string>
+    <string name="title_settings">設 定</string>
+
+    <!--  Tips  -->
     <string name="sensitive_word_detected_msg">第 %1$d 条消息包含敏感词：\n\n%2$s</string>
+    <string name="file_too_large">文件大小超过 %1$s 限制</string>
+    <string name="file_too_much_row">文件行数超过限制（%1$d 行）</string>
+    <string name="deduplication_result">移除 %1$d 条重复收信人</string>
+    <string name="edit_hint">写点什么吧~</string>
+    <string name="save_success">保存成功</string>
+    <string name="hint_sms_rate">请输入资费</string>
+    <string name="edit_unsaved_msg">确定不保存就离开吗？</string>
+
+    <!-- Sending State -->
+    <string name="sending">正在发送</string>
+    <string name="pending">等待发送</string>
+    <string name="waiting">即将发送</string>
+    <string name="submitted">已提交</string>
+    <string name="sent">已发送</string>
+    <string name="failed">已失败</string>
+    <string name="paused">已暂停</string>
+
+    <!--  Actions  -->
     <string name="skip_message">跳过此条</string>
-    <string name="edit_message">编辑消息</string>
+    <string name="exit_app">退出应用</string>
+    <string name="go_to_settings">前往设置</string>
+
+    <!--  MISC  -->
     <string name="cancel_send">取消发送</string>
-    <string name="edit_sensitive_message_title">编辑消息内容</string>
-    <string name="checking_sensitive_words">正在检查敏感词…</string>
+    <string name="edit_message">编辑消息</string>
+    <string name="currency_sms_rate">￥%1$s</string>
+    <string name="currency_unit">￥</string>
+
+
 </resources>

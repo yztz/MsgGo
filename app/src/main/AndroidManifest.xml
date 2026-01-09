@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2026 yztz
   ~
@@ -51,9 +50,12 @@
         <activity android:name=".activities.AboutActivity" />
         <activity android:name=".activities.EditActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.SendingActivity"
+            android:launchMode="singleTop"
+            android:label="@string/sending"/>
         <activity android:name=".activities.MainActivity"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -74,7 +76,9 @@
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
             </intent-filter>
         </activity>
-        <service android:name=".services.MessageService" android:foregroundServiceType="dataSync" />
+        <service android:name=".services.MessageService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -86,7 +90,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <service android:name=".services.LoadService" android:foregroundServiceType="dataSync" />
+
     </application>
 
 </manifest>

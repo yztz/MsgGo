@@ -74,32 +74,43 @@ public class SMSSender {
      * @param code        独一无二的请求码（用以广播接收）
      */
     public static void sendMessage(Context context, String content, String phoneNumber, int subId, int code) {
-        final SmsManager manager;
+        try {
+            final SmsManager manager;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            manager = context.getSystemService(SmsManager.class).createForSubscriptionId(subId);
-        } else {
-            manager = SmsManager.getSmsManagerForSubscriptionId(subId);
-        }
-
-
-        Intent sentIntent = new Intent(SENT_SMS_ACTION);
-        sentIntent.putExtra("code", code);
-        sentIntent.putExtra("phone", phoneNumber);
-        PendingIntent sentPI = PendingIntent.getBroadcast(context, code, sentIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        if (content.length() > 70) {
-            android.util.Log.i("SMSSender", "Sending multipart SMS to: " + phoneNumber + " (length: " + content.length() + ")");
-            ArrayList<String> msgs = manager.divideMessage(content);
-            ArrayList<PendingIntent> sentIntents = new ArrayList<>();
-
-            for (int i = 0; i < msgs.size(); i++) {
-                sentIntents.add(sentPI);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                manager = context.getSystemService(SmsManager.class).createForSubscriptionId(subId);
+            } else {
+                manager = SmsManager.getSmsManagerForSubscriptionId(subId);
             }
-            manager.sendMultipartTextMessage(phoneNumber, null, msgs, sentIntents, null);
-        } else {
-            android.util.Log.i("SMSSender", "Sending standard SMS to: " + phoneNumber);
-            manager.sendTextMessage(phoneNumber, null, content, sentPI, null);
+
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+
+            ArrayList<String> msgs = manager.divideMessage(content);
+            int messageCount = msgs.size();
+
+            if (messageCount > 1) {
+                ArrayList<PendingIntent> sentIntents = new ArrayList<>();
+                for (int i = 0; i < messageCount; i++) {
+                    Intent sentIntent = new Intent(SENT_SMS_ACTION);
+                    sentIntent.putExtra("code", code);
+                    sentIntent.putExtra("phone", phoneNumber);
+                    sentIntent.putExtra("part", i);
+                    sentIntent.putExtra("totalParts", messageCount);
+                    sentIntents.add(PendingIntent.getBroadcast(context,
+                            code * 1000 + i, sentIntent, flags));
+                }
+                manager.sendMultipartTextMessage(phoneNumber, null, msgs, sentIntents, null);
+            } else {
+                Intent sentIntent = new Intent(SENT_SMS_ACTION);
+                sentIntent.putExtra("code", code);
+                sentIntent.putExtra("phone", phoneNumber);
+                sentIntent.putExtra("part", 0);
+                sentIntent.putExtra("totalParts", 1);
+                PendingIntent sentPI = PendingIntent.getBroadcast(context, code, sentIntent, flags);
+                manager.sendTextMessage(phoneNumber, null, content, sentPI, null);
+            }
+        } catch (Exception e) {
+            android.util.Log.e("SMSSender", "Failed to send SMS", e);
         }
     }
 }

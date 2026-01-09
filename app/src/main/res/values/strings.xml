@@ -31,7 +31,7 @@
     <string name="language_prefix">Current: %1$s</string>
     <string name="not_selected">Not selected</string>
     <string name="unknown">Unknown</string>
-    <string name="unknown_error">Unknown error</string>
+    <string name="unknown_error">Unknown error(%1$s)</string>
 
     <!-- Main Navigation -->
     <string name="nav_home">Home</string>
@@ -64,7 +64,7 @@
     <string name="category_storage">Storage</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="category_others">Others</string>
-    <string name="export_log">Export Debug Logs</string>
+    <string name="debug_log">Debug Logs</string>
     <string name="about_app">About App</string>
 
     <!-- About Activity -->
@@ -76,15 +76,13 @@
     <string name="visit_source_code">Visit Source Code</string>
     <string name="going_to_url">Proceeding to %s</string>
     <string name="visit">Visit</string>
+    <string name="check_update">Check for Updates</string>
 
     <!-- Edit Activity -->
     <string name="edit_info">Edit Info</string>
 
     <!-- Sending Dialog -->
-    <string name="sending">Sending…</string>
-    <string name="sent_progress">Progress</string>
-    <string name="confirmed_progress">Confirmed</string>
-    <string name="detailed_logs">Detailed Logs</string>
+    <string name="sending">Sending</string>
 
     <!-- Messages & Toasts -->
     <string name="permission_denied_exit">Permission denied, app will exit</string>
@@ -99,7 +97,7 @@
     <string name="fgs_timeout_msg">6-hour service limit reached, stopping…</string>
     <string name="sending_cancelled">Sending task cancelled</string>
     <string name="preparing_to_send">Preparing…</string>
-    <string name="sending_completed">Sending completed</string>
+    <string name="sending_completed">Completed</string>
     <string name="sms_sent_success">#%1$d [%2$s] Sent successfully</string>
     <string name="sms_sent_failed">#%1$d [%2$s] Failed (Code %3$d)</string>
     <string name="notification_title">MsgGo SMS Batch</string>
@@ -159,8 +157,8 @@
     <string name="tip_sms_preview">tip: click the row to preview</string>
     <string name="preview_and_send">Preview &amp; Send</string>
     <string name="edit_hint">Write something~</string>
-    <string name="file_too_large">File size exceeds limit(> 50MB)</string>
-    <string name="file_too_much_row">File contains too many rows(> 100)</string>
+    <string name="file_too_large">File size exceeds limit(> %1$s)</string>
+    <string name="file_too_much_row">File contains too many rows(> %1$d)</string>
     <string name="deduplication_result">Removed %1$d duplicated recipients</string>
 
     <string name="sensitive_word_detected_title">Sensitive Word Detected</string>
@@ -168,6 +166,10 @@
     <string name="skip_message">Skip</string>
     <string name="edit_message">Edit Message</string>
     <string name="cancel_send">Cancel Send</string>
-    <string name="edit_sensitive_message_title">Edit Message Content</string>
-    <string name="checking_sensitive_words">Checking for sensitive words…</string>
+    <string name="pending">Pending</string>
+    <string name="waiting">Waiting</string>
+    <string name="submitted">Submitted</string>
+    <string name="sent">Sent</string>
+    <string name="failed">Failed</string>
+    <string name="paused">Paused</string>
 </resources>

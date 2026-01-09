@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (C) 2026 yztz
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU General Public License as published by the Free Software
+  ~ Foundation; either version 3 of the License, or (at your option) any later
+  ~ version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  ~ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with
+  ~ this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+  <path
+      android:pathData="M512,65.3c-246.7,0 -446.7,200 -446.7,446.7 0,246.7 200,446.7 446.7,446.7 246.7,0 446.7,-200 446.7,-446.7C958.7,265.3 758.7,65.3 512,65.3L512,65.3zM756.3,405.9 L465.1,697.1c-6.8,6.8 -17.9,6.8 -24.7,0L267.7,524.3c-6.8,-6.8 -6.8,-17.9 0,-24.7l54.3,-54.3c6.8,-6.8 17.9,-6.8 24.7,0l106.1,106.1 224.6,-224.6c6.8,-6.8 17.9,-6.8 24.7,0l54.3,54.3C763.1,388 763.1,399.1 756.3,405.9L756.3,405.9 756.3,405.9zM756.3,405.9"
+      android:fillColor="#89C27E"/>
+</vector>

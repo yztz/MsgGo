@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SubscriptionInfo;
 import android.text.TextUtils;
@@ -32,17 +33,13 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
@@ -56,10 +53,9 @@ import top.yztz.msggo.adapters.ListAdapter;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.Message;
 import top.yztz.msggo.data.SettingManager;
-import top.yztz.msggo.services.MessageService;
 import top.yztz.msggo.services.SMSSender;
-import top.yztz.msggo.services.SendingMonitor;
 
+import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.TextParser;
 import top.yztz.msggo.util.ToastUtil;
 import top.yztz.msggo.adapters.CheckboxAdapter;
@@ -75,13 +71,6 @@ public class ChooserActivity extends AppCompatActivity {
     private TextView tvFileName, tvSimInfo, tvSelectionCount, tvEstimatedCost;
     private LinearLayout layoutHeader;
     private CheckboxAdapter checkboxAdapter;
-    
-    // Sending Progress UI
-    private BottomSheetDialog progressDialog;
-    private TextView tvProgressTitle, tvSentCount, tvConfirmedCount, tvLogs;
-    private LinearProgressIndicator progressSent, progressConfirmed;
-    private ScrollView scrollLogs;
-    private Button btnCancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,9 +169,7 @@ public class ChooserActivity extends AppCompatActivity {
         setupInfoCard();
         setupTableHeader();
         updateSelectionSummary();
-        
-        // Observe Sending Status
-        observeSending();
+
     }
 
     private void updateSelectionSummary() {
@@ -256,11 +243,6 @@ public class ChooserActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Restore dialog if sending
-        SendingMonitor.SendingState state = SendingMonitor.getInstance().getState().getValue();
-        if (state == SendingMonitor.SendingState.SENDING) {
-            showProgressDialog();
-        }
     }
 
 
@@ -318,8 +300,15 @@ public class ChooserActivity extends AppCompatActivity {
                 ToastUtil.show(this, R.string.sending_completed);
                 return;
             }
-            MessageService.startSending(this, validMessages, DataModel.getSubId(), SettingManager.getDelay(), SettingManager.isRandomizeDelay());
-            showProgressDialog();
+
+            String serPath = FileUtil.saveMessageArrayToFile(this, messages.toArray(new Message[0]));
+            if (TextUtils.isEmpty(serPath)) {
+                ToastUtil.show(this, R.string.unknown_error);
+                return;
+            }
+            Intent intent = new Intent(this, SendingActivity.class);
+            intent.putExtra("to_send", serPath);
+            startActivity(intent);
             return;
         }
 
@@ -369,7 +358,7 @@ public class ChooserActivity extends AppCompatActivity {
         editText.setSelection(editText.getText().length());
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.edit_sensitive_message_title))
+                .setTitle(getString(R.string.edit_message))
                 .setView(dialogView)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.save), (dialog, which) -> {
@@ -385,126 +374,7 @@ public class ChooserActivity extends AppCompatActivity {
                 .show();
     }
 
-    
-    private void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new BottomSheetDialog(this);
-            progressDialog.setContentView(R.layout.dialog_sending_progress);
-            progressDialog.setCancelable(false);
-            progressDialog.setCanceledOnTouchOutside(false);
-            
-            tvProgressTitle = progressDialog.findViewById(R.id.tv_progress_title);
-            tvSentCount = progressDialog.findViewById(R.id.tv_sent_count);
-            tvConfirmedCount = progressDialog.findViewById(R.id.tv_confirmed_count);
-            tvLogs = progressDialog.findViewById(R.id.tv_logs);
-            progressSent = progressDialog.findViewById(R.id.progress_sent);
-            progressConfirmed = progressDialog.findViewById(R.id.progress_confirmed);
-            scrollLogs = progressDialog.findViewById(R.id.scroll_logs);
-            btnCancel = progressDialog.findViewById(R.id.btn_cancel);
-            
-            if (btnCancel != null) {
-                btnCancel.setOnClickListener(v -> {
-                    SendingMonitor.SendingState state = SendingMonitor.getInstance().getState().getValue();
-                    if (state == SendingMonitor.SendingState.SENDING) {
-                        MessageService.stopSending(ChooserActivity.this);
-                    } else {
-                        progressDialog.dismiss();
-                    }
-                });
-            }
-        }
-        if (!progressDialog.isShowing()) {
-            progressDialog.show();
-        }
-        
-        // Refresh UI state
-        refreshDialogUI();
-    }
-    
-    private void refreshDialogUI() {
-        Integer total = SendingMonitor.getInstance().getTotal().getValue();
-        updateSentProgressUI(SendingMonitor.getInstance().getSentProgress().getValue(), total);
-        updateConfirmedProgressUI(SendingMonitor.getInstance().getConfirmedProgress().getValue(), total);
-    }
-    
-    private void updateSentProgressUI(Integer sent, Integer total) {
-        if (sent == null) sent = 0;
-        if (total == null) total = 0;
-        
-        if (progressSent != null) {
-            progressSent.setMax(total);
-            progressSent.setProgress(sent);
-        }
-        if (tvSentCount != null) {
-            tvSentCount.setText(String.format(Locale.getDefault(), "%d/%d", sent, total));
-        }
-    }
-    
-    private void updateConfirmedProgressUI(Integer confirmed, Integer total) {
-        if (confirmed == null) confirmed = 0;
-        if (total == null) total = 0;
-        
-        if (progressConfirmed != null) {
-            progressConfirmed.setMax(total);
-            progressConfirmed.setProgress(confirmed);
-        }
-        if (tvConfirmedCount != null) {
-            tvConfirmedCount.setText(String.format(Locale.getDefault(), "%d/%d", confirmed, total));
-        }
-    }
-    
-    private void observeSending() {
-        SendingMonitor.getInstance().getSentProgress().observe(this, sent -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                updateSentProgressUI(sent, SendingMonitor.getInstance().getTotal().getValue());
-            }
-        });
-        
-        SendingMonitor.getInstance().getConfirmedProgress().observe(this, confirmed -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                updateConfirmedProgressUI(confirmed, SendingMonitor.getInstance().getTotal().getValue());
-            }
-        });
-        
-        SendingMonitor.getInstance().getTotal().observe(this, total -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                updateSentProgressUI(SendingMonitor.getInstance().getSentProgress().getValue(), total);
-                updateConfirmedProgressUI(SendingMonitor.getInstance().getConfirmedProgress().getValue(), total);
-            }
-        });
-        
-        SendingMonitor.getInstance().getLogs().observe(this, logs -> {
-            if (progressDialog != null && progressDialog.isShowing() && tvLogs != null) {
-                tvLogs.setText(logs);
-                if (scrollLogs != null) scrollLogs.fullScroll(View.FOCUS_DOWN);
-            }
-        });
-        
-        SendingMonitor.getInstance().getState().observe(this, state -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                switch (state) {
-                    case COMPLETED:
-                        tvProgressTitle.setText(getString(R.string.sending_completed));
-                        progressDialog.setCancelable(true);
-                        progressDialog.setCanceledOnTouchOutside(true);
-                        btnCancel.setText(getString(R.string.done));
-                        break;
-                    case CANCELLED:
-                        tvProgressTitle.setText(getString(R.string.cancelled));
-                        progressDialog.setCancelable(true);
-                        progressDialog.setCanceledOnTouchOutside(true);
-                        btnCancel.setText(getString(R.string.close));
-                        break;
-                    case SENDING:
-                        tvProgressTitle.setText(getString(R.string.sending));
-                        progressDialog.setCancelable(false);
-                        progressDialog.setCanceledOnTouchOutside(false);
-                        btnCancel.setText(getString(R.string.cancel_send));
-                        break;
-                }
-            }
-        });
-    }
+
 
     @Override
     protected void onDestroy() {
