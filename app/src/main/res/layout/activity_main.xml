@@ -21,8 +21,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
     android:fitsSystemWindows="true">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -32,21 +30,30 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
+            android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:minHeight="?attr/actionBarSize"
-                android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorSurface"
                 app:expandedTitleMarginBottom="23dp"
                 app:expandedTitleMarginStart="24dp"
                 app:expandedTitleTextAppearance="@style/TextAppearance.Msggo.DisplayLarge"
                 app:collapsedTitleTextAppearance="@style/TextAppearance.Msggo.DisplaySmall"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+                <ImageView
+                    android:id="@+id/iv_header_image"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="0dp"
+                    android:contentDescription="@string/app_name"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.7" />
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"

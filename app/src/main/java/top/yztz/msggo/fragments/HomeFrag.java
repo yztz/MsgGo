@@ -54,7 +54,6 @@ import top.yztz.msggo.activities.EditActivity;
 import top.yztz.msggo.activities.MarkdownActivity;
 import top.yztz.msggo.activities.MainActivity;
 import top.yztz.msggo.data.DataModel;
-import top.yztz.msggo.services.LoadService;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.FileUtil;
@@ -74,6 +73,12 @@ public class HomeFrag extends Fragment {
     private List<SubscriptionInfo> subs;
 //    private int simSubId;
 
+    public interface DataLoader {
+        void loadData(String path);
+    }
+
+    private DataLoader dataLoader = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +97,12 @@ public class HomeFrag extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+        if (context instanceof DataLoader) {
+            dataLoader = (DataLoader) context;
+        } else {
+            throw new RuntimeException(context + " MUST Implement DataLoader");
+        }
+
     }
 
     @Override
@@ -364,7 +375,7 @@ public class HomeFrag extends Fragment {
 
             holder.itemView.setOnClickListener(v -> {
                 Log.i(TAG, "从历史记录加载：" + item.path);
-                LoadService.load(context, item.path);
+                dataLoader.loadData(item.path);
             });
         }
 
