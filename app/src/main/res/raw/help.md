@@ -14,7 +14,8 @@
 
 Notes:
 1. (Untested) Compatible with all Excel formats.
-2. ***Do not set the sending delay too short, or you may encounter carrier blocking issues.***
+2. Excel rows number limit: 200, size limit: 50MB
+3. ***Do not set the sending delay too short, or you may encounter carrier blocking issues.***
 
 ## Magic Variables
 
