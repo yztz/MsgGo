@@ -44,7 +44,7 @@ jobs:
           DATE=$(date +'%Y%m%d')
           find app/build/outputs/apk/release -name "MsgGo-*-signed.apk" | while read -r apk; do
             NAME=$(basename "$apk" | sed 's/-signed//')
-            NEW_NAME="${NAME%.apk}-nightly-$DATE.apk"
+            NEW_NAME="${NAME%.apk}-nightly.apk"
             mv "$apk" "nightly_artifacts/$NEW_NAME"
           done
 
