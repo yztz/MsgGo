@@ -13,6 +13,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify version matches tag
+        run: |
+          # Extract versionName from build.gradle
+          VERSION_NAME=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*versionName "\(.*\)"/\1/')
+          # Get tag name (remove refs/tags/ prefix and 'v' if present)
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          TAG_VERSION="${TAG_NAME#v}"
+          
+          echo "Version from build.gradle: $VERSION_NAME"
+          echo "Version from tag: $TAG_VERSION"
+          
+          if [ "$VERSION_NAME" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch! build.gradle has '$VERSION_NAME' but tag is '$TAG_VERSION'"
+            exit 1
+          fi
+          echo "✅ Version check passed!"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -52,6 +69,6 @@ jobs:
         with:
           files: release_artifacts/*.apk
           generate_release_notes: true
-          prerelease: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
