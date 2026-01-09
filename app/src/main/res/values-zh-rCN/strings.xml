@@ -31,7 +31,7 @@
     <string name="language_prefix">当前: %1$s</string>
     <string name="not_selected">未选择</string>
     <string name="unknown">未知</string>
-    <string name="unknown_error">未知错误（%1$s）</string>
+    <string name="unknown_error">未知错误(%1$s)</string>
 
     <!-- Main Navigation -->
     <string name="nav_home">主页</string>
@@ -110,7 +110,7 @@
     <string name="close">关闭</string>
     <string name="service_start_failed">服务启动失败</string>
     <string name="all_messages_confirmed">所有消息已发送完成并确认</string>
-    <string name="error_no_header">未找到首行标题（内容为空）</string>
+    <string name="error_no_header">未找到首行标题(内容为空)</string>
     <string name="error_non_continuous_columns">数据内容列非连续</string>
     <string name="error_empty_content">内容为空</string>
     <string name="error_empty_title_column">标题内容列存在空位</string>
@@ -150,9 +150,9 @@
     <string name="title_settings">設 定</string>
 
     <!--  Tips  -->
-    <string name="sensitive_word_detected_msg">第 %1$d 条消息包含敏感词：\n\n%2$s</string>
+    <string name="sensitive_word_detected_msg">第 %1$d 条消息包含敏感词：\n\n%2$s\n\n(误判了？请至源代码新开Issue)</string>
     <string name="file_too_large">文件大小超过 %1$s 限制</string>
-    <string name="file_too_much_row">文件行数超过限制（%1$d 行）</string>
+    <string name="file_too_much_row">文件行数超过限制(%1$d 行)</string>
     <string name="deduplication_result">移除 %1$d 条重复收信人</string>
     <string name="edit_hint">写点什么吧~</string>
     <string name="save_success">保存成功</string>

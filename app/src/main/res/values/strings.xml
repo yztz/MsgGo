@@ -162,7 +162,7 @@
     <string name="deduplication_result">Removed %1$d duplicated recipients</string>
 
     <string name="sensitive_word_detected_title">Sensitive Word Detected</string>
-    <string name="sensitive_word_detected_msg">Message #%1$d contains sensitive words:\n\n%2$s</string>
+    <string name="sensitive_word_detected_msg">Message #%1$d contains sensitive words:\n\n%2$s\n\n(Incorrect detection? Open a new issue.)</string>
     <string name="skip_message">Skip</string>
     <string name="edit_message">Edit Message</string>
     <string name="cancel_send">Cancel Send</string>

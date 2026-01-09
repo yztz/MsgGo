@@ -352,6 +352,25 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "Paused!");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "Stopped!");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "Restart!");
+        adapter.setMessages(messages);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
