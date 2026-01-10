@@ -148,7 +148,7 @@
     <string name="xiaomi_permission_msg">Xiaomi system has restricted phone information access. Please go to settings to manually enable \"Phone\" permission and ensure no \"Blank Pass\" is active for SMS and Phone.</string>
     <string name="go_to_settings">Go to Settings</string>
     <string name="exit_app">Exit App</string>
-    <string name="currency_sms_rate">$ %1$s</string>
+    <string name="currency_sms_rate">$ %1$.2f</string>
     <string name="save_success">saved</string>
     <string name="title_home">Send</string>
     <string name="title_settings">Settings</string>

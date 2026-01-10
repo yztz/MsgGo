@@ -33,7 +33,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "SMSBroadcastReceiver";
     private final Callback callback;
-    private Map<Integer, SmsStatus> smsStatusMap = new HashMap<>();
+    private final Map<Integer, SmsStatus> smsStatusMap = new HashMap<>();
 
     // 短信状态追踪类
     private static class SmsStatus {

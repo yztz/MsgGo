@@ -32,7 +32,7 @@ import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.R;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
-    private Context context;
+    private final Context context;
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
@@ -84,7 +84,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
     }
 
     static class ListHolder extends RecyclerView.ViewHolder {
-        private RecyclerView mRv;
+        private final RecyclerView mRv;
 
         ListHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,9 +94,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
 }
 
 class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
-    private Context context;
-    private HashMap<String, String> map;
-    private String[] titles;
+    private final Context context;
+    private final HashMap<String, String> map;
+    private final String[] titles;
 
     DataAdapter(Context context, HashMap<String, String> map) {
         this.context = context;
@@ -123,7 +123,7 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
     }
 
     static class DataHolder extends RecyclerView.ViewHolder {
-        private TextView mTvData;
+        private final TextView mTvData;
 
         DataHolder(@NonNull View itemView) {
             super(itemView);

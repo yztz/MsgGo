@@ -177,7 +177,7 @@
     <!--  MISC  -->
     <string name="cancel_send">取消发送</string>
     <string name="edit_message">编辑消息</string>
-    <string name="currency_sms_rate">￥%1$s</string>
+    <string name="currency_sms_rate">￥%1$.2f</string>
     <string name="currency_unit">￥</string>
 
 

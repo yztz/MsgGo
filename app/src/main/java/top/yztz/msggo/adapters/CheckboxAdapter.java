@@ -31,8 +31,8 @@ import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataModel;
 
 public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.CheckboxHolder> {
-    private Context context;
-    private SparseBooleanArray checkedMap;
+    private final Context context;
+    private final SparseBooleanArray checkedMap;
     // Callback to notify activity about selection changes if needed
     private OnSelectionChangedListener selectionListener;
 

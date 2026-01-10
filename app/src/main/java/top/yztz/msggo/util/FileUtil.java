@@ -122,7 +122,7 @@ public class FileUtil {
         }
     }
 
-    private static int copyStream(InputStream input, OutputStream output) throws Exception, IOException {
+    private static int copyStream(InputStream input, OutputStream output) throws Exception {
         final int BUFFER_SIZE = 1024 * 2;
         byte[] buffer = new byte[BUFFER_SIZE];
         BufferedInputStream in = new BufferedInputStream(input, BUFFER_SIZE);

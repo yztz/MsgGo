@@ -147,7 +147,7 @@ public class SettingFrag extends Fragment {
 
             EditText editText = dialogView.findViewById(R.id.edit_text);
             editText.setInputType(EditorInfo.TYPE_NUMBER_FLAG_DECIMAL | EditorInfo.TYPE_CLASS_NUMBER);
-            editText.setText(String.format(Locale.getDefault(), "%f", SettingManager.getSmsRate()));
+            editText.setText(String.format(Locale.getDefault(), "%.2f", SettingManager.getSmsRate()));
             editText.setSelection(editText.getText().length());
 
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
