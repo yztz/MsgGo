@@ -58,9 +58,9 @@
 
                 <ImageView
                     android:id="@+id/iv_app_icon"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:src="@mipmap/ic_launcher" />
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@mipmap/ic_launcher_v2_round" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -88,13 +88,13 @@
 <!--                    android:textAppearance="?attr/textAppearanceBodySmall"-->
 <!--                    android:textColor="?attr/colorOutline" />-->
 
-                 <TextView
-                    android:id="@+id/tv_arch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOutline" />
+<!--                 <TextView-->
+<!--                    android:id="@+id/tv_arch"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="2dp"-->
+<!--                    android:textAppearance="?attr/textAppearanceBodySmall"-->
+<!--                    android:textColor="?attr/colorOutline" />-->
 
             </LinearLayout>
 
@@ -201,6 +201,32 @@
 
                     </LinearLayout>
 
+                    <!-- License -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="56dp"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/license"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GPL-3.0-or-later"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOutline" />
+
+                    </LinearLayout>
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

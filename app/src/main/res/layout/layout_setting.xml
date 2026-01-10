@@ -359,8 +359,8 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_translate"
                         app:tint="?attr/colorOnSurfaceVariant" />
@@ -396,8 +396,8 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_update"
                         app:tint="?attr/colorOnSurfaceVariant" />
@@ -441,8 +441,8 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_bug"
                         app:tint="?attr/colorOnSurfaceVariant" />
@@ -485,8 +485,8 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_info"
                         app:tint="?attr/colorOnSurfaceVariant" />

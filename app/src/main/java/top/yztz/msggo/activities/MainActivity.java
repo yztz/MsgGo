@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.IntentCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -272,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
     }
 
     private void showLawDialog(String title, int res_id, Runnable onAgree) {
-        androidx.core.widget.NestedScrollView scrollView = new androidx.core.widget.NestedScrollView(this);
+        NestedScrollView scrollView = new NestedScrollView(this);
         TextView textView = new TextView(this);
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         textView.setPadding(padding, padding / 2, padding, padding);
@@ -285,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
                 .build();
 
         String content = FileUtil.loadFromRaw(this, res_id);
-        content = content.replaceFirst("(?m)^#\\s.*(?:\\r?\\n)?", "");
+//        content = content.replaceFirst("(?m)^#\\s.*(?:\\r?\\n)?", "");
         markwon.setMarkdown(textView, content);
 
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)

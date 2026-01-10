@@ -72,6 +72,7 @@
     <string name="source_code">Source Code</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="license">License</string>
     <string name="made_by">Made with ❤️ by Yztz</string>
     <string name="visit_source_code">Visit Source Code</string>
     <string name="going_to_url">Proceeding to %s</string>

@@ -1,10 +1,15 @@
 # MsgGo
 
-<img src="./fastlane/metadata/android/zh-CN/images/icon.png" width="30%">
+<img src="./app/src/main/ic_launcher_v2-playstore.png" width="30%">
 
 安卓平台上的一款轻量的短信群发App。
 
+![](https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=ffffff)
+![](https://img.shields.io/github/v/release/yztz/MsgGo.svg)
+![](https://img.shields.io/github/license/yztz/MsgGo)
 ![](https://img.shields.io/github/downloads/yztz/MsgGo/total?color=green)
+
+
 
 [中文](./README.md) | [English](./README_EN.md)
 

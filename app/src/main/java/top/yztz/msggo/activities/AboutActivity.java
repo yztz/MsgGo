@@ -50,8 +50,8 @@ public class AboutActivity extends AppCompatActivity {
         tvVersion.setText(getString(R.string.version_format, BuildConfig.VERSION_NAME));
 
         // Show Arch
-        TextView tvArch = findViewById(R.id.tv_arch);
-        tvArch.setText(android.os.Build.SUPPORTED_ABIS[0]);
+//        TextView tvArch = findViewById(R.id.tv_arch);
+//        tvArch.setText(android.os.Build.SUPPORTED_ABIS[0]);
 
         // Easter egg: tap app icon 5 times
         ImageView ivAppIcon = findViewById(R.id.iv_app_icon);
