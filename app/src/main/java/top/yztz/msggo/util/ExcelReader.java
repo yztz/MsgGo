@@ -106,12 +106,17 @@ public class ExcelReader {
 
     public ArrayList<HashMap<String, String>> readExcelContent() {
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
-        HashMap<String, String> content = null;
         Row currentRow;
         // 正文内容应该从第二行开始,第一行为表头的标题
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             currentRow = sheet.getRow(i);
-            content = new HashMap<>();
+            
+            // 跳过空行
+            if (currentRow == null || isRowEmpty(currentRow)) {
+                continue;
+            }
+            
+            HashMap<String, String> content = new HashMap<>();
             for (int j = 0; j < titleColumns.size(); j++) {
                 content.put(titles[j],
                         getCellFormatValue(currentRow.getCell(titleColumns.get(j))).trim());
@@ -119,6 +124,21 @@ public class ExcelReader {
             list.add(content);
         }
         return list;
+    }
+
+    /**
+     * 检查行是否为空（所有单元格都为空）
+     */
+    private boolean isRowEmpty(Row row) {
+        if (row == null) return true;
+        for (int colIdx : titleColumns) {
+            Cell cell = row.getCell(colIdx);
+            String value = getCellFormatValue(cell);
+            if (!TextUtils.isEmpty(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String[] getTitles() {
