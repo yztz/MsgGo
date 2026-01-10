@@ -222,7 +222,7 @@ public class SettingFrag extends Fragment {
 
         // Check Update
         mRowCheckUpdate.setOnClickListener(v -> {
-            String releaseUrl = "https://github.com/yztz/MsgGo/releases";
+            String releaseUrl = "https://github.com/yztz/MsgGo/releases/latest";
             new MaterialAlertDialogBuilder(context)
                     .setTitle(getString(R.string.check_update))
                     .setMessage(getString(R.string.going_to_url, releaseUrl))
