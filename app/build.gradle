@@ -7,8 +7,8 @@ android {
         applicationId "top.yztz.msggo"
         minSdkVersion 26
         targetSdkVersion 35
-        versionCode 26000306
-        versionName "3.6"
+        versionCode 26000307
+        versionName "3.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 //        buildConfigField "long", "BUILD_TIME", "${System.currentTimeMillis()}L"
 //        multiDexEnabled true
