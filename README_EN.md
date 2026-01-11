@@ -28,20 +28,6 @@ Happy New Year! Entering our fifth year! The New Year Special Edition is now liv
 
 It has been nearly 4 years since this project was launched. This update brings a brand-new look and feel (**Material 3**) and significantly improved interactions. Everyone is welcome to download and try it out!
 
-## Screenshots
-
-<div style="display: flex; flex-direction: row; justify-content: space-between;">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="18%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="18%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="18%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="18%">
-<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="18%">
-</div>
-
-## Important Notes
-
-Please be aware that carriers usually impose sending limits. For example, some carriers limit users to 200 messages/hour and 1,000 messages/day. Exceeding these limits may result in restricted sending/receiving capabilities.
-
 ## Features
 
 * [New] History logs
@@ -59,12 +45,40 @@ Please be aware that carriers usually impose sending limits. For example, some c
 * No fixed template required; specify the phone number column within the app
 * *One-click data sharing/import from third-party apps*
 
+## Screenshots
+
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="18%">
+<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="18%">
+</div>
+
+## Download
+
+
+<a href="https://github.com/yztz/MsgGo/releases/latest">
+    <img src="https://raw.githubusercontent.com/rubenpgrady/get-it-on-github/refs/heads/main/get-it-on-github.png" alt="Get it on GitHub" height="80" />
+</a>
+<a href="https://f-droid.org/packages/top.yztz.msggo">
+    <img src="https://f-droid.org/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">
+</a>
+
+
 ## Basic Usage
 1. Import data
-2. Edit SMS content
-3. Select variable names
-4. Choose the recipient phone number column
-5. Send
+2. Select the recipient phone number column
+3. Edit SMS content
+4. Select SIM card
+5. Start sending
+
+> [!NOTE]  
+> 1. Compatible with .xls/.xlsx formats
+> 2. Do not set the sending delay too short, or you may encounter carrier blocking issues.
+> 3. Please be aware that carriers usually impose sending limits. For example, some carriers limit users to 200 messages/hour and 1,000 messages/day. Exceeding these limits may result in restricted sending/receiving capabilities.
 
 ## Excel Format Requirements
 | Column Name | Column Name | Column Name | ... |
@@ -73,12 +87,6 @@ Please be aware that carriers usually impose sending limits. For example, some c
 | Data        | Data        | Data        | ... |
 | ...         |             |             |     |
 
-Notes:
-1. (Untested) Compatible with all Excel formats.
-2. ***Do not set the sending delay too short, or you may encounter carrier blocking issues.***
-
-## Download
-[release](https://github.com/yztz/MsgGo/releases/latest)
 
 ## Magic Variables
 

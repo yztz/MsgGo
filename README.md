@@ -10,7 +10,6 @@
 ![](https://img.shields.io/github/downloads/yztz/MsgGo/total?color=green)
 
 
-
 [中文](./README.md) | [English](./README_EN.md)
 
 
@@ -30,19 +29,6 @@
 
 距该项目发布已经将近 4 年了，本次更新带来了全新的外观材质（Material 3），更加优秀的交互，欢迎大家下载体验！
 
-## 截图
-<div style="display: flex; flex-direction: row; justify-content: space-between;">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="18%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="18%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="18%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="18%">
-<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/5.png" width="18%">
-</div>
-
-## 注意事项
-
-已知运营商一般存在发送限制，例如移动为200条/小时，1000条/天，超出后可能会被限制收发。
-
 ## Features
 
 * [新] 历史记录功能
@@ -60,12 +46,39 @@
 * 无需固定格式，App内指定号码列
 * *第三方应用数据一键分享导入*
 
+## 截图
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/1.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/2.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/3.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/4.png" width="18%">
+<img src="./fastlane/metadata/android/zh-CN/images/phoneScreenshots/5.png" width="18%">
+</div>
+
+## 下载
+
+
+<a href="https://github.com/yztz/MsgGo/releases/latest">
+    <img src="https://raw.githubusercontent.com/rubenpgrady/get-it-on-github/refs/heads/main/get-it-on-github.png" alt="Get it on GitHub" height="80" />
+</a>
+<a href="https://f-droid.org/packages/top.yztz.msggo">
+    <img src="https://f-droid.org/badge/get-it-on-zh-cn.png"
+    alt="Get it on F-Droid"
+    height="80">
+</a>
+
+
 ## 基本使用
 1. 导入数据
-2. 编辑短信内容
-3. 选择号码变量
-4. 选择收件人号码列
-5. 发送
+2. 选择收件人号码列
+3. 编辑短信内容
+4. 选择 SIM 卡
+5. 开始发送
+
+> [!NOTE]  
+> 1. 兼容.xls/.xlsx格式
+> 2. 发送延迟不要过短，否则可能存在拦截问题。
+> 3. 已知运营商一般存在发送限制，例如移动为200条/小时，1000条/天，超出后可能会被限制收发。
 
 ## Excel格式要求
 | 列名  | 列名 | 列名 | ... |
@@ -74,12 +87,6 @@
 | 数据  | 数据 | 数据 | ... |
 | ... |    |    |     |
 
-注：
-1. （未测试）兼容所有excel格式
-2. ***发送延迟不要过短，否则可能存在拦截问题***
-
-## 下载
-[release](https://github.com/yztz/MsgGo/releases/latest)  
 
 ## 魔法变量
 
