@@ -25,8 +25,7 @@ import android.util.Log;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -48,10 +47,11 @@ import top.yztz.msggo.exception.DataLoadFailed;
 
 public class ExcelReader {
     private static final String TAG = "excelReader";
+    private static final DataFormatter dataFormatter = new DataFormatter();
+    
     private Workbook wb;
     private Sheet sheet;
     private int colNum = 0;
-//    public static int rowNum = 0;
     private String[] titles = null;
     private List<Integer> titleColumns = null;
 
@@ -152,36 +152,9 @@ public class ExcelReader {
      * @return 数据的字符串形式
      */
     private static String getCellFormatValue(Cell cell) {
-        //判断是否为null或空串
-        if (cell == null || cell.toString().trim().isEmpty()) {
+        if (cell == null) {
             return "";
         }
-        String cellValue = "";
-        CellType cellType = cell.getCellType();
-//        if (cellType == Cell.CELL_TYPE_FORMULA) { //表达式类型
-//            cellType = evaluator.evaluate(cell).getCellType();
-//        }
-
-        switch (cellType) {
-            case STRING: //字符串类型
-                cellValue = cell.getStringCellValue().trim();
-                cellValue = TextUtils.isEmpty(cellValue) ? "" : cellValue;
-                break;
-            case BOOLEAN:  //布尔类型
-                cellValue = String.valueOf(cell.getBooleanCellValue());
-                break;
-            case NUMERIC: //数值类型
-                if (DateUtil.isCellDateFormatted(cell)) {  //判断日期类型
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-                    cellValue = sdf.format(cell.getDateCellValue());
-                } else {  //否
-                    cellValue = new DecimalFormat("#").format(cell.getNumericCellValue());
-                }
-                break;
-            default: //其它类型，取空串吧
-                cellValue = "";
-                break;
-        }
-        return cellValue;
+        return dataFormatter.formatCellValue(cell).trim();
     }
 }
