@@ -70,6 +70,7 @@
     <!-- About Activity -->
     <string name="version_format">Version %s</string>
     <string name="source_code">Source Code</string>
+    <string name="feedback">Feedback</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="license">License</string>

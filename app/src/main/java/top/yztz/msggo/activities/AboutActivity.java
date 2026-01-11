@@ -85,6 +85,21 @@ public class AboutActivity extends AppCompatActivity {
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show());
 
+        findViewById(R.id.row_feedback).setOnClickListener(v ->
+                new MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.feedback))
+                .setMessage(getString(R.string.going_to_url, "https://github.com/yztz/MsgGo/issues"))
+                .setPositiveButton(getString(R.string.visit), (dialog, which) -> {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/yztz/MsgGo/issues"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        ToastUtil.show(this, getString(R.string.cannot_open_link, e.getMessage()));
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show());
+
         findViewById(R.id.row_privacy_policy).setOnClickListener(v ->
                 MarkdownActivity.open(this, getString(R.string.privacy_policy), R.raw.privacy));
 

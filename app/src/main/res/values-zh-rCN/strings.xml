@@ -69,6 +69,7 @@
 
     <string name="version_format">Version %s</string>
     <string name="source_code">源代码</string>
+    <string name="feedback">问题反馈</string>
     <string name="disclaimer">免责声明</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="license">许可证</string>
