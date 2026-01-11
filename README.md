@@ -57,7 +57,7 @@
 
 ## 下载
 
-
+<div style="font-size: 0;">
 <a href="https://github.com/yztz/MsgGo/releases/latest">
     <img src="https://raw.githubusercontent.com/rubenpgrady/get-it-on-github/refs/heads/main/get-it-on-github.png" alt="Get it on GitHub" height="80" />
 </a><a href="https://f-droid.org/packages/top.yztz.msggo">
@@ -65,6 +65,7 @@
     alt="Get it on F-Droid"
     height="80">
 </a>
+</div>
 
 
 ## 基本使用
