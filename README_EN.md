@@ -36,7 +36,7 @@ It has been nearly 4 years since this project was launched. This update brings a
 * [New] HyperOS support
 * [New] Multi-language support
 * Dual-SIM selection support
-* No internet permission required
+* **No internet permission required**
 * Material Design 3
 * Import based on Excel data format
 * Automatic retrieval of SMS variable names
@@ -69,6 +69,7 @@ It has been nearly 4 years since this project was launched. This update brings a
 
 
 ## Basic Usage
+
 1. Import data
 2. Select the recipient phone number column
 3. Edit SMS content
@@ -81,6 +82,7 @@ It has been nearly 4 years since this project was launched. This update brings a
 > 3. Please be aware that carriers usually impose sending limits. For example, some carriers limit users to 200 messages/hour and 1,000 messages/day. Exceeding these limits may result in restricted sending/receiving capabilities.
 
 ## Excel Format Requirements
+
 | Column Name | Column Name | Column Name | ... |
 |-------------|-------------|-------------|-----|
 | Data        | Data        | Data        | ... |

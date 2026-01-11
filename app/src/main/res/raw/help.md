@@ -1,11 +1,15 @@
 ## Basic Usage
+
 1. Import data
-2. Edit SMS content
-3. Select variable names
-4. Choose the recipient phone number column
-5. Send
+2. Select the recipient phone number column
+3. Edit SMS content
+4. Select SIM card
+5. Start sending
+
+Tip: MsgGo allows you to import data by sharing or sending Excel files from other apps!
 
 ## Excel Format Requirements
+
 | Column Name | Column Name | Column Name | ... |
 |-------------|-------------|-------------|-----|
 | Data        | Data        | Data        | ... |
@@ -13,9 +17,10 @@
 | ...         |             |             |     |
 
 Notes:
-1. (Untested) Compatible with all Excel formats.
+1. Compatible with .xls/.xlsx formats
 2. Excel rows number limit: 200, size limit: 50MB
-3. ***Do not set the sending delay too short, or you may encounter carrier blocking issues.***
+3. Do not set the sending delay too short, or you may encounter carrier blocking issues.
+4. Please be aware that carriers usually impose sending limits. For example, some carriers limit users to 200 messages/hour and 1,000 messages/day. Exceeding these limits may result in restricted sending/receiving capabilities.
 
 ## Magic Variables
 
