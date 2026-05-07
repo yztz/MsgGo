@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue *)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(bash gradlew *)",
+      "Bash(bash /Users/yztz/Workspace/MsgGo/gradlew assembleDebug)",
+      "Bash(python3 *)"
+    ]
+  }
+}

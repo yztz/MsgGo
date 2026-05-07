@@ -31,8 +31,7 @@ public class TextParser {
         while (m.find()) {
             String key = m.group(1);
             String value = data.get(key);
-            //如果不存在映射关系，则替换为"null"
-            m.appendReplacement(sb, value == null ? "null" : value);
+            m.appendReplacement(sb, Matcher.quoteReplacement(value == null ? "${" + key + "}" : value));
         }
         m.appendTail(sb);
         return sb.toString();
