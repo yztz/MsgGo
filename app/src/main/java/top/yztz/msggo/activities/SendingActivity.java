@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 import top.yztz.msggo.R;
+import top.yztz.msggo.adapters.SendingListAdapter;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.Message;
 import top.yztz.msggo.data.MessageState;

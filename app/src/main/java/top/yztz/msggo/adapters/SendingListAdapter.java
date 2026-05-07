@@ -14,7 +14,7 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package top.yztz.msggo.activities;
+package top.yztz.msggo.adapters;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -100,14 +100,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
 
         private AnimatorSet currentAnimator = null;
 
-        // 缓存颜色值，避免重复获取
-        private final int colorDefault;
-        private final int colorOnDefault;
-        private final int colorSuccess;
-        private final int colorOnSuccess;
-        private final int colorError;
-        private final int colorOnError;
-
+        private final java.util.EnumMap<MessageState, StateStyle> styleMap = new java.util.EnumMap<>(MessageState.class);
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -118,59 +111,23 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
             ivStatusIcon = itemView.findViewById(R.id.iv_status_icon);
             progressIndicator = itemView.findViewById(R.id.progress_indicator);
 
-            // 初始化时获取一次颜色值
-            colorDefault = MaterialColors.getColor(itemView, R.attr.colorSurface);
-            colorError = MaterialColors.getColor(itemView, R.attr.colorErrorContainer);
-            colorSuccess = MaterialColors.getColor(itemView, R.attr.colorPrimaryContainer);
-            colorOnDefault = MaterialColors.getColor(itemView, com.google.android.material.R.attr.colorOnSurface);
-            colorOnError = MaterialColors.getColor(itemView, R.attr.colorOnErrorContainer);
-            colorOnSuccess = MaterialColors.getColor(itemView, R.attr.colorOnPrimaryContainer);
+            int bg       = MaterialColors.getColor(itemView, R.attr.colorSurface);
+            int onBg     = MaterialColors.getColor(itemView, com.google.android.material.R.attr.colorOnSurface);
+            int bgOk     = MaterialColors.getColor(itemView, R.attr.colorPrimaryContainer);
+            int onBgOk   = MaterialColors.getColor(itemView, R.attr.colorOnPrimaryContainer);
+            int bgErr    = MaterialColors.getColor(itemView, R.attr.colorErrorContainer);
+            int onBgErr  = MaterialColors.getColor(itemView, R.attr.colorOnErrorContainer);
+
+            styleMap.put(MessageState.PENDING,   new StateStyle(bg,    onBg,    R.drawable.ic_hourglass, R.string.pending,   1f,   false));
+            styleMap.put(MessageState.WAITING,   new StateStyle(bg,    onBg,    R.drawable.ic_hourglass, R.string.waiting,   1f,   true));
+            styleMap.put(MessageState.SUBMITTED, new StateStyle(bg,    onBg,    R.drawable.ic_hourglass, R.string.submitted, 1f,   true));
+            styleMap.put(MessageState.PAUSED,    new StateStyle(bg,    onBg,    R.drawable.ic_pause,     R.string.paused,    0.6f, false));
+            styleMap.put(MessageState.SENT,      new StateStyle(bgOk,  onBgOk,  R.drawable.ic_success,   R.string.sent,      1f,   false));
+            styleMap.put(MessageState.FAILED,    new StateStyle(bgErr, onBgErr, R.drawable.ic_error,     R.string.failed,    1f,   false));
         }
 
         private StateStyle getStyleForState(MessageState state) {
-            StateStyle style = new StateStyle();
-
-            // 默认样式
-            style.bgColor = colorDefault;
-            style.textColor = colorOnDefault;
-            style.iconColor = colorOnDefault;
-            style.iconRes = R.drawable.ic_hourglass;
-            style.alpha = 1f;
-            style.showProgress = false;
-
-            switch (state) {
-                case PENDING:
-                    style.textRes = R.string.pending;
-                    break;
-                case WAITING:
-                    style.textRes = R.string.waiting;
-                    style.showProgress = true;
-                    break;
-                case SUBMITTED:
-                    style.textRes = R.string.submitted;
-                    style.showProgress = true;
-                    break;
-                case PAUSED:
-                    style.textRes = R.string.paused;
-                    style.iconRes = R.drawable.ic_pause;
-                    style.alpha = 0.6f;
-                    break;
-                case SENT:
-                    style.textRes = R.string.sent;
-                    style.bgColor = colorSuccess;
-                    style.textColor = colorOnSuccess;
-                    style.iconColor = colorOnSuccess;
-                    style.iconRes = R.drawable.ic_success;
-                    break;
-                case FAILED:
-                    style.textRes = R.string.failed;
-                    style.bgColor = colorError;
-                    style.textColor = colorOnError;
-                    style.iconColor = colorOnError;
-                    style.iconRes = R.drawable.ic_error;
-                    break;
-            }
-            return style;
+            return styleMap.get(state);
         }
 
         /**
@@ -198,9 +155,9 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
 
         private void applyStyleImmediately(StateStyle style) {
             cardView.setCardBackgroundColor(style.bgColor);
-            tvStatus.setTextColor(style.textColor);
+            tvStatus.setTextColor(style.fgColor);
             ivStatusIcon.setImageResource(style.iconRes);
-            ivStatusIcon.setColorFilter(style.iconColor);
+            ivStatusIcon.setColorFilter(style.fgColor);
             cardView.setAlpha(style.alpha);
             ivStatusIcon.setAlpha(1f);
         }
@@ -224,7 +181,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
                     "textColor",
                     new ArgbEvaluator(),
                     tvStatus.getCurrentTextColor(),
-                    style.textColor
+                    style.fgColor
             );
             animators.add(textAnim);
 
@@ -251,7 +208,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
                 public void onAnimationStart(android.animation.Animator animation) {
                     // 在淡入开始时切换图标
                     ivStatusIcon.setImageResource(style.iconRes);
-                    ivStatusIcon.setColorFilter(style.iconColor);
+                    ivStatusIcon.setColorFilter(style.fgColor);
                 }
 
                 @Override
@@ -296,9 +253,18 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
         }
 
         static class StateStyle {
-            int bgColor, textColor, iconColor, iconRes, textRes;
-            float alpha;
-            boolean showProgress;
+            final int bgColor, fgColor, iconRes, textRes;
+            final float alpha;
+            final boolean showProgress;
+
+            StateStyle(int bgColor, int fgColor, int iconRes, int textRes, float alpha, boolean showProgress) {
+                this.bgColor = bgColor;
+                this.fgColor = fgColor;
+                this.iconRes = iconRes;
+                this.textRes = textRes;
+                this.alpha = alpha;
+                this.showProgress = showProgress;
+            }
         }
     }
 }
