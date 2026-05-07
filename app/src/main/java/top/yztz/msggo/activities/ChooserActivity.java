@@ -93,7 +93,7 @@ public class ChooserActivity extends AppCompatActivity {
 
         final RecyclerView.LayoutManager manager = new LinearLayoutManager(this);
         mRv.setLayoutManager(manager);
-        final ListAdapter adapter = new ListAdapter(this);
+        final ListAdapter adapter = new ListAdapter(this, DataModel.getData(), DataModel.getTitles());
         mRv.setAdapter(adapter);
         adapter.setOnItemClickListener(position -> {
             String template = DataModel.getTemplate();
@@ -112,7 +112,7 @@ public class ChooserActivity extends AppCompatActivity {
 
         final RecyclerView.LayoutManager checkboxManager = new LinearLayoutManager(this);
         rvCheckbox.setLayoutManager(checkboxManager);
-        checkboxAdapter = new CheckboxAdapter(this);
+        checkboxAdapter = new CheckboxAdapter(this, DataModel.getRowCount());
         rvCheckbox.setAdapter(checkboxAdapter);
 
         checkboxAdapter.setOnSelectionChangedListener((position, isChecked) -> updateSelectionSummary());

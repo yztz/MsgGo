@@ -27,24 +27,30 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Collections;
 import java.util.HashMap;
-import top.yztz.msggo.data.DataModel;
+import java.util.List;
+
 import top.yztz.msggo.R;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
     private final Context context;
+    private List<HashMap<String, String>> data;
+    private String[] titles;
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+    public ListAdapter(Context context, List<HashMap<String, String>> data, String[] titles) {
+        this.context = context;
+        this.data = data != null ? data : Collections.emptyList();
+        this.titles = titles != null ? titles : new String[0];
     }
 
-    public ListAdapter(Context context) {
-        this.context = context;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -55,32 +61,25 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ListHolder holder, final int position) {
-        // Disable nested scrolling to let parent handle horizontal scroll
         holder.mRv.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
             }
         });
-        
-        HashMap<String, String> temp = DataModel.getRow(holder.getBindingAdapterPosition());
-        DataAdapter adapter = new DataAdapter(context, temp);
-        holder.mRv.setAdapter(adapter);
 
-        // Make the inner RecyclerView pass touch events to the itemView
+        HashMap<String, String> row = data.get(holder.getBindingAdapterPosition());
+        holder.mRv.setAdapter(new DataAdapter(context, row, titles));
         holder.mRv.setOnTouchListener((v, event) -> holder.itemView.onTouchEvent(event));
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(holder.getAbsoluteAdapterPosition());
-            }
+            if (listener != null) listener.onItemClick(holder.getAbsoluteAdapterPosition());
         });
     }
 
-
     @Override
     public int getItemCount() {
-        return DataModel.loaded() ? DataModel.getRowCount() : 0;
+        return data.size();
     }
 
     static class ListHolder extends RecyclerView.ViewHolder {
@@ -98,10 +97,10 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataHolder> {
     private final HashMap<String, String> map;
     private final String[] titles;
 
-    DataAdapter(Context context, HashMap<String, String> map) {
+    DataAdapter(Context context, HashMap<String, String> map, String[] titles) {
         this.context = context;
         this.map = map;
-        this.titles = DataModel.getTitles();
+        this.titles = titles;
     }
 
     @NonNull

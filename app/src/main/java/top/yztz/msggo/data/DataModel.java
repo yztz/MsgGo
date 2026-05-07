@@ -73,6 +73,10 @@ public class DataModel implements Serializable {
         HistoryManager.addHistory(context, path, template, subId, numberColumn, signature);
     }
 
+    public static List<HashMap<String, String>> getData() {
+        return data;
+    }
+
     public static int getRowCount() {
         return data.size();
     }

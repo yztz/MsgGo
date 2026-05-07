@@ -19,13 +19,11 @@ package top.yztz.msggo.data;
 
 import java.io.Serializable;
 
-import top.yztz.msggo.activities.SendingActivity;
-
 public class Message implements Serializable {
     private String phone;
     private String content;
 
-    private SendingActivity.MessageState state = SendingActivity.MessageState.PENDING;
+    private MessageState state = MessageState.PENDING;
 
     public Message(String phone, String content) {
         this.phone = phone;
@@ -53,11 +51,11 @@ public class Message implements Serializable {
         return "Message{phone='" + phone + "', content='" + content + "'}";
     }
 
-    public SendingActivity.MessageState getState() {
+    public MessageState getState() {
         return state;
     }
 
-    public void setState(SendingActivity.MessageState state) {
+    public void setState(MessageState state) {
         this.state = state;
     }
 }

@@ -28,26 +28,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import top.yztz.msggo.R;
-import top.yztz.msggo.data.DataModel;
 
 public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.CheckboxHolder> {
     private final Context context;
     private final SparseBooleanArray checkedMap;
-    // Callback to notify activity about selection changes if needed
+    private int itemCount;
     private OnSelectionChangedListener selectionListener;
 
     public interface OnSelectionChangedListener {
         void onSelectionChanged(int position, boolean isChecked);
     }
 
-    public CheckboxAdapter(Context context) {
+    public CheckboxAdapter(Context context, int itemCount) {
         this.context = context;
+        this.itemCount = itemCount;
         checkedMap = new SparseBooleanArray();
-
-        if (DataModel.loaded()) {
-            for (int i = 0; i < getItemCount(); i++) {
-                checkedMap.put(i, false);
-            }
+        for (int i = 0; i < itemCount; i++) {
+            checkedMap.put(i, false);
         }
     }
 
@@ -71,18 +68,16 @@ public class CheckboxAdapter extends RecyclerView.Adapter<CheckboxAdapter.Checkb
                 selectionListener.onSelectionChanged(holder.getAbsoluteAdapterPosition(), isChecked);
             }
         });
-
-        // Allow clicking the item view to toggle checkbox
         holder.itemView.setOnClickListener(v -> holder.mCb.toggle());
     }
 
     @Override
     public int getItemCount() {
-        return DataModel.loaded() ? DataModel.getRowCount() : 0;
+        return itemCount;
     }
 
     public void setAllCheckBoxChosen(boolean flag) {
-        for (int i = 0; i < checkedMap.size(); i++) {
+        for (int i = 0; i < itemCount; i++) {
             checkedMap.put(i, flag);
         }
         notifyDataSetChanged();

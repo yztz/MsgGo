@@ -17,9 +17,11 @@
 
 package top.yztz.msggo.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.net.Uri;
 import android.telephony.SubscriptionInfo;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -52,12 +56,12 @@ import top.yztz.msggo.R;
 import top.yztz.msggo.activities.ChooserActivity;
 import top.yztz.msggo.activities.EditActivity;
 import top.yztz.msggo.activities.MarkdownActivity;
-import top.yztz.msggo.activities.MainActivity;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.HistoryManager;
 import top.yztz.msggo.services.SMSSender;
 import top.yztz.msggo.util.FileUtil;
 import top.yztz.msggo.util.ToastUtil;
+import android.util.Log;
 
 public class HomeFrag extends Fragment {
     private static final String TAG = "HomeFrag";
@@ -78,12 +82,26 @@ public class HomeFrag extends Fragment {
     }
 
     private DataLoader dataLoader = null;
+    private ActivityResultLauncher<Intent> filePickerLauncher;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
         setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+
+        filePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Uri uri = result.getData().getData();
+                        if (uri != null) {
+                            Log.i(TAG, "Importing file from picker: " + uri);
+                            String path = FileUtil.getFilePathFromContentUri(requireContext(), uri);
+                            dataLoader.loadData(path);
+                        }
+                    }
+                });
     }
 
     @Nullable
@@ -169,11 +187,7 @@ public class HomeFrag extends Fragment {
         rowSelectSim.setOnClickListener(v -> showSimSelector());
 
         // File import
-        rowCurrentFile.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).openFileChooser();
-            }
-        });
+        rowCurrentFile.setOnClickListener(v -> openFileChooser());
 
         // Number column selection
         rowNumberColumn.setOnClickListener(v -> showNumberColumnSelector());
@@ -323,6 +337,13 @@ public class HomeFrag extends Fragment {
         }
 
         loadHistory();
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        filePickerLauncher.launch(intent);
     }
 
     private void loadHistory() {

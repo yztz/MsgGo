@@ -45,6 +45,7 @@ import java.util.Locale;
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.Message;
+import top.yztz.msggo.data.MessageState;
 import top.yztz.msggo.data.SettingManager;
 import top.yztz.msggo.services.MessageService;
 import top.yztz.msggo.util.FileUtil;
@@ -78,10 +79,6 @@ public class SendingActivity extends AppCompatActivity implements MessageService
 
     public enum SendingState {
         IDLE, SENDING, PAUSED, COMPLETED, CANCELLED
-    }
-
-    public enum MessageState {
-        PENDING, WAITING, SUBMITTED, SENT, FAILED, PAUSED
     }
 
     private SendingState currentState = SendingState.IDLE;

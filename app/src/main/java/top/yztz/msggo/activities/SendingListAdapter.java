@@ -39,6 +39,7 @@ import java.util.List;
 
 import top.yztz.msggo.R;
 import top.yztz.msggo.data.Message;
+import top.yztz.msggo.data.MessageState;
 
 public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.ViewHolder> {
 
@@ -72,7 +73,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
         if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads);
         } else {
-            SendingActivity.MessageState newState = (SendingActivity.MessageState) payloads.get(0);
+            MessageState newState = (MessageState) payloads.get(0);
             holder.transitionToState(newState, true); // true = 使用动画
         }
     }
@@ -126,7 +127,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
             colorOnSuccess = MaterialColors.getColor(itemView, R.attr.colorOnPrimaryContainer);
         }
 
-        private StateStyle getStyleForState(SendingActivity.MessageState state) {
+        private StateStyle getStyleForState(MessageState state) {
             StateStyle style = new StateStyle();
 
             // 默认样式
@@ -177,7 +178,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
          * @param newState 新状态
          * @param animate 是否使用动画
          */
-        public void transitionToState(SendingActivity.MessageState newState, boolean animate) {
+        public void transitionToState(MessageState newState, boolean animate) {
             cancelAnimation();
 
             StateStyle style = getStyleForState(newState);

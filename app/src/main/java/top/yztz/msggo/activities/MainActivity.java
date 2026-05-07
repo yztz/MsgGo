@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
     private ImageView ivHeaderImage;
     private List<String> permissionsToRequest;
 
-    private ActivityResultLauncher<Intent> excelPickerLauncher;
-
     /**
      * 初始化fragment
      */
@@ -229,21 +227,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
         AppCompatDelegate.setDefaultNightMode(SettingManager.getDarkMode());
 
         LocaleUtils.applyLocale();
-        excelPickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Intent data = result.getData();
-                        Uri uri = data.getData();
-                        if (uri != null) {
-                            Log.d(TAG, "File URI: " + uri.getEncodedPath());
-                            String path = getFilePathFromContentUri(this, uri);
-                            Log.i(TAG, "Importing file from picker: " + path);
-                            loadData(path);
-                        }
-                    }
-                }
-        );
         setContentView(R.layout.activity_main);
 
         // Check Privacy Policy and Disclaimer
@@ -358,19 +341,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
         checkShare();
     }
 
-
-    /**
-     * 打开文件选择器
-     */
-    public void openFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        // Use */* so files appear regardless of how the device's MIME database
-        // maps extensions — unsupported formats are caught by SpreadsheetReader.
-        intent.setType("*/*");
-        excelPickerLauncher.launch(intent);
-    }
 
     public void loadData(String path) {
         Log.d(TAG, "Start loading path: " + path);
