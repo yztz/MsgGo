@@ -65,6 +65,7 @@
                 <data android:mimeType="application/vnd.ms-excel"/>
                 <data android:mimeType="application/x-excel"/>
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+                <data android:mimeType="application/vnd.oasis.opendocument.spreadsheet"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -72,6 +73,7 @@
                 <data android:mimeType="application/vnd.ms-excel"/>
                 <data android:mimeType="application/x-excel"/>
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+                <data android:mimeType="application/vnd.oasis.opendocument.spreadsheet"/>
             </intent-filter>
         </activity>
         <service android:name=".services.MessageService"

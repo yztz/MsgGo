@@ -366,16 +366,9 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
+        // Use */* so files appear regardless of how the device's MIME database
+        // maps extensions — unsupported formats are caught by SpreadsheetReader.
         intent.setType("*/*");
-
-        String[] mimeTypes = {
-                "application/vnd.ms-excel",
-                "application/x-excel",
-                "application/wps-office.xls",
-                "application/wps-office.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        };
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         excelPickerLauncher.launch(intent);
     }
 

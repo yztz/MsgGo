@@ -38,7 +38,7 @@ It has been nearly 4 years since this project was launched. This update brings a
 * Dual-SIM selection support
 * **No internet permission required**
 * Material Design 3
-* Import based on Excel data format
+* Import from Excel (.xls/.xlsx) and ODS (.ods) spreadsheets
 * Automatic retrieval of SMS variable names
 * Built-in SMS editor with support for [**Magic Variables**](#magic-variables)
 * Real-time feedback on message sending status
@@ -71,7 +71,7 @@ It has been nearly 4 years since this project was launched. This update brings a
 5. Start sending
 
 > [!NOTE]  
-> 1. Compatible with .xls/.xlsx formats
+> 1. Compatible with .xls / .xlsx / .ods formats
 > 2. Do not set the sending delay too short, or you may encounter carrier blocking issues.
 > 3. Please be aware that carriers usually impose sending limits. For example, some carriers limit users to 200 messages/hour and 1,000 messages/day. Exceeding these limits may result in restricted sending/receiving capabilities.
 

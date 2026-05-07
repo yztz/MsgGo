@@ -39,7 +39,7 @@
 
     <!-- Home Fragment -->
     <string name="import_excel">Import Table</string>
-    <string name="click_to_import">Tap to import Excel file</string>
+    <string name="click_to_import">Tap to import Excel / ODS file</string>
     <string name="select_number_column">Select Number Column</string>
     <string name="edit_sms">Edit SMS</string>
     <string name="no_template">Template not set</string>
@@ -131,6 +131,7 @@
     <string name="close">Close</string>
     <string name="service_start_failed">service start failed</string>
     <string name="all_messages_confirmed">All messages sent and confirmed</string>
+    <string name="error_unsupported_format">Unsupported file format</string>
     <string name="error_no_header">Header row not found (empty content)</string>
     <string name="error_non_continuous_columns">Data columns are not continuous</string>
     <string name="error_empty_content">Content is empty</string>

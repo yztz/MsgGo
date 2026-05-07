@@ -39,7 +39,7 @@
 
     <!-- Home Fragment -->
     <string name="import_excel">导入表格</string>
-    <string name="click_to_import">点击导入 Excel 文件</string>
+    <string name="click_to_import">点击导入 Excel / ODS 文件</string>
     <string name="select_number_column">选择号码列</string>
     <string name="edit_sms">编辑短信</string>
     <string name="no_template">未设置模板</string>
@@ -125,6 +125,7 @@
     <string name="close">关闭</string>
     <string name="service_start_failed">服务启动失败</string>
     <string name="all_messages_confirmed">所有消息已发送完成并确认</string>
+    <string name="error_unsupported_format">不支持的文件格式</string>
     <string name="error_no_header">未找到首行标题(内容为空)</string>
     <string name="error_non_continuous_columns">数据内容列非连续</string>
     <string name="error_empty_content">内容为空</string>

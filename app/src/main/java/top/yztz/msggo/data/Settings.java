@@ -23,7 +23,7 @@ public class Settings {
     // Send delay (ms)
     public static final int SEND_DELAY_DEFAULT = 3000;
     public static final int SEND_DELAY_MIN = 1000;
-    public static final int SEND_DELAY_MAX = 8000;
+    public static final int SEND_DELAY_MAX = 20000;
     public static final int SEND_DELAY_STEP_UNIT = 500;
     public static final boolean SEND_DELAY_RANDOMIZATION_DEFAULT = true;
     // SMS rate

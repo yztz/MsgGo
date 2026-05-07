@@ -29,7 +29,7 @@ import java.util.Set;
 
 import top.yztz.msggo.exception.DataLoadFailed;
 import top.yztz.msggo.services.SMSSender;
-import top.yztz.msggo.util.ExcelReader;
+import top.yztz.msggo.util.SpreadsheetReader;
 import top.yztz.msggo.util.HashUtils;
 
 public class DataModel implements Serializable {
@@ -54,9 +54,9 @@ public class DataModel implements Serializable {
      * @param path    excel file to load
      */
     public static synchronized void load(String path) throws DataLoadFailed {
-        ExcelReader reader = new ExcelReader();
+        SpreadsheetReader reader = new SpreadsheetReader();
         reader.read(path);
-        DataModel.data = reader.readExcelContent();
+        DataModel.data = reader.readContent();
         DataModel.titles = reader.getTitles();
         DataModel.path = path;
         DataModel.signature = HashUtils.toMd5(path + "+" + String.join("-", reader.getTitles()));
